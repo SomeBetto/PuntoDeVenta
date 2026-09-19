@@ -94,10 +94,26 @@ const PosModule = {
       });
     });
 
-    // Modal de Cobro - Monto recibido (input)
+    // Modal de Cobro - Monto recibido (input) y atajos
     const paidInput = document.getElementById('checkout-paid-input');
     if (paidInput) {
       paidInput.addEventListener('input', () => this.calculateChange());
+      paidInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          this.processCheckout();
+        }
+      });
+    }
+
+    const custSelect = document.getElementById('checkout-customer-select');
+    if (custSelect) {
+      custSelect.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          this.processCheckout();
+        }
+      });
     }
 
     // Botones rápidos de billetes ($50, $100, $200, $500, Exacto)
@@ -156,6 +172,64 @@ const PosModule = {
 
     // Atajos de teclado universales para alta velocidad en mostrador
     window.addEventListener('keydown', (e) => {
+      const checkoutModal = document.getElementById('checkout-modal');
+      const isCheckoutOpen = checkoutModal && checkoutModal.classList.contains('active');
+
+      // ATAJOS CUANDO EL MODAL DE COBRO ESTÁ ACTIVO
+      if (isCheckoutOpen) {
+        // F2: Seleccionar Efectivo
+        if (e.key === 'F2') {
+          e.preventDefault();
+          this.setPaymentMethod('EFECTIVO');
+          const pInput = document.getElementById('checkout-paid-input');
+          if (pInput) {
+            pInput.focus();
+            pInput.select();
+          }
+          return;
+        }
+
+        // F3: Seleccionar Tarjeta
+        if (e.key === 'F3') {
+          e.preventDefault();
+          this.setPaymentMethod('TARJETA');
+          return;
+        }
+
+        // F4: Seleccionar Transferencia
+        if (e.key === 'F4') {
+          e.preventDefault();
+          this.setPaymentMethod('TRANSFERENCIA');
+          return;
+        }
+
+        // F5: Seleccionar Fiado (Prevenir recarga de navegador)
+        if (e.key === 'F5') {
+          e.preventDefault();
+          this.setPaymentMethod('FIADO');
+          const cSelect = document.getElementById('checkout-customer-select');
+          if (cSelect) cSelect.focus();
+          return;
+        }
+
+        // Enter: Completar / Cobrar la venta
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          this.processCheckout();
+          return;
+        }
+
+        // Escape: Cerrar modal de cobro
+        if (e.key === 'Escape') {
+          e.preventDefault();
+          App.closeModal('checkout-modal');
+          return;
+        }
+
+        return; // Detener propagación de otros atajos si el modal está visible
+      }
+
+      // ATAJOS NORMALES DEL MOSTRADOR (VENTA PRINCIPAL)
       // F1: Foco inmediato al buscador de productos
       if (e.key === 'F1') {
         e.preventDefault();
@@ -1108,8 +1182,8 @@ const PosModule = {
     document.querySelectorAll('.payment-method-card').forEach(c => {
       const isActive = c.getAttribute('data-method') === method;
       c.classList.toggle('active', isActive);
-      c.style.borderColor = isActive ? 'var(--primary-blue)' : 'var(--border-color)';
-      c.style.background = isActive ? 'var(--primary-blue-light)' : '#ffffff';
+      c.style.borderColor = isActive ? 'var(--primary-blue)' : '';
+      c.style.background = isActive ? 'var(--primary-blue-light)' : '';
     });
 
     const cashBox = document.getElementById('cash-payment-fields');
@@ -1149,28 +1223,33 @@ const PosModule = {
   },
 
   async processCheckout() {
-    const total = this.getCartTotal();
-    let amountPaid = total;
-    let customerId = this.tickets[this.activeTab].customerId || null;
-
-    if (this.selectedPaymentMethod === 'EFECTIVO') {
-      const paidInput = document.getElementById('checkout-paid-input');
-      amountPaid = parseFloat(paidInput.value) || 0;
-      if (amountPaid < total) {
-        App.showToast('El monto pagado no cubre el total de la venta', 'error');
-        return;
-      }
-    } else if (this.selectedPaymentMethod === 'FIADO') {
-      const custSelect = document.getElementById('checkout-customer-select');
-      customerId = parseInt(custSelect.value) || customerId;
-      if (!customerId) {
-        App.showToast('Seleccione un cliente para anotar el fiado', 'error');
-        return;
-      }
-      amountPaid = 0;
-    }
+    if (this._isProcessingCheckout) return;
+    this._isProcessingCheckout = true;
+    const confirmBtn = document.getElementById('confirm-checkout-btn');
+    if (confirmBtn) confirmBtn.disabled = true;
 
     try {
+      const total = this.getCartTotal();
+      let amountPaid = total;
+      let customerId = this.tickets[this.activeTab].customerId || null;
+
+      if (this.selectedPaymentMethod === 'EFECTIVO') {
+        const paidInput = document.getElementById('checkout-paid-input');
+        amountPaid = parseFloat(paidInput.value) || 0;
+        if (amountPaid < total) {
+          App.showToast('El monto pagado no cubre el total de la venta', 'error');
+          return;
+        }
+      } else if (this.selectedPaymentMethod === 'FIADO') {
+        const custSelect = document.getElementById('checkout-customer-select');
+        customerId = parseInt(custSelect.value) || customerId;
+        if (!customerId) {
+          App.showToast('Seleccione un cliente para anotar el fiado', 'error');
+          return;
+        }
+        amountPaid = 0;
+      }
+
       const response = await fetch('/api/pos/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1206,6 +1285,9 @@ const PosModule = {
 
     } catch (err) {
       App.showToast(err.message, 'error');
+    } finally {
+      this._isProcessingCheckout = false;
+      if (confirmBtn) confirmBtn.disabled = false;
     }
   },
 

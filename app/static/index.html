@@ -9,8 +9,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  
-  <link rel="stylesheet" href="/static/css/style.css">
+  <!-- CSS Estilos -->
+  <link rel="stylesheet" href="/static/css/style.css?v=2.8">
 </head>
 <body>
 
@@ -1648,23 +1648,27 @@
           <div style="font-size: 2.5rem; font-weight: 900; font-family: var(--font-mono); color: var(--primary-blue);" id="checkout-total-val">$0.00</div>
         </div>
 
-        <!-- Métodos de pago -->
+        <!-- Métodos de pago con atajos F2, F3, F4, F5 -->
         <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem;">
-          <button class="meta-btn payment-method-card active" data-method="EFECTIVO" style="flex-direction: column; padding: 0.6rem 0.2rem; border-color: var(--primary-blue);">
+          <button type="button" class="meta-btn payment-method-card active" data-method="EFECTIVO" id="btn-pm-efectivo">
+            <span class="pos-kbd-badge">F2</span>
             <span style="font-size: 1.3rem;">💵</span>
-            <span style="font-size: 0.75rem;">Efectivo</span>
+            <span style="font-size: 0.75rem; font-weight: 700;">Efectivo</span>
           </button>
-          <button class="meta-btn payment-method-card" data-method="TARJETA" style="flex-direction: column; padding: 0.6rem 0.2rem;">
+          <button type="button" class="meta-btn payment-method-card" data-method="TARJETA" id="btn-pm-tarjeta">
+            <span class="pos-kbd-badge">F3</span>
             <span style="font-size: 1.3rem;">💳</span>
-            <span style="font-size: 0.75rem;">Tarjeta</span>
+            <span style="font-size: 0.75rem; font-weight: 700;">Tarjeta</span>
           </button>
-          <button class="meta-btn payment-method-card" data-method="TRANSFERENCIA" style="flex-direction: column; padding: 0.6rem 0.2rem;">
+          <button type="button" class="meta-btn payment-method-card" data-method="TRANSFERENCIA" id="btn-pm-transferencia">
+            <span class="pos-kbd-badge">F4</span>
             <span style="font-size: 1.3rem;">📲</span>
-            <span style="font-size: 0.75rem;">Transf.</span>
+            <span style="font-size: 0.75rem; font-weight: 700;">Transf.</span>
           </button>
-          <button class="meta-btn payment-method-card" data-method="FIADO" style="flex-direction: column; padding: 0.6rem 0.2rem;">
+          <button type="button" class="meta-btn payment-method-card" data-method="FIADO" id="btn-pm-fiado">
+            <span class="pos-kbd-badge">F5</span>
             <span style="font-size: 1.3rem;">📝</span>
-            <span style="font-size: 0.75rem;">Fiado</span>
+            <span style="font-size: 0.75rem; font-weight: 700;">Fiado</span>
           </button>
         </div>
 
@@ -1693,8 +1697,9 @@
           <select id="checkout-customer-select" class="sub-search-input" style="background:#fff;"></select>
         </div>
 
-        <button class="btn-modal-accept" id="confirm-checkout-btn">
-          COMPLETAR VENTA
+        <button type="button" class="btn-modal-accept" id="confirm-checkout-btn" style="display: flex; align-items: center; justify-content: center; gap: 0.6rem; width: 100%; font-size: 1.05rem; font-weight: 800; cursor: pointer;">
+          <span>COMPLETAR VENTA</span>
+          <span class="pos-enter-badge">Enter ↵</span>
         </button>
       </div>
     </div>
@@ -2722,19 +2727,19 @@
   <div class="toast-container" id="toast-container"></div>
 
   <!-- Scripts -->
-  <script src="/static/js/qr-generator.js?v=2.7"></script>
-  <script src="/static/js/barcode.js?v=2.7"></script>
-  <script src="/static/js/pos.js?v=2.7"></script>
-  <script src="/static/js/inventory.js?v=2.7"></script>
-  <script src="/static/js/customers.js?v=2.7"></script>
-  <script src="/static/js/cash.js?v=2.7"></script>
-  <script src="/static/js/users.js?v=2.7"></script>
-  <script src="/static/js/suppliers.js?v=2.7"></script>
-  <script src="/static/js/purchases.js?v=2.7"></script>
-  <script src="/static/js/reports.js?v=2.7"></script>
-  <script src="/static/js/eleventa.js?v=2.7"></script>
-  <script src="/static/js/settings.js?v=2.7"></script>
-  <script src="/static/js/backup.js?v=2.7"></script>
-  <script src="/static/js/app.js?v=2.7"></script>
+  <script src="/static/js/qr-generator.js?v=2.8"></script>
+  <script src="/static/js/barcode.js?v=2.8"></script>
+  <script src="/static/js/pos.js?v=2.8"></script>
+  <script src="/static/js/inventory.js?v=2.8"></script>
+  <script src="/static/js/customers.js?v=2.8"></script>
+  <script src="/static/js/cash.js?v=2.8"></script>
+  <script src="/static/js/users.js?v=2.8"></script>
+  <script src="/static/js/suppliers.js?v=2.8"></script>
+  <script src="/static/js/purchases.js?v=2.8"></script>
+  <script src="/static/js/reports.js?v=2.8"></script>
+  <script src="/static/js/eleventa.js?v=2.8"></script>
+  <script src="/static/js/settings.js?v=2.8"></script>
+  <script src="/static/js/backup.js?v=2.8"></script>
+  <script src="/static/js/app.js?v=2.8"></script>
 </body>
 </html>

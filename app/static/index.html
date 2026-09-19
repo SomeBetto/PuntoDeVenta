@@ -1,0 +1,2740 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Punto de Venta - Tienda de Abarrotes</title>
+  
+  <!-- Tipografía moderna Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+  <!-- ==================== 1. BARRA SUPERIOR AZUL REY (TOP APP BAR) ==================== -->
+  <header class="top-app-bar">
+    <div class="bar-left">
+      <button class="menu-toggle-btn" id="btn-open-drawer" title="Abrir menú">
+        ☰
+      </button>
+      <div class="store-avatar" title="Abarrotes La Esquina">
+        🏪
+      </div>
+      <span class="bar-title" id="current-view-title">Venta</span>
+    </div>
+
+    <div class="bar-right">
+      <button class="bar-connect-mobile-btn" id="btn-connect-mobile" title="Abrir en celular o tablet">
+        📱 Conectar Móvil
+      </button>
+      <button class="bar-action-icon" onclick="InventoryModule.openProductModal()" title="Nuevo Producto">
+        ➕
+      </button>
+      <button class="bar-action-icon" id="btn-top-settings" title="Configuración y Respaldos">
+        ⚙️
+      </button>
+      <button class="bar-action-icon" id="btn-top-logout" style="color: #ef4444;" title="Cerrar Sesión y Respaldar">
+        🚪
+      </button>
+    </div>
+  </header>
+
+  <!-- ==================== 2. MENÚ LATERAL DESLIZABLE (DRAWER ESTILO CLOUD POS) ==================== -->
+  <div class="drawer-backdrop" id="drawer-backdrop">
+    <aside class="drawer-menu cloud-pos-drawer">
+      
+      <!-- Cabecera de Tienda / Sucursal y Caja -->
+      <div class="drawer-header-cloud">
+        <div class="drawer-header-top">
+          <div class="store-brand-badge">
+            <div class="cloud-logo-icon">☁️</div>
+            <div class="store-brand-text">
+              <span class="brand-title">Happy POS</span>
+              <span class="brand-sub">Punto de Venta</span>
+            </div>
+          </div>
+          <button class="menu-toggle-btn" id="btn-close-drawer" style="font-size: 1.1rem; color: #64748b;">✕</button>
+        </div>
+
+        <!-- Selector de Caja y Almacén -->
+        <div class="branch-selector-card">
+          <div class="branch-row">
+            <span class="branch-icon">🏪</span>
+            <div class="branch-details">
+              <div class="caja-select-wrap">
+                <strong>Caja 1</strong>
+                <span class="dropdown-arrow">▾</span>
+              </div>
+              <span class="storage-text">Almacén 1</span>
+            </div>
+          </div>
+          <div class="sucursal-pill">
+            <span>Sucursal 1 • Principal</span>
+            <span class="exchange-icon" title="Cambiar sucursal">⇄</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navegación por Secciones -->
+      <nav class="drawer-nav cloud-drawer-nav">
+        <button class="drawer-nav-item" data-view="pos">
+          <div class="nav-item-left">
+            <span class="nav-icon">🏠</span>
+            <span>Inicio</span>
+          </div>
+          <span class="theme-toggle-indicator" title="Modo Claro / Oscuro">☀️</span>
+        </button>
+
+        <button class="drawer-nav-item active" data-view="pos">
+          <div class="nav-item-left">
+            <span class="nav-icon">🛒</span>
+            <span>Ventas</span>
+          </div>
+        </button>
+
+        <button class="drawer-nav-item" data-view="pos" onclick="App.showToast('Módulo de Cotizaciones disponible próximamente', 'info')">
+          <div class="nav-item-left">
+            <span class="nav-icon">📋</span>
+            <span>Cotizaciones</span>
+          </div>
+        </button>
+
+        <!-- SECCIÓN: OPERACIONES -->
+        <div class="drawer-nav-section-title">
+          <span>OPERACIONES</span>
+          <span class="section-arrow">▾</span>
+        </div>
+        <button class="drawer-nav-item sub-item" data-view="products">
+          <div class="nav-item-left">
+            <span class="nav-icon">📦</span>
+            <span>Productos</span>
+          </div>
+        </button>
+        <button class="drawer-nav-item sub-item" data-view="purchases">
+          <div class="nav-item-left">
+            <span class="nav-icon">🛍️</span>
+            <span>Compras</span>
+          </div>
+        </button>
+        <button class="drawer-nav-item sub-item" data-view="customers">
+          <div class="nav-item-left">
+            <span class="nav-icon">👥</span>
+            <span>Clientes & Fiados</span>
+          </div>
+        </button>
+        <button class="drawer-nav-item sub-item" data-view="suppliers">
+          <div class="nav-item-left">
+            <span class="nav-icon">🚚</span>
+            <span>Proveedores</span>
+          </div>
+        </button>
+
+        <!-- SECCIÓN: CONSULTAS -->
+        <div class="drawer-nav-section-title">
+          <span>CONSULTAS</span>
+          <span class="section-arrow">▾</span>
+        </div>
+        <button class="drawer-nav-item sub-item" data-view="cash">
+          <div class="nav-item-left">
+            <span class="nav-icon">💵</span>
+            <span>Control de Caja</span>
+          </div>
+        </button>
+        <button class="drawer-nav-item sub-item" data-view="inventory-adjust">
+          <div class="nav-item-left">
+            <span class="nav-icon">⚖️</span>
+            <span>Ajuste de Inventario</span>
+          </div>
+        </button>
+        <button class="drawer-nav-item sub-item" data-view="multiservices">
+          <div class="nav-item-left">
+            <span class="nav-icon">📱</span>
+            <span>Pago de Servicios</span>
+          </div>
+        </button>
+
+        <!-- SECCIÓN: SISTEMA -->
+        <div class="drawer-nav-section-title">
+          <span>SISTEMA</span>
+          <span class="section-arrow">▾</span>
+        </div>
+        <button class="drawer-nav-item sub-item" data-view="users">
+          <div class="nav-item-left">
+            <span class="nav-icon">👤</span>
+            <span>Usuarios</span>
+          </div>
+        </button>
+        <button class="drawer-nav-item sub-item" data-view="reports">
+          <div class="nav-item-left">
+            <span class="nav-icon">📊</span>
+            <span>Reportes Eleventa</span>
+          </div>
+        </button>
+        <button class="drawer-nav-item sub-item" data-view="settings" id="btn-open-settings-modal">
+          <div class="nav-item-left">
+            <span class="nav-icon">⚙️</span>
+            <span>Configuraciones</span>
+          </div>
+        </button>
+        <button class="drawer-nav-item sub-item" id="btn-open-eleventa-modal">
+          <div class="nav-item-left">
+            <span class="nav-icon">📥</span>
+            <span>Importar Eleventa</span>
+          </div>
+        </button>
+        <button class="drawer-nav-item sub-item" onclick="App.openConnectModal()">
+          <div class="nav-item-left">
+            <span class="nav-icon">📱</span>
+            <span>Conectar Móvil / Tablet</span>
+          </div>
+        </button>
+
+        <button class="drawer-nav-item" onclick="App.showToast('Tutoriales y guías interactivas disponibles', 'info')">
+          <div class="nav-item-left">
+            <span class="nav-icon">▶️</span>
+            <span>Tutoriales</span>
+          </div>
+        </button>
+
+        <button class="drawer-nav-item logout-item" id="btn-drawer-logout">
+          <div class="nav-item-left">
+            <span class="nav-icon" style="color: #ef4444;">🚪</span>
+            <span style="color: #ef4444; font-weight: 700;">Cerrar sesión</span>
+          </div>
+        </button>
+      </nav>
+
+      <!-- Botón Flotante de WhatsApp y Perfil de Usuario -->
+      <div class="drawer-footer-cloud">
+        <a href="https://wa.me/" target="_blank" class="floating-whatsapp-btn" title="Contactar soporte por WhatsApp">
+          <span>💬</span>
+        </a>
+        <div class="drawer-user-card">
+          <div class="drawer-user-avatar">👑</div>
+          <div class="drawer-user-meta">
+            <strong id="drawer-user-name">Admin</strong>
+            <span id="drawer-user-sub">Administrador</span>
+          </div>
+        </div>
+      </div>
+
+    </aside>
+  </div>
+
+  <!-- ==================== 3. CONTENEDOR PRINCIPAL DE VISTAS ==================== -->
+  <div class="app-container">
+
+    <!-- ====================================================================
+         VISTA 1: VENTA / MOSTRADOR (ESTILO CLOUD POS / HAPPY DAY)
+         ==================================================================== -->
+    <section id="view-pos" class="view-panel active">
+      <div class="cloud-pos-layout">
+
+        <!-- COLUMNA CENTRAL: Catálogo Visual de Productos -->
+        <main class="cloud-pos-catalog">
+
+          <!-- Barra Superior del Catálogo: Categorías Horizontales y Herramientas -->
+          <div class="catalog-header-bar">
+            
+            <!-- Barra de Píldoras de Categorías con Scroll Horizontal -->
+            <div class="category-pills-scroll" id="pos-category-pills">
+              <button class="cat-pill active" data-cat="all">Todas</button>
+              <button class="cat-pill" data-cat="abarrote">Abarrotes</button>
+              <button class="cat-pill" data-cat="Lacteos">Lácteos & Cremería</button>
+              <button class="cat-pill" data-cat="frutas y verduras">Frutas & Verduras</button>
+              <button class="cat-pill" data-cat="coca caloricos">Refrescos & Bebidas</button>
+              <button class="cat-pill" data-cat="sabritas calorico">Sabritas & Botanas</button>
+              <button class="cat-pill" data-cat="Caloricos">Dulces & Galletas</button>
+              <button class="cat-pill" data-cat="articulo de limpieza">Limpieza & Hogar</button>
+            </div>
+
+            <!-- Acciones Superiores: Impuestos, Pestañas de Ventas Múltiples y Opciones -->
+            <div class="catalog-top-actions">
+              <span class="tax-status-pill">Precios con impuestos</span>
+
+              <!-- Pestañas de Ventas Múltiples (Venta A, Venta B, etc.) -->
+              <div class="multi-ticket-tabs" id="pos-multi-ticket-tabs">
+                <button class="ticket-tab active" data-tab-id="A">Venta A</button>
+                <button class="btn-add-ticket-tab" id="btn-add-ticket-tab" title="Abrir otra venta">+</button>
+              </div>
+
+              <!-- Menú de Opciones del Mostrador -->
+              <div class="dropdown-more-wrap">
+                <button class="btn-catalog-more" id="btn-catalog-more" title="Más opciones de vista">⋮</button>
+                <div class="catalog-dropdown-menu" id="catalog-dropdown-menu">
+                  <button type="button" id="btn-toggle-view-mode" onclick="PosModule.toggleTableView()">
+                    <span id="pos-view-mode-label">📋 Ver en Modo Tabla</span>
+                  </button>
+                  <button type="button" onclick="PosModule.openQuickCatalogModal()">
+                    <span>🔍 Búsqueda en Catálogo</span>
+                  </button>
+                  <button type="button" onclick="PosModule.clearCurrentSale()">
+                    <span>🗑️ Vaciar Carrito</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Cuadrícula Principal de Tarjetas de Productos -->
+          <div class="catalog-grid-wrapper" id="pos-catalog-grid-wrapper">
+            <div class="pos-products-grid" id="pos-products-grid">
+              <!-- Renderizado dinámico de tarjetas de productos -->
+            </div>
+          </div>
+
+          <!-- Vista Alternativa Secundaria: Modo Tabla Clásica -->
+          <div class="table-view-container" id="pos-table-view-container" style="display: none;">
+            <div class="sicar-table-card">
+              <table class="sicar-table">
+                <thead>
+                  <tr>
+                    <th style="width: 40px; text-align: center;">○</th>
+                    <th style="width: 130px;">Cant.</th>
+                    <th style="width: 120px;">Ud. / Factor</th>
+                    <th>Producto</th>
+                    <th style="text-align: right; width: 140px;">Precio</th>
+                    <th style="text-align: right; width: 150px;">Importe Total</th>
+                    <th style="width: 50px; text-align: center;"></th>
+                  </tr>
+                </thead>
+                <tbody id="pos-cart-table-body">
+                  <!-- Renderizado dinámico de filas de la tabla -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </main>
+
+        <!-- COLUMNA DERECHA: Ticket / Carrito Actual de Venta -->
+        <aside class="cloud-pos-ticket">
+
+          <!-- Barra de Atajos Rápidos del Teclado -->
+          <div class="pos-shortcuts-bar">
+            <span><kbd>F1</kbd> Buscar</span>
+            <span><kbd>F2</kbd> Rápido</span>
+            <span><kbd>F3</kbd> En Espera</span>
+            <span><kbd>F10</kbd> Exacto</span>
+            <span><kbd>F12</kbd> Cobrar</span>
+            <span><kbd>+/-</kbd> Cant.</span>
+          </div>
+
+          <!-- Encabezado del Ticket: Buscador con Escáner y Acciones Rápidas -->
+          <div class="ticket-header-card">
+            
+            <!-- Buscador y Lector de Código de Barras -->
+            <div class="ticket-search-box">
+              <span class="ticket-search-icon">🔍</span>
+              <input 
+                type="text" 
+                id="pos-search-input" 
+                class="ticket-search-input" 
+                placeholder="Buscar por nombre o código... (F1)" 
+                autofocus
+                autocomplete="off"
+              >
+              <button class="btn-scanner-icon" id="btn-pos-scanner" title="Escanear código de barras">
+                ⛶
+              </button>
+            </div>
+
+            <!-- Fila de Acciones Rápidas del Ticket -->
+            <div class="ticket-actions-bar">
+              <button class="ticket-action-btn" id="btn-quick-custom" title="Venta rápida de artículo común (⚡ - F2)" onclick="PosModule.openQuickItemModal()">
+                ⚡
+              </button>
+              <button class="ticket-action-btn" id="btn-ticket-notes" title="Agregar nota al ticket (💬)" onclick="PosModule.openTicketNotesModal()">
+                💬
+              </button>
+              <div class="cashier-initials-badge" id="cashier-initials-badge" title="Cajero Activo: Admin">
+                AD
+              </div>
+              <button class="ticket-customer-btn" id="btn-customer-selector" onclick="PosModule.openCustomerSelectModal()" title="Seleccionar o cambiar cliente">
+                <span id="pos-client-display">Cliente</span>
+                <span class="customer-badge-icon">👤</span>
+              </button>
+            </div>
+
+          </div>
+
+          <!-- Lista Scrolleable de Artículos en el Carrito Actual -->
+          <div class="ticket-items-list" id="pos-cart-items-container">
+            <!-- Renderizado dinámico de tarjetas de artículos del carrito -->
+          </div>
+
+          <!-- Pie del Ticket: Subtotal, Descuento y Botón Verde Gigante de Cobro -->
+          <div class="ticket-checkout-footer">
+            
+            <div class="ticket-breakdown-row">
+              <div class="country-flag-badge" title="Moneda: Peso Mexicano (MXN)">🇲🇽</div>
+              <div class="ticket-amounts-col">
+                <div class="ticket-subtotal-val">
+                  Subtotal <strong id="pos-subtotal-text">$0.00</strong>
+                </div>
+                <div class="ticket-discount-val" id="pos-discount-wrapper" style="display: none;">
+                  Descuento total <span id="pos-discount-text">-$0.00</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Botón Gigante Verde de Cobro -->
+            <button class="btn-checkout-green" id="btn-pos-checkout" onclick="PosModule.openCheckoutModal()" disabled>
+              <span id="btn-checkout-label">$0.00 MXN</span>
+            </button>
+
+            <!-- Acciones Rápidas Complementarias: Congelar Venta y Cobro Express -->
+            <div style="display: flex; gap: 0.4rem; margin-top: 0.5rem;">
+              <button type="button" class="btn-secondary" onclick="PosModule.holdCurrentTicket()" title="Poner venta actual en espera (F3)" style="flex: 1; padding: 0.45rem 0.5rem; font-size: 0.78rem; font-weight: 700; background: #f0fdf4; color: #15803d; border: 1px solid #86efac; border-radius: var(--radius-sm);">
+                ❄️ En Espera (F3)
+              </button>
+              <button type="button" class="btn-secondary" onclick="PosModule.quickCheckoutExactCash()" title="Cobro rápido con efectivo exacto (F10)" style="flex: 1; padding: 0.45rem 0.5rem; font-size: 0.78rem; font-weight: 700; background: #eff6ff; color: #1d4ed8; border: 1px solid #93c5fd; border-radius: var(--radius-sm);">
+                ⚡ Exacto (F10)
+              </button>
+            </div>
+
+          </div>
+
+        </aside>
+
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         VISTA 2: PRODUCTOS MAESTRO-DETALLE (ESTILO CAPTURA 2)
+         ==================================================================== -->
+    <section id="view-products" class="view-panel">
+      <!-- Subtoolbar de Productos -->
+      <div class="sub-toolbar">
+        <div class="sub-search-wrapper">
+          <span class="sub-search-icon">🔍</span>
+          <input 
+            type="text" 
+            id="products-search-input" 
+            class="sub-search-input" 
+            placeholder="Buscar productos en catálogo..."
+          >
+        </div>
+        <div class="sub-meta-group" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <button class="meta-btn" onclick="InventoryModule.openProductModal()">
+            <span>➕</span>
+            <span>Nuevo Producto</span>
+          </button>
+          <button class="meta-btn" onclick="InventoryModule.openReorderSuggestionsModal()" title="Sugerencias inteligentes de reabastecimiento" style="background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe;">
+            <span>💡</span>
+            <span>Sugerencias de Compra</span>
+          </button>
+          <button class="meta-btn" onclick="InventoryModule.exportCatalogCSV()" title="Descargar catálogo en formato CSV compatible con Excel">
+            <span>📥</span>
+            <span>Exportar CSV</span>
+          </button>
+          <button class="meta-btn" onclick="InventoryModule.openImportCsvModal()" title="Cargar o actualizar catálogo masivamente por CSV">
+            <span>📤</span>
+            <span>Importar CSV</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Layout Dividido Maestro-Detalle -->
+      <div class="master-detail-grid">
+        
+        <!-- Columna Izquierda: Lista Scrolleable de Productos -->
+        <div class="master-col">
+          <div class="master-list-scroll" id="master-products-list">
+            <!-- Renderizado dinámico de la lista de productos -->
+          </div>
+        </div>
+
+        <!-- Columna Derecha: Detalle del Producto e Historial de Movimientos -->
+        <div class="detail-col" id="product-detail-container">
+          
+          <!-- Ficha Hero del Producto -->
+          <div class="product-hero-card" style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 1.25rem;">
+              <div class="hero-thumb-box" id="detail-product-icon">📦</div>
+              <div class="hero-info-box">
+                <span class="hero-barcode" id="detail-product-barcode">7501055300075</span>
+                <h2 class="hero-title" id="detail-product-name">Seleccione un producto</h2>
+                <div class="hero-price" id="detail-product-price">$0.00 MXN</div>
+                <div class="hero-category" id="detail-product-category">Categoría: Abarrotes</div>
+              </div>
+            </div>
+            <button type="button" class="btn-modal-accept" id="btn-edit-current-product" onclick="InventoryModule.openEditCurrentProduct()" style="padding: 0.65rem 1.25rem; font-size: 0.88rem; display: flex; align-items: center; gap: 0.4rem; background: var(--primary-blue); cursor: pointer; white-space: nowrap;">
+              ✏️ Modificar Producto
+            </button>
+          </div>
+
+          <!-- Pestañas del Detalle -->
+          <div class="detail-tabs-bar">
+            <button class="detail-tab-btn active" id="tab-btn-history">
+              <span>🕒</span>
+              <span>Historial de Movimientos</span>
+            </button>
+            <button class="detail-tab-btn" id="tab-btn-data">
+              <span>📊</span>
+              <span>Datos y Costos</span>
+            </button>
+            <button class="detail-tab-btn" id="tab-btn-stock">
+              <span>📦</span>
+              <span id="detail-stock-badge-text">0 existencias</span>
+            </button>
+          </div>
+
+          <!-- Tabla de Historial de Movimientos (SICAR Style) -->
+          <div class="history-table-card">
+            <table class="sicar-table">
+              <thead>
+                <tr>
+                  <th>Movimiento</th>
+                  <th>Usuario</th>
+                  <th style="text-align: right;">Cantidad</th>
+                  <th style="text-align: right;">Saldo</th>
+                </tr>
+              </thead>
+              <tbody id="detail-movements-table-body">
+                <!-- Renderizado dinámico de movimientos -->
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         VISTA 3: COMPRAS A PROVEEDORES
+         ==================================================================== -->
+    <section id="view-purchases" class="view-panel">
+      <!-- Pestañas Superiores de Compras -->
+      <div style="display: flex; gap: 0.5rem; padding: 0.75rem 1.25rem; background: #fff; border-bottom: 1px solid var(--border-light); align-items: center;">
+        <button type="button" class="report-tab-btn active" id="tab-purchase-new" style="border-radius: var(--radius-md); padding: 0.5rem 1.2rem; font-weight: 700;">
+          <span>➕</span> <span>Registrar Nueva Compra</span>
+        </button>
+        <button type="button" class="report-tab-btn" id="tab-purchase-history" style="border-radius: var(--radius-md); padding: 0.5rem 1.2rem; font-weight: 700;">
+          <span>📜</span> <span>Historial de Compras</span>
+        </button>
+      </div>
+
+      <!-- Panel 1: Nueva Compra -->
+      <div id="pane-purchase-new">
+        <div class="sub-toolbar" style="flex-wrap: wrap; gap: 0.75rem;">
+          <div style="display: flex; align-items: center; gap: 0.5rem; flex: 1; min-width: 250px;">
+            <label style="font-size: 0.82rem; font-weight: 700; color: var(--text-secondary); white-space: nowrap;">Proveedor:</label>
+            <select id="purchase-supplier-select" class="sub-search-input" style="background:#fff; font-weight: 600;">
+              <option value="">Cargando proveedores...</option>
+            </select>
+          </div>
+
+          <div class="sub-meta-group" style="flex-wrap: wrap;">
+            <div class="meta-badge">
+              <span># Folio:</span>
+              <strong id="purchase-folio-display">COM-00001</strong>
+              <input type="hidden" id="purchase-folio-input" value="COM-00001">
+            </div>
+            <input type="text" id="purchase-invoice-input" class="sub-search-input" placeholder="# Factura / Remisión" style="background:#fff; max-width: 160px; height: 34px;">
+            <select id="purchase-payment-method" class="sub-search-input" style="background:#fff; max-width: 160px; height: 34px; font-weight: 600;">
+              <option value="EFECTIVO" selected>💵 Efectivo de Caja</option>
+              <option value="TRANSFERENCIA">🏦 Transferencia</option>
+              <option value="TARJETA">💳 Tarjeta</option>
+              <option value="CREDITO">⏳ Crédito a Proveedor</option>
+            </select>
+            <button type="button" class="meta-btn" id="btn-clear-purchase" style="color: #ef4444;" title="Vaciar lista de compra actual">
+              <span>🗑️</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Barra de Búsqueda de Productos para Compra con Autocompletado -->
+        <div style="padding: 0.6rem 1.25rem; background: var(--bg-subtle); border-bottom: 1px solid var(--border-light); position: relative;">
+          <div style="position: relative;">
+            <span style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 1.1rem; color: #94a3b8;">🔍</span>
+            <input 
+              type="text" 
+              id="purchase-product-search" 
+              class="sub-search-input" 
+              placeholder="Escanear código de barras o escribir nombre del producto a comprar... (Enter para agregar)" 
+              style="padding-left: 2.5rem; background: #fff; height: 42px; border-radius: var(--radius-md); font-size: 0.95rem; width: 100%;" 
+              autocomplete="off"
+            >
+            <div id="purchase-search-results" style="display:none; position:absolute; top: 100%; left: 0; right: 0; background: #fff; border: 1px solid #cbd5e1; border-radius: var(--radius-md); box-shadow: 0 10px 25px -5px rgba(0,0,0,0.15); z-index: 1000; max-height: 280px; overflow-y: auto; margin-top: 4px;"></div>
+          </div>
+        </div>
+
+        <!-- Tabla de Partidas de Compra -->
+        <div class="table-view-container" style="padding: 1rem 1.25rem;">
+          <div class="sicar-table-card">
+            <table class="sicar-table">
+              <thead>
+                <tr>
+                  <th style="width: 40px; text-align: center;">#</th>
+                  <th style="width: 110px;">Cant.</th>
+                  <th>Unidad</th>
+                  <th>Producto</th>
+                  <th style="text-align: right; width: 130px;">Costo Unitario ($)</th>
+                  <th style="text-align: right; width: 130px;">Importe Subtotal</th>
+                  <th style="width: 45px;"></th>
+                </tr>
+              </thead>
+              <tbody id="purchases-table-body">
+                <!-- Se llena dinámicamente con PurchasesModule -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Barra Inferior de Totales y Registro -->
+        <div class="sticky-bottom-bar" style="flex-wrap: wrap; gap: 0.75rem;">
+          <div class="bottom-info-left" style="display: flex; gap: 1.25rem; align-items: center; flex-wrap: wrap;">
+            <label style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.82rem; cursor: pointer; color: var(--text-secondary); user-select: none;">
+              <input type="checkbox" id="purchase-chk-cashout" checked style="width: 16px; height: 16px; accent-color: var(--primary-blue);">
+              <span>💵 Registrar egreso de efectivo en el turno de caja actual</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.82rem; cursor: pointer; color: var(--text-secondary); user-select: none;">
+              <input type="checkbox" id="purchase-chk-updatecosts" checked style="width: 16px; height: 16px; accent-color: var(--primary-blue);">
+              <span>📦 Actualizar precio de costo en catálogo de productos</span>
+            </label>
+          </div>
+          <div class="bottom-info-right" style="display: flex; align-items: center; gap: 1rem;">
+            <div class="totals-breakdown">
+              <div class="subtotal-text">
+                Unidades: <strong id="purchase-total-units" style="color: var(--primary-blue);">0 unidades</strong> • 
+                Total: <strong id="purchase-total-amount" style="font-size: 1.15rem; color: var(--accent-green-dark);">$0.00 MXN</strong>
+              </div>
+            </div>
+            <button type="button" class="main-action-pill-btn" id="btn-submit-purchase" style="background: var(--primary-blue); font-size: 0.95rem; padding: 0.65rem 1.6rem;">
+              <span id="purchase-pill-btn-text">💾 Registrar Compra</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel 2: Historial de Compras -->
+      <div id="pane-purchase-history" style="display: none; padding: 1.25rem;">
+        <div class="sub-toolbar" style="margin-bottom: 1rem;">
+          <div class="sub-search-wrapper" style="max-width: 420px;">
+            <span class="sub-search-icon">🔍</span>
+            <input type="text" id="purchase-history-search" class="sub-search-input" placeholder="Buscar compra por folio, factura o proveedor...">
+          </div>
+          <button type="button" class="meta-btn" onclick="PurchasesModule.loadHistory()">
+            <span>🔄</span> <span>Actualizar Historial</span>
+          </button>
+        </div>
+
+        <div class="sicar-table-card">
+          <table class="sicar-table">
+            <thead>
+              <tr>
+                <th>Folio</th>
+                <th>Fecha y Hora</th>
+                <th>Proveedor</th>
+                <th>Método de Pago</th>
+                <th style="text-align: center;">Artículos</th>
+                <th style="text-align: right;">Total Compra</th>
+                <th style="text-align: center;">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="purchases-history-tbody">
+              <!-- Cargado dinámicamente -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         VISTA NUEVA: DIRECTORIO DE PROVEEDORES
+         ==================================================================== -->
+    <section id="view-suppliers" class="view-panel">
+      <div class="sub-toolbar">
+        <div class="sub-search-wrapper" style="max-width: 450px;">
+          <span class="sub-search-icon">🔍</span>
+          <input type="text" id="suppliers-search-input" class="sub-search-input" placeholder="Buscar por nombre de empresa, contacto, teléfono o RFC...">
+        </div>
+        <div class="sub-meta-group">
+          <div class="meta-badge" id="suppliers-count-badge">
+            0 Proveedores
+          </div>
+          <button type="button" class="main-action-pill-btn" id="btn-new-supplier" style="background: var(--primary-blue);">
+            <span>➕ Registrar Nuevo Proveedor</span>
+          </button>
+        </div>
+      </div>
+
+      <div id="suppliers-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.25rem; padding: 1.25rem;">
+        <!-- Tarjetas cargadas dinámicamente con SuppliersModule -->
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         VISTA 4: AJUSTE LIBRE DE INVENTARIO (ESTILO CAPTURA 4)
+         ==================================================================== -->
+    <section id="view-inventory-adjust" class="view-panel">
+      <div class="sub-toolbar">
+        <div class="sub-search-wrapper">
+          <span class="sub-search-icon">🔍</span>
+          <input 
+            type="text" 
+            id="adjust-search-input" 
+            class="sub-search-input" 
+            placeholder="Añadir productos para conteo físico..."
+          >
+        </div>
+        <div class="sub-meta-group">
+          <button class="meta-btn" onclick="App.showToast('Lector listo para conteo', 'info')">
+            <span>📷</span>
+            <span>Escanear</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="adjustment-container">
+        <div class="sicar-table-card">
+          <table class="sicar-table">
+            <thead>
+              <tr>
+                <th style="width: 40px;">✓</th>
+                <th>Producto</th>
+                <th>Localización</th>
+                <th style="text-align: right;">Precio</th>
+                <th style="text-align: right;">Existencia</th>
+                <th style="text-align: right;">Diferencia</th>
+                <th style="text-align: right;">Contado</th>
+              </tr>
+            </thead>
+            <tbody id="adjustment-table-body">
+              <!-- Renderizado dinámico de productos para ajuste -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Barra Inferior de Diferencias de Ajuste -->
+      <div class="adjustment-bottom-bar">
+        <div class="adjustment-stats-row">
+          <span class="stat-tag" id="adj-stat-sindiff">Sin diferencia (0)</span>
+          <span class="stat-tag" style="color: var(--accent-green-dark);" id="adj-stat-pos">D. positiva (0) +$0.00</span>
+          <span class="stat-tag" style="color: var(--accent-red);" id="adj-stat-neg">D. negativa (0) -$0.00</span>
+          <span class="stat-tag" style="font-weight: 800;" id="adj-stat-total">Total diferencia: $0.00</span>
+        </div>
+
+        <button class="btn-apply-adjustment" onclick="InventoryModule.applyBatchAdjustment()">
+          APLICAR AJUSTE
+        </button>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         VISTA 5: MULTISERVICIOS Y RECARGAS (ESTILO CAPTURA 3)
+         ==================================================================== -->
+    <section id="view-multiservices" class="view-panel">
+      <div class="multiservices-container">
+        
+        <!-- Pestañas de Servicios -->
+        <div class="service-tabs-bar">
+          <button class="service-tab-btn active" data-tab="recargas">
+            <span>📱</span>
+            <span>Recargas Telefónicas</span>
+          </button>
+          <button class="service-tab-btn" data-tab="servicios">
+            <span>🧾</span>
+            <span>Pago de Servicios (Luz, Agua)</span>
+          </button>
+          <button class="service-tab-btn" data-tab="giftcard">
+            <span>🎁</span>
+            <span>GiftCard / Pines</span>
+          </button>
+        </div>
+
+        <!-- Banner informativo -->
+        <div style="background: var(--primary-blue-light); border: 1px solid rgba(0,96,223,0.2); padding: 1rem 1.5rem; border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: space-between;">
+          <div>
+            <span style="background: var(--primary-blue); color:#fff; font-size: 0.72rem; font-weight:800; padding: 0.2rem 0.5rem; border-radius: 4px;">NUEVO</span>
+            <strong style="margin-left: 0.5rem; color: var(--primary-blue-dark);">Recargas electrónicas y cobro de servicios</strong>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.2rem;">Atiende a tus clientes con recargas al instante sin salir del punto de venta.</p>
+          </div>
+        </div>
+
+        <!-- Cuadrícula de Compañías Telefónicas (Captura 3) -->
+        <div class="carriers-grid">
+          <div class="carrier-card carrier-telcel" onclick="MultiservicesModule.openRechargeModal('Telcel')">
+            <span style="font-size: 1.3rem;">telcel</span>
+          </div>
+          <div class="carrier-card carrier-movistar" onclick="MultiservicesModule.openRechargeModal('Movistar')">
+            <span style="font-size: 1.4rem;">M</span>
+            <span style="font-size: 0.8rem;">movistar</span>
+          </div>
+          <div class="carrier-card carrier-att" onclick="MultiservicesModule.openRechargeModal('AT&T')">
+            <span style="font-size: 1.2rem;">AT&T</span>
+          </div>
+          <div class="carrier-card carrier-unefon" onclick="MultiservicesModule.openRechargeModal('Unefon')">
+            <span style="font-size: 1.1rem; font-weight:900;">UNEFON</span>
+          </div>
+          <div class="carrier-card carrier-virgin" onclick="MultiservicesModule.openRechargeModal('Virgin Mobile')">
+            <span style="font-size: 1.2rem;">Virgin</span>
+          </div>
+          <div class="carrier-card carrier-bait" onclick="MultiservicesModule.openRechargeModal('Bait')">
+            <span style="font-size: 1.3rem; letter-spacing: 0.1em;">bait</span>
+          </div>
+          <div class="carrier-card carrier-cierto" onclick="MultiservicesModule.openRechargeModal('Cierto')">
+            <span>cierto</span>
+          </div>
+          <div class="carrier-card carrier-yobi" onclick="MultiservicesModule.openRechargeModal('Yobi')">
+            <span>Yobi</span>
+          </div>
+          <div class="carrier-card carrier-oui" onclick="MultiservicesModule.openRechargeModal('Oui Móvil')">
+            <span>ü Oui</span>
+          </div>
+          <div class="carrier-card carrier-flash" onclick="MultiservicesModule.openRechargeModal('Flash Mobile')">
+            <span>Flash</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         VISTA 6: LIBRETA DE FIADOS (CUENTAS POR COBRAR)
+         ==================================================================== -->
+    <section id="view-customers" class="view-panel">
+      <div class="sub-toolbar">
+        <div class="sub-search-wrapper">
+          <span class="sub-search-icon">🔍</span>
+          <input type="text" id="customers-search-input" class="sub-search-input" placeholder="Buscar cliente por nombre o teléfono...">
+        </div>
+        <div class="sub-meta-group">
+          <button class="meta-btn" id="btn-new-customer" onclick="CustomersModule.openNewCustomerModal()">
+            <span>➕</span>
+            <span>Registrar Nuevo Cliente</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="table-view-container">
+        <div class="sicar-table-card">
+          <table class="sicar-table">
+            <thead>
+              <tr>
+                <th>Cliente</th>
+                <th>Teléfono</th>
+                <th>Límite de Crédito</th>
+                <th style="text-align: right;">Saldo Adeudado</th>
+                <th style="text-align: right;">Crédito Disponible</th>
+                <th style="text-align: center;">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="customers-table-body">
+              <!-- Renderizado dinámico -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         VISTA 7: CONTROL DE CAJA Y TURNOS
+         ==================================================================== -->
+    <section id="view-cash" class="view-panel">
+      <!-- Vista cuando el turno está activo -->
+      <div id="cash-shift-active-view">
+        <div class="sub-toolbar">
+          <div class="sub-meta-group">
+            <div class="meta-badge">
+              <span>Turno abierto:</span>
+              <strong id="cash-opened-at">-</strong>
+            </div>
+            <div class="meta-badge" id="cash-shift-cashier-badge" style="background: var(--primary-blue-light); color: var(--primary-blue-dark); font-weight: 700;">
+              👤 Cajero: Admin
+            </div>
+          </div>
+          <div class="sub-meta-group">
+            <button class="meta-btn" id="btn-add-movement">
+              <span>💸</span>
+              <span>Registrar Entrada / Salida</span>
+            </button>
+            <button class="meta-btn" id="btn-close-shift" style="background: var(--primary-blue); color: #fff;">
+              <span>🔒</span>
+              <span>Realizar Corte Z</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="table-view-container">
+          <!-- Tarjetas Desglose de Caja -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+            <div class="sicar-table-card" style="padding: 1.2rem;">
+              <div style="font-size: 0.8rem; color: var(--text-secondary);">FONDO INICIAL</div>
+              <div style="font-size: 1.5rem; font-weight: 900; font-family: var(--font-mono); margin-top: 0.2rem;" id="cash-initial-val">$0.00</div>
+            </div>
+            <div class="sicar-table-card" style="padding: 1.2rem;">
+              <div style="font-size: 0.8rem; color: var(--text-secondary);">VENTAS EN EFECTIVO</div>
+              <div style="font-size: 1.5rem; font-weight: 900; font-family: var(--font-mono); color: var(--accent-green-dark); margin-top: 0.2rem;" id="cash-sales-val">$0.00</div>
+            </div>
+            <div class="sicar-table-card" style="padding: 1.2rem;">
+              <div style="font-size: 0.8rem; color: var(--text-secondary);">TARJETAS / TRANSFERENCIAS</div>
+              <div style="font-size: 1.5rem; font-weight: 900; font-family: var(--font-mono); color: var(--primary-blue); margin-top: 0.2rem;" id="cash-card-val">$0.00</div>
+            </div>
+            <div class="sicar-table-card" style="padding: 1.2rem; background: var(--primary-blue-light); border-color: rgba(0,96,223,0.3);">
+              <div style="font-size: 0.8rem; font-weight: 700; color: var(--primary-blue-dark);">EFECTIVO ESPERADO EN CAJA</div>
+              <div style="font-size: 1.8rem; font-weight: 900; font-family: var(--font-mono); color: var(--primary-blue-dark); margin-top: 0.2rem;" id="cash-expected-val">$0.00</div>
+            </div>
+          </div>
+
+          <h3 style="font-size: 1.05rem; font-weight: 800; margin-bottom: 0.75rem;">Movimientos Extraordinarios de Efectivo</h3>
+          <div class="sicar-table-card">
+            <table class="sicar-table">
+              <thead>
+                <tr>
+                  <th>Tipo</th>
+                  <th>Concepto / Proveedor</th>
+                  <th style="text-align: right;">Monto</th>
+                  <th style="text-align: right;">Hora</th>
+                </tr>
+              </thead>
+              <tbody id="cash-movements-table-body">
+                <!-- Renderizado dinámico -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Vista cuando la caja está cerrada -->
+      <div id="cash-shift-closed-view" style="display: none; text-align: center; padding: 4rem 1.5rem;">
+        <div style="font-size: 3.5rem; margin-bottom: 1rem;">🔒</div>
+        <h2 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 0.5rem;">Caja Cerrada • Sin Turno Activo</h2>
+        <p style="color: var(--text-secondary); max-width: 480px; margin: 0 auto 1.5rem; font-size: 0.92rem;">
+          No hay ningún turno de caja abierto en este momento. Abre un nuevo turno para poder comenzar a cobrar y emitir tickets en el mostrador.
+        </p>
+        <button class="main-action-pill-btn" onclick="document.getElementById('modal-open-shift').classList.add('active')" style="font-size: 1rem; padding: 0.85rem 2.2rem;">
+          🔑 Abrir Nuevo Turno de Caja
+        </button>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         VISTA 8: USUARIOS Y ROLES (ESTILO CAPTURA 5)
+         ==================================================================== -->
+    <section id="view-users" class="view-panel">
+      <div class="sub-toolbar">
+        <div class="sub-search-wrapper">
+          <span class="sub-search-icon">🔍</span>
+          <input type="text" id="users-search-input" class="sub-search-input" placeholder="Buscar cajero o usuario...">
+        </div>
+        <div class="sub-meta-group">
+          <button class="meta-btn" id="btn-new-user" style="background: var(--primary-blue); color: #fff;">
+            <span>➕</span>
+            <span>Nuevo Cajero / Usuario</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="master-detail-grid">
+        <!-- Lista de Usuarios Dinámica -->
+        <div class="master-col">
+          <div class="master-list-scroll" id="users-master-list">
+            <!-- Renderizado dinámico desde users.js -->
+          </div>
+        </div>
+
+        <!-- Ficha de Detalle y Edición de Usuario / Cajero -->
+        <div class="detail-col">
+          <div class="user-hero-card">
+            <div class="user-avatar-large" id="user-avatar-preview" style="font-size: 2.2rem;">
+              👑
+            </div>
+            <h2 id="user-detail-title" style="font-size: 1.3rem; font-weight: 800;">Administrador</h2>
+            <span class="role-badge-pill" id="user-detail-role-badge">👑 Rol: ADMINISTRADOR GENERAL</span>
+          </div>
+
+          <div class="sicar-table-card" style="padding: 1.25rem; margin-top: 1rem;">
+            <input type="hidden" id="user-edit-id">
+            <h4 style="font-size: 0.95rem; font-weight: 800; margin-bottom: 0.85rem;">Datos del Cajero / Usuario</h4>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.85rem; font-size: 0.88rem;">
+              <div>
+                <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.3rem;">Nombre Completo:</label>
+                <input type="text" id="user-edit-name" class="sub-search-input" style="background:#fff;">
+              </div>
+              <div>
+                <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.3rem;">Usuario (Login):</label>
+                <input type="text" id="user-edit-username" class="sub-search-input" style="background:#fff;">
+              </div>
+              <div>
+                <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.3rem;">Rol Asignado:</label>
+                <select id="user-edit-role" class="sub-search-input" style="background:#fff; height: 38px;">
+                  <option value="ADMIN">Administrador (Control Total)</option>
+                  <option value="Encargado">Encargado de Tienda</option>
+                  <option value="Cajero" selected>Cajero / Vendedor</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.3rem;">PIN de Acceso:</label>
+                <input type="password" id="user-edit-pin" class="sub-search-input" style="background:#fff;" placeholder="Ej: 1234">
+              </div>
+              <div>
+                <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.3rem;">Avatar / Icono:</label>
+                <select id="user-edit-avatar" class="sub-search-input" style="background:#fff; height: 38px;">
+                  <option value="👑">👑 Corona (Admin)</option>
+                  <option value="👨‍💼" selected>👨‍💼 Hombre con Corbata</option>
+                  <option value="👩‍💼">👩‍💼 Mujer con Corbata</option>
+                  <option value="🧑">🧑 Persona</option>
+                  <option value="👧">👧 Chica</option>
+                  <option value="🧑‍💻">🧑‍💻 Desarrollador / Técnico</option>
+                  <option value="👤">👤 Silueta</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.3rem;">Teléfono / WhatsApp:</label>
+                <input type="text" id="user-edit-phone" class="sub-search-input" style="background:#fff;" placeholder="Opcional">
+              </div>
+              <div>
+                <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.3rem;">Correo Electrónico:</label>
+                <input type="email" id="user-edit-email" class="sub-search-input" style="background:#fff;" placeholder="Opcional">
+              </div>
+              <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 1.2rem;">
+                <input type="checkbox" id="user-edit-active" checked style="width: 18px; height: 18px; accent-color: var(--primary-blue);">
+                <label for="user-edit-active" style="font-weight: 700; cursor: pointer;">Cajero Activo en Sistema</label>
+              </div>
+            </div>
+
+            <!-- Sección de Permisos Granulares -->
+            <div style="margin-top: 1.5rem; border-top: 1px solid var(--border-light); padding-top: 1.25rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                <h4 style="font-size: 0.95rem; font-weight: 800; display:flex; align-items:center; gap:0.4rem;">
+                  <span>🔐</span>
+                  <span>Permisos Asignados al Cajero</span>
+                </h4>
+                <span style="font-size: 0.78rem; color: var(--text-secondary);">Marca las acciones permitidas para este cajero</span>
+              </div>
+              <div id="user-permissions-container">
+                <!-- Renderizado dinámico desde users.js -->
+              </div>
+            </div>
+
+            <!-- Botones de Acción -->
+            <div style="margin-top: 1.5rem; display: flex; gap: 0.75rem; justify-content: flex-end; border-top: 1px solid var(--border-light); padding-top: 1rem;">
+              <button class="meta-btn" id="btn-delete-user" style="background: var(--bg-card); color: var(--accent-red); border-color: var(--accent-red);">
+                <span>🗑️</span>
+                <span>Eliminar Cajero</span>
+              </button>
+              <button class="main-action-pill-btn" id="btn-save-user" style="padding: 0.65rem 1.6rem;">
+                <span>💾</span>
+                <span>Guardar Cambios</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         VISTA 9: REPORTES Y CONFIGURACIÓN
+         ==================================================================== -->
+    <section id="view-reports" class="view-panel">
+      <div class="table-view-container">
+        
+        <!-- Encabezado de Reportes y Filtros de Período -->
+        <div class="sicar-table-card" style="padding: 1.25rem; margin-bottom: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;">
+            <div>
+              <h2 style="font-size: 1.3rem; font-weight: 800; display:flex; align-items:center; gap:0.5rem; margin-bottom: 0.2rem;">
+                <span>📊</span>
+                <span>Reportes y Estadísticas de Eleventa</span>
+              </h2>
+              <div style="font-size: 0.84rem; color: var(--text-secondary);" id="report-current-period-desc">
+                Cargando datos del período...
+              </div>
+            </div>
+
+            <!-- Selector de Rango de Período Rápido -->
+            <div style="display: flex; flex-wrap: wrap; gap: 0.4rem;">
+              <button class="report-period-pill" data-period="today">Hoy</button>
+              <button class="report-period-pill" data-period="yesterday">Ayer</button>
+              <button class="report-period-pill" data-period="week">Esta Semana</button>
+              <button class="report-period-pill" data-period="month">Este Mes</button>
+              <button class="report-period-pill active" data-period="last30">Últimos 30 días</button>
+              <button class="report-period-pill" data-period="year">Año Actual</button>
+              <button class="report-period-pill" data-period="all">Todo el Historial</button>
+              <button class="report-period-pill" data-period="custom">Personalizado 📅</button>
+            </div>
+          </div>
+
+          <!-- Filtro de Fechas Personalizadas (oculto por defecto) -->
+          <div id="custom-date-container" style="display: none; align-items: center; gap: 0.8rem; background: var(--bg-subtle); padding: 0.75rem 1rem; border-radius: 8px; margin-top: 0.5rem; flex-wrap: wrap;">
+            <span style="font-size: 0.85rem; font-weight: 700;">Rango de Fechas:</span>
+            <div style="display: flex; align-items: center; gap: 0.4rem;">
+              <span style="font-size: 0.8rem; color: var(--text-secondary);">Desde:</span>
+              <input type="date" id="rep-start-date" class="sub-search-input" style="background:#fff; width: 150px; height: 32px; font-size: 0.85rem;">
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.4rem;">
+              <span style="font-size: 0.8rem; color: var(--text-secondary);">Hasta:</span>
+              <input type="date" id="rep-end-date" class="sub-search-input" style="background:#fff; width: 150px; height: 32px; font-size: 0.85rem;">
+            </div>
+            <button class="main-action-pill-btn" id="btn-apply-custom-dates" style="padding: 0.4rem 1.2rem; font-size: 0.85rem;">
+              Filtrar
+            </button>
+          </div>
+        </div>
+
+        <!-- Tarjetas KPI Financieras Dinámicas -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+          <div class="kpi-report-card">
+            <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">VENTAS TOTALES</div>
+            <div style="font-size: 1.7rem; font-weight: 900; font-family: var(--font-mono); color: var(--primary-blue); margin-top: 0.25rem;" id="kpi-sales-total">$0.00</div>
+            <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.2rem;">Ventas cobradas en el período</div>
+          </div>
+          <div class="kpi-report-card">
+            <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">GANANCIA / UTILIDAD</div>
+            <div style="font-size: 1.7rem; font-weight: 900; font-family: var(--font-mono); color: var(--accent-green-dark); margin-top: 0.25rem;" id="kpi-profit-total">$0.00</div>
+            <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.2rem;">Venta menos precio de costo</div>
+          </div>
+          <div class="kpi-report-card">
+            <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">MARGEN PROMEDIO</div>
+            <div style="font-size: 1.7rem; font-weight: 900; font-family: var(--font-mono); color: var(--accent-green-dark); margin-top: 0.25rem;" id="kpi-margin-pct">0.0%</div>
+            <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.2rem;">Margen sobre ventas brutas</div>
+          </div>
+          <div class="kpi-report-card">
+            <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">TICKETS COBRADOS</div>
+            <div style="font-size: 1.7rem; font-weight: 900; font-family: var(--font-mono); margin-top: 0.25rem;" id="kpi-tickets-count">0</div>
+            <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.2rem;">Transacciones finalizadas</div>
+          </div>
+          <div class="kpi-report-card">
+            <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">TICKET PROMEDIO</div>
+            <div style="font-size: 1.7rem; font-weight: 900; font-family: var(--font-mono); color: var(--primary-blue-dark); margin-top: 0.25rem;" id="kpi-avg-ticket">$0.00</div>
+            <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.2rem;">Promedio de compra por ticket</div>
+          </div>
+        </div>
+
+        <!-- Pestañas de Sub-Reportes -->
+        <div class="sicar-table-card" style="padding: 0; overflow: hidden; margin-bottom: 1.5rem;">
+          <div style="display: flex; border-bottom: 1px solid var(--border-light); background: var(--bg-subtle); overflow-x: auto;">
+            <button class="report-tab-btn active" data-tab="sales">
+              <span>💵</span>
+              <span>Ventas y Métodos de Pago</span>
+            </button>
+            <button class="report-tab-btn" data-tab="departments">
+              <span>🗂️</span>
+              <span>Por Departamentos (57)</span>
+            </button>
+            <button class="report-tab-btn" data-tab="products">
+              <span>🏆</span>
+              <span>Productos Más Vendidos</span>
+            </button>
+            <button class="report-tab-btn" data-tab="cashiers">
+              <span>👤</span>
+              <span>Ventas por Cajero</span>
+            </button>
+            <button class="report-tab-btn" data-tab="shifts">
+              <span>📑</span>
+              <span>Cortes de Turno (3,054)</span>
+            </button>
+            <button class="report-tab-btn" data-tab="credits">
+              <span>👥</span>
+              <span>Libreta de Fiados</span>
+            </button>
+            <button class="report-tab-btn" data-tab="inventory">
+              <span>📦</span>
+              <span>Valuación de Inventario</span>
+            </button>
+          </div>
+
+          <div style="padding: 1.25rem;">
+            <!-- Pestaña 1: Ventas y Métodos de Pago -->
+            <div id="tab-content-sales" class="report-tab-content" style="display: block;">
+              <h4 style="font-size: 0.95rem; font-weight: 800; margin-bottom: 0.85rem;">Distribución de Ventas por Forma de Pago</h4>
+              <table class="sicar-table">
+                <thead>
+                  <tr>
+                    <th>Método de Pago</th>
+                    <th style="text-align: right;">Tickets</th>
+                    <th style="text-align: right;">Monto Total</th>
+                    <th>% de Participación</th>
+                  </tr>
+                </thead>
+                <tbody id="payment-methods-table-body">
+                  <!-- Renderizado dinámico -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Pestaña 2: Ventas por Departamento -->
+            <div id="tab-content-departments" class="report-tab-content" style="display: none;">
+              <h4 style="font-size: 0.95rem; font-weight: 800; margin-bottom: 0.85rem;">Ventas y Ganancias por Departamento / Categoría</h4>
+              <table class="sicar-table">
+                <thead>
+                  <tr>
+                    <th>Departamento</th>
+                    <th style="text-align: right;">Unidades Vendidas</th>
+                    <th style="text-align: right;">Ventas Totales</th>
+                    <th style="text-align: right;">Ganancia Bruta</th>
+                    <th style="text-align: right;">Margen</th>
+                    <th>% Total</th>
+                  </tr>
+                </thead>
+                <tbody id="departments-report-table-body">
+                  <!-- Renderizado dinámico -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Pestaña 3: Productos Más Vendidos -->
+            <div id="tab-content-products" class="report-tab-content" style="display: none;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem; flex-wrap: wrap; gap: 0.5rem;">
+                <h4 style="font-size: 0.95rem; font-weight: 800;">Ranking de Artículos Más Vendidos</h4>
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                  <span style="font-size: 0.82rem; color: var(--text-secondary);">Ordenar por:</span>
+                  <select id="top-products-order-by" class="sub-search-input" style="background:#fff; height: 32px; font-size: 0.84rem;">
+                    <option value="revenue" selected>Mayor Ingreso ($)</option>
+                    <option value="qty">Mayor Cantidad Vendida (piezas/kg)</option>
+                    <option value="profit">Mayor Ganancia ($)</option>
+                  </select>
+                </div>
+              </div>
+              <table class="sicar-table">
+                <thead>
+                  <tr>
+                    <th style="text-align: center;">#</th>
+                    <th>Código</th>
+                    <th>Descripción del Producto</th>
+                    <th style="text-align: right;">Vendidos</th>
+                    <th style="text-align: right;">Ingresos ($)</th>
+                    <th style="text-align: right;">Ganancia ($)</th>
+                    <th style="text-align: right;">Margen</th>
+                  </tr>
+                </thead>
+                <tbody id="top-products-report-table-body">
+                  <!-- Renderizado dinámico -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Pestaña 4: Ventas por Cajero -->
+            <div id="tab-content-cashiers" class="report-tab-content" style="display: none;">
+              <h4 style="font-size: 0.95rem; font-weight: 800; margin-bottom: 0.85rem;">Rendimiento de Ventas por Cajero</h4>
+              <table class="sicar-table">
+                <thead>
+                  <tr>
+                    <th>Cajero / Usuario</th>
+                    <th style="text-align: right;">Tickets</th>
+                    <th style="text-align: right;">Total Vendido</th>
+                    <th style="text-align: right;">Ticket Promedio</th>
+                    <th>% de Ventas</th>
+                    <th style="text-align: right;">Última Venta</th>
+                  </tr>
+                </thead>
+                <tbody id="cashiers-report-table-body">
+                  <!-- Renderizado dinámico -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Pestaña 5: Cortes de Turno de Eleventa -->
+            <div id="tab-content-shifts" class="report-tab-content" style="display: none;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem;">
+                <h4 style="font-size: 0.95rem; font-weight: 800;">Historial de Turnos de Caja (Cortes Z)</h4>
+                <span class="meta-badge" id="shifts-count-badge">3,054 turnos registrados</span>
+              </div>
+              <table class="sicar-table">
+                <thead>
+                  <tr>
+                    <th>Turno #</th>
+                    <th>Cajero</th>
+                    <th>Apertura</th>
+                    <th>Cierre</th>
+                    <th style="text-align: right;">Fondo Inicial</th>
+                    <th style="text-align: right;">Esperado</th>
+                    <th style="text-align: right;">Cierre Real</th>
+                    <th style="text-align: right;">Diferencia</th>
+                  </tr>
+                </thead>
+                <tbody id="shifts-history-table-body">
+                  <!-- Renderizado dinámico -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Pestaña 6: Libreta de Fiados y Deudas -->
+            <div id="tab-content-credits" class="report-tab-content" style="display: none;">
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.25rem;">
+                <div class="sicar-table-card" style="padding: 1rem; border-color: rgba(239, 68, 68, 0.3); background: rgba(239, 68, 68, 0.04);">
+                  <div style="font-size: 0.78rem; font-weight: 700; color: var(--accent-red);">TOTAL EN FIADOS PENDIENTES</div>
+                  <div style="font-size: 1.6rem; font-weight: 900; font-family: var(--font-mono); color: var(--accent-red); margin-top: 0.2rem;" id="credits-total-debt">$0.00</div>
+                  <div style="font-size: 0.75rem; color: var(--text-secondary);" id="credits-debtors-count">0 clientes con deuda</div>
+                </div>
+              </div>
+              <h4 style="font-size: 0.95rem; font-weight: 800; margin-bottom: 0.85rem;">Clientes con Mayor Saldo Pendiente</h4>
+              <table class="sicar-table">
+                <thead>
+                  <tr>
+                    <th>Cliente</th>
+                    <th>Teléfono</th>
+                    <th>Dirección</th>
+                    <th style="text-align: right;">Límite Crédito</th>
+                    <th style="text-align: right;">Saldo Adeudado</th>
+                  </tr>
+                </thead>
+                <tbody id="credits-report-table-body">
+                  <!-- Renderizado dinámico -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Pestaña 7: Valuación de Inventario -->
+            <div id="tab-content-inventory" class="report-tab-content" style="display: none;">
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.25rem;">
+                <div class="kpi-report-card">
+                  <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary);">VALOR A PRECIO DE COSTO</div>
+                  <div style="font-size: 1.6rem; font-weight: 900; font-family: var(--font-mono); margin-top: 0.2rem;" id="inv-cost-val">$0.00</div>
+                  <div style="font-size: 0.75rem; color: var(--text-secondary);">Inversión física en anaqueles</div>
+                </div>
+                <div class="kpi-report-card">
+                  <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary);">VALOR A PRECIO DE VENTA</div>
+                  <div style="font-size: 1.6rem; font-weight: 900; font-family: var(--font-mono); color: var(--primary-blue); margin-top: 0.2rem;" id="inv-retail-val">$0.00</div>
+                  <div style="font-size: 0.75rem; color: var(--text-secondary);">Valor comercial total estimado</div>
+                </div>
+                <div class="kpi-report-card">
+                  <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary);">GANANCIA PROYECTADA</div>
+                  <div style="font-size: 1.6rem; font-weight: 900; font-family: var(--font-mono); color: var(--accent-green-dark); margin-top: 0.2rem;" id="inv-profit-val">$0.00</div>
+                  <div style="font-size: 0.75rem; color: var(--text-secondary);">Utilidad potencial al vender todo</div>
+                </div>
+                <div class="kpi-report-card">
+                  <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary);">UNIDADES EN STOCK</div>
+                  <div style="font-size: 1.2rem; font-weight: 800; font-family: var(--font-mono); margin-top: 0.4rem;" id="inv-units-val">0 unidades</div>
+                  <div style="font-size: 0.75rem; color: var(--text-secondary);">Productos activos en catálogo</div>
+                </div>
+              </div>
+
+              <h4 style="font-size: 0.95rem; font-weight: 800; margin-bottom: 0.85rem; color: var(--accent-red);">⚠️ Productos Agotados o por Debajo del Stock Mínimo</h4>
+              <table class="sicar-table">
+                <thead>
+                  <tr>
+                    <th>Código</th>
+                    <th>Producto</th>
+                    <th style="text-align: right;">Existencia Actual</th>
+                    <th style="text-align: right;">Stock Mínimo</th>
+                    <th style="text-align: right;">Precio Venta</th>
+                  </tr>
+                </thead>
+                <tbody id="inv-lowstock-table-body">
+                  <!-- Renderizado dinámico -->
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Acceso directo a Configuración -->
+        <div class="sicar-table-card" style="padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-top: 1.5rem;">
+          <div>
+            <h3 style="font-size: 1.1rem; font-weight: 800; margin-bottom: 0.3rem;">⚙️ Configuración del Negocio y Tickets</h3>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0;">Personaliza los datos comerciales, datos de contacto, encabezados de ticket y opciones del punto de venta.</p>
+          </div>
+          <button type="button" class="main-action-pill-btn" onclick="App.switchView('settings')" style="background: var(--primary-blue); font-size: 0.9rem; padding: 0.6rem 1.4rem;">
+            ⚙️ Abrir Módulo de Configuración
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         VISTA NUEVA: CONFIGURACIÓN GENERAL DEL SISTEMA (POR PESTAÑAS)
+         ==================================================================== -->
+    <section id="view-settings" class="view-panel">
+      <!-- Barra Superior de Pestañas de Configuración -->
+      <div class="settings-tabs-bar" style="background: #fff; border-bottom: 1px solid var(--border-light); padding: 0.5rem 1.5rem 0; display: flex; gap: 0.5rem; overflow-x: auto; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
+        <button type="button" class="report-tab-btn active" id="tab-btn-cfg-store" onclick="SettingsModule.switchTab('store')">
+          <span>🏪</span> <span>Datos del Negocio</span>
+        </button>
+        <button type="button" class="report-tab-btn" id="tab-btn-cfg-tickets" onclick="SettingsModule.switchTab('tickets')">
+          <span>🧾</span> <span>Tickets e Impresión</span>
+        </button>
+        <button type="button" class="report-tab-btn" id="tab-btn-cfg-pos" onclick="SettingsModule.switchTab('pos')">
+          <span>⚖️</span> <span>Ventas y Granel</span>
+        </button>
+        <button type="button" class="report-tab-btn" id="tab-btn-cfg-backups" onclick="SettingsModule.switchTab('backups')">
+          <span>💾</span> <span>Respaldos de Seguridad</span>
+        </button>
+      </div>
+
+      <div style="padding: 1.5rem; max-width: 950px; margin: 0 auto;">
+        
+        <!-- PESTAÑA 1: DATOS DEL NEGOCIO -->
+        <div id="panel-cfg-store" class="cfg-tab-panel">
+          <div class="sicar-table-card" style="padding: 1.5rem;">
+            <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.5rem;">
+              <span>🏪</span> Datos del Negocio / Establecimiento
+            </h3>
+            <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
+              Información fiscal y comercial que aparecerá en el encabezado de tus tickets de venta y reportes.
+            </p>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+              <div class="form-group">
+                <label class="form-label" style="font-weight: 700;">Nombre Comercial de la Tienda:</label>
+                <input type="text" id="cfg-store-name" class="form-input" placeholder="Ej. Abarrotes & Mini Súper La Tiendita">
+              </div>
+              <div class="form-group">
+                <label class="form-label" style="font-weight: 700;">Teléfono / WhatsApp:</label>
+                <input type="text" id="cfg-store-phone" class="form-input" placeholder="Ej. 555-123-4567">
+              </div>
+              <div class="form-group">
+                <label class="form-label" style="font-weight: 700;">RFC / Identificación Fiscal:</label>
+                <input type="text" id="cfg-store-rfc" class="form-input" placeholder="Ej. XAXX010101000">
+              </div>
+              <div class="form-group">
+                <label class="form-label" style="font-weight: 700;">Dirección / Domicilio:</label>
+                <input type="text" id="cfg-store-address" class="form-input" placeholder="Ej. Av. Principal #123, Col. Centro">
+              </div>
+            </div>
+
+            <button type="button" class="main-action-pill-btn" id="btn-save-business-config" style="background: var(--primary-blue); font-size: 0.95rem; padding: 0.65rem 1.8rem;">
+              💾 Guardar Datos del Negocio
+            </button>
+          </div>
+        </div>
+
+        <!-- PESTAÑA 2: TICKETS E IMPRESIÓN -->
+        <div id="panel-cfg-tickets" class="cfg-tab-panel" style="display: none;">
+          <div class="sicar-table-card" style="padding: 1.5rem;">
+            <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.5rem;">
+              <span>🧾</span> Personalización de Impresión y Tickets
+            </h3>
+            <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
+              Ajusta los textos impresos y el comportamiento de la impresora de tickets térmicos.
+            </p>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+              <div class="form-group">
+                <label class="form-label" style="font-weight: 700;">Encabezado / Lema del Ticket:</label>
+                <input type="text" id="cfg-ticket-header" class="form-input" placeholder="Ej. ¡LOS MEJORES PRECIOS DE LA COLONIA!">
+              </div>
+              <div class="form-group">
+                <label class="form-label" style="font-weight: 700;">Mensaje al Pie del Ticket:</label>
+                <input type="text" id="cfg-ticket-footer" class="form-input" placeholder="Ej. ¡Muchas gracias por su compra! Vuelva pronto.">
+              </div>
+              <div class="form-group">
+                <label class="form-label" style="font-weight: 700;">Ancho de Impresión del Ticket:</label>
+                <select id="cfg-ticket-width" class="form-input">
+                  <option value="58" selected>58 mm (Mini impresora térmica POS estándar)</option>
+                  <option value="80">80 mm (Impresora térmica ancha de mostrador)</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap; margin-bottom: 1.5rem; padding: 0.75rem; background: #f8fafc; border-radius: var(--radius-md);">
+              <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.88rem; cursor: pointer; font-weight: 600;">
+                <input type="checkbox" id="cfg-auto-print-ticket" style="width: 17px; height: 17px; accent-color: var(--primary-blue);">
+                <span>Abrir diálogo de impresión de ticket automáticamente al cobrar cada venta</span>
+              </label>
+            </div>
+
+            <button type="button" class="main-action-pill-btn" onclick="SettingsModule.saveBusinessConfig()" style="background: var(--primary-blue); font-size: 0.95rem; padding: 0.65rem 1.8rem;">
+              💾 Guardar Opciones de Tickets
+            </button>
+          </div>
+        </div>
+
+        <!-- PESTAÑA 3: VENTAS Y GRANEL -->
+        <div id="panel-cfg-pos" class="cfg-tab-panel" style="display: none;">
+          
+          <!-- Tarjeta Especial: Funcionalidad de Granel y Redondeo -->
+          <div class="sicar-table-card" style="padding: 1.5rem; margin-bottom: 1.5rem; border-left: 4px solid #16a34a;">
+            <h3 style="font-size: 1.15rem; font-weight: 800; color: #15803d; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.5rem;">
+              <span>⚖️</span> Venta a Granel, Báscula y Redondeo Entero
+            </h3>
+            <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 1rem;">
+              Configuración para productos que se venden por fracción o kilogramo (frutas, verduras, carnes, semillas).
+            </p>
+
+            <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: var(--radius-md); padding: 1rem; margin-bottom: 0.5rem;">
+              <label style="display: flex; align-items: flex-start; gap: 0.75rem; cursor: pointer; user-select: none;">
+                <input type="checkbox" id="cfg-bulk-round-up" checked style="width: 20px; height: 20px; margin-top: 2px; accent-color: #16a34a;">
+                <div>
+                  <strong style="font-size: 0.95rem; color: #166534; display: block; margin-bottom: 0.2rem;">
+                    🔺 Redondear importe de granel al entero superior automáticamente
+                  </strong>
+                  <span style="font-size: 0.82rem; color: #15803d; line-height: 1.4; display: block;">
+                    Al ingresar el peso de un producto a granel (ej. aguacate, jitomate, jamón), el importe total a cobrar se redondeará automáticamente hacia el siguiente peso entero superior (ej. <strong>$15.20 ➔ $16.00</strong>, <strong>$8.05 ➔ $9.00</strong>). Evita faltantes de monedas fraccionarias y agiliza el cambio en caja.
+                  </span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Preferencias Generales de Venta e Inventario -->
+          <div class="sicar-table-card" style="padding: 1.5rem; margin-bottom: 1.5rem;">
+            <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.5rem;">
+              <span>⚙️</span> Preferencias Generales de Venta e Inventario
+            </h3>
+            <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
+              Control de existencias negativas, moneda y escáner de códigos de barras.
+            </p>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+              <div class="form-group">
+                <label class="form-label" style="font-weight: 700;">Símbolo de Moneda:</label>
+                <input type="text" id="cfg-currency-symbol" class="form-input" style="max-width: 120px;" value="$">
+              </div>
+              <div class="form-group">
+                <label class="form-label" style="font-weight: 700;">Alerta Stock Mínimo por Defecto:</label>
+                <input type="number" id="cfg-min-stock-default" class="form-input" style="max-width: 140px;" value="5">
+              </div>
+              <div class="form-group">
+                <label class="form-label" style="font-weight: 700;">Prefijo de Escáner a Ignorar:</label>
+                <input type="text" id="cfg-scanner-prefix" class="form-input" style="max-width: 180px;" placeholder="Auto-limpieza activa">
+                <small style="color: var(--text-secondary); font-size: 0.72rem; display: block; margin-top: 0.2rem;">Opcional: Si tu hardware antepone caracteres fijos.</small>
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap; margin-bottom: 1.5rem; padding: 0.75rem; background: #f8fafc; border-radius: var(--radius-md);">
+              <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.88rem; cursor: pointer; font-weight: 600;">
+                <input type="checkbox" id="cfg-allow-negative-stock" checked style="width: 17px; height: 17px; accent-color: var(--accent-green);">
+                <span>Permitir ventas cuando el producto no tenga stock registrado (evita detener el cobro)</span>
+              </label>
+            </div>
+
+            <button type="button" class="main-action-pill-btn" id="btn-save-pos-preferences" style="background: var(--accent-green); font-size: 0.95rem; padding: 0.65rem 1.8rem;">
+              💾 Guardar Preferencias de Venta y Granel
+            </button>
+          </div>
+
+        </div>
+
+        <!-- PESTAÑA 4: RESPALDOS DE SEGURIDAD -->
+        <div id="panel-cfg-backups" class="cfg-tab-panel" style="display: none;">
+          <div class="sicar-table-card" style="padding: 1.5rem; margin-bottom: 1.5rem;">
+            <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.5rem;">
+              <span>📁</span> Carpeta de Respaldos de Base de Datos
+            </h3>
+            <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
+              Las copias de seguridad de la base de datos se generan automáticamente al <strong>cerrar sesión</strong> o cuando pulses "Crear Respaldo Ahora".
+            </p>
+
+            <div class="form-group" style="margin-bottom: 1rem;">
+              <label class="form-label" style="font-weight: 700;">Ruta de la Carpeta de Respaldos:</label>
+              <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+                <input type="text" class="form-input" id="setting-backup-folder-input" style="flex: 1; min-width: 260px;" placeholder="C:\PuntoDeVenta\respaldos">
+                <button type="button" class="meta-btn" id="btn-save-backup-folder" style="white-space: nowrap;">
+                  💾 Guardar Carpeta
+                </button>
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 0.75rem; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap;">
+              <button type="button" class="btn-modal-accept" id="btn-create-manual-backup" style="background: var(--accent-green); font-size: 0.88rem; padding: 0.6rem 1.4rem;">
+                📦 Crear Respaldo Ahora
+              </button>
+            </div>
+
+            <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.5rem;">
+              Respaldos Recientes en Carpeta:
+            </h4>
+            <div id="recent-backups-list">
+              <div style="color: var(--text-secondary); font-size: 0.85rem; padding: 0.5rem 0;">Cargando lista de respaldos...</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </div>
+
+  <!-- ==================== 4. MODALES ==================== -->
+
+  <!-- Modal 1: Modal "Cantidad" (Captura 4) -->
+  <div class="modal-overlay" id="modal-cantidad-adjust">
+    <div class="modal-sicar-dialog">
+      <div class="modal-sicar-header">
+        <h3>Cantidad</h3>
+        <button class="menu-toggle-btn" onclick="App.closeModal('modal-cantidad-adjust')">✕</button>
+      </div>
+      <div class="modal-sicar-body">
+        <div class="modal-product-summary">
+          <div class="modal-product-thumb" id="modal-qty-thumb">🥤</div>
+          <div>
+            <div style="font-size: 0.75rem; color: var(--text-muted);" id="modal-qty-code">PZA • 52528488</div>
+            <strong style="font-size: 1.05rem;" id="modal-qty-name">Coca Cola 600 ml</strong>
+            <div style="font-size: 0.85rem; color: var(--primary-blue); font-weight: 700;" id="modal-qty-price">$18.00 MXN</div>
+            <div style="font-size: 0.75rem; color: var(--text-secondary);" id="modal-qty-exist">Existencia: 10 pzas</div>
+          </div>
+        </div>
+
+        <div class="modal-stepper-box">
+          <button class="modal-stepper-btn" onclick="InventoryModule.stepModalQuantity(-1)">−</button>
+          <input type="number" id="modal-stepper-val" class="modal-stepper-input" value="11">
+          <button class="modal-stepper-btn" onclick="InventoryModule.stepModalQuantity(1)">+</button>
+        </div>
+
+        <button class="btn-modal-accept" onclick="InventoryModule.confirmModalQuantity()">
+          ACEPTAR
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 2: Conectar Móvil con Código QR -->
+  <div class="modal-overlay" id="connect-modal">
+    <div class="modal-sicar-dialog" style="max-width: 460px;">
+      <div class="modal-sicar-header">
+        <h3>📱 Conectar Celular / Tablet</h3>
+        <button class="menu-toggle-btn" onclick="App.closeModal('connect-modal')">✕</button>
+      </div>
+      <div class="modal-sicar-body" style="text-align: center;">
+        <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 0.5rem;">
+          Escanea este código QR con la cámara de tu teléfono para abrir el sistema:
+        </p>
+
+        <!-- Selector de Adaptador de Red (en caso de múltiples IPs) -->
+        <div style="margin-bottom: 0.6rem; text-align: left;" id="qr-ip-container">
+          <label style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">
+            Red Wi-Fi / Adaptador de red:
+          </label>
+          <select id="qr-ip-select" class="form-control" style="font-size: 0.82rem; padding: 0.4rem 0.6rem; background: #fff; border: 1px solid var(--border-color); border-radius: var(--radius-md); width: 100%;">
+          </select>
+        </div>
+
+        <div style="display: flex; justify-content: center; margin: 0.5rem 0;">
+          <div style="background:#fff; padding: 0.75rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); border: 1px solid var(--border-color); display: inline-block;">
+            <img id="qr-image" alt="Código QR Móvil" style="width: 220px; height: 220px; display: block; margin: 0 auto; object-fit: contain;" />
+            <canvas id="qr-canvas" style="display: none;"></canvas>
+          </div>
+        </div>
+
+        <div style="margin: 0.6rem 0;">
+          <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.3rem;">O ingresa esta URL en el navegador de tu celular:</div>
+          <div style="background: var(--bg-subtle); border: 1px solid var(--border-color); padding: 0.55rem 1rem; border-radius: var(--radius-pill); font-family: var(--font-mono); font-weight: 700; color: var(--primary-blue); word-break: break-all;" id="qr-network-url">
+            http://...
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 0.5rem; justify-content: center; margin-top: 0.5rem;">
+          <button class="meta-btn" style="justify-content: center; padding: 0.6rem 1.2rem;" id="btn-copy-url">
+            📋 Copiar Enlace
+          </button>
+        </div>
+
+        <!-- Caja de Ayuda y Diagnóstico de Red / Firewall -->
+        <div style="margin-top: 1rem; text-align: left; background: #fffbeb; border: 1px solid #fef3c7; border-radius: var(--radius-md); padding: 0.75rem; font-size: 0.78rem; color: #92400e; line-height: 1.45;">
+          <strong style="display: flex; align-items: center; gap: 0.35rem; margin-bottom: 0.3rem;">
+            <span>💡</span> ¿Tu celular no carga la página?
+          </strong>
+          <ul style="margin: 0; padding-left: 1.2rem;">
+            <li><strong>Mismo Wi-Fi:</strong> El teléfono debe estar en la misma red Wi-Fi de esta PC (desactiva datos celulares mientras te conectas).</li>
+            <li><strong>Bloqueo por Firewall de Windows:</strong> Si el celular marca <em>"No se puede acceder al sitio"</em>, ejecuta el archivo <code style="background: #fde68a; padding: 1px 4px; border-radius: 3px; font-weight: 700;">habilitar_acceso_celular.bat</code> en la carpeta del sistema dando <em>Clic derecho &gt; Ejecutar como administrador</em>.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 3: Cobro Rápido (Efectivo, Tarjeta, Fiado) -->
+  <div class="modal-overlay" id="checkout-modal">
+    <div class="modal-sicar-dialog" style="max-width: 480px;">
+      <div class="modal-sicar-header">
+        <h3>💵 Cobrar Venta</h3>
+        <button class="menu-toggle-btn" onclick="App.closeModal('checkout-modal')">✕</button>
+      </div>
+      <div class="modal-sicar-body">
+        
+        <div style="text-align: center; background: var(--primary-blue-light); padding: 1.25rem; border-radius: var(--radius-lg);">
+          <span style="font-size: 0.8rem; text-transform: uppercase; color: var(--primary-blue); font-weight: 700;">Total a Cobrar</span>
+          <div style="font-size: 2.5rem; font-weight: 900; font-family: var(--font-mono); color: var(--primary-blue);" id="checkout-total-val">$0.00</div>
+        </div>
+
+        <!-- Métodos de pago -->
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem;">
+          <button class="meta-btn payment-method-card active" data-method="EFECTIVO" style="flex-direction: column; padding: 0.6rem 0.2rem; border-color: var(--primary-blue);">
+            <span style="font-size: 1.3rem;">💵</span>
+            <span style="font-size: 0.75rem;">Efectivo</span>
+          </button>
+          <button class="meta-btn payment-method-card" data-method="TARJETA" style="flex-direction: column; padding: 0.6rem 0.2rem;">
+            <span style="font-size: 1.3rem;">💳</span>
+            <span style="font-size: 0.75rem;">Tarjeta</span>
+          </button>
+          <button class="meta-btn payment-method-card" data-method="TRANSFERENCIA" style="flex-direction: column; padding: 0.6rem 0.2rem;">
+            <span style="font-size: 1.3rem;">📲</span>
+            <span style="font-size: 0.75rem;">Transf.</span>
+          </button>
+          <button class="meta-btn payment-method-card" data-method="FIADO" style="flex-direction: column; padding: 0.6rem 0.2rem;">
+            <span style="font-size: 1.3rem;">📝</span>
+            <span style="font-size: 0.75rem;">Fiado</span>
+          </button>
+        </div>
+
+        <!-- Efectivo & Billetes rápidos -->
+        <div id="cash-payment-fields">
+          <label style="font-size: 0.82rem; color: var(--text-secondary); display: block; margin-bottom: 0.3rem;">¿Con cuánto paga el cliente?</label>
+          <input type="number" id="checkout-paid-input" class="sub-search-input" style="background:#fff; font-size: 1.4rem; font-weight: 800; text-align: center;" placeholder="0.00" step="0.5">
+
+          <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.4rem; margin-top: 0.5rem;">
+            <button class="meta-btn bill-btn" data-amount="exact" style="padding: 0.5rem 0.2rem; justify-content: center; font-size: 0.75rem;">Exacto</button>
+            <button class="meta-btn bill-btn" data-amount="50" style="padding: 0.5rem 0.2rem; justify-content: center;">$50</button>
+            <button class="meta-btn bill-btn" data-amount="100" style="padding: 0.5rem 0.2rem; justify-content: center;">$100</button>
+            <button class="meta-btn bill-btn" data-amount="200" style="padding: 0.5rem 0.2rem; justify-content: center;">$200</button>
+            <button class="meta-btn bill-btn" data-amount="500" style="padding: 0.5rem 0.2rem; justify-content: center;">$500</button>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.85rem; padding: 0.75rem 1rem; background: var(--bg-subtle); border-radius: var(--radius-md);">
+            <strong style="font-size: 1rem;">Cambio:</strong>
+            <span style="font-size: 1.6rem; font-weight: 900; font-family: var(--font-mono); color: var(--accent-green-dark);" id="checkout-change-val">$0.00</span>
+          </div>
+        </div>
+
+        <!-- Fiado Fields -->
+        <div id="fiado-payment-fields" style="display: none;">
+          <label style="font-size: 0.82rem; color: var(--text-secondary); display: block; margin-bottom: 0.3rem;">Seleccionar Cliente para Fiado:</label>
+          <select id="checkout-customer-select" class="sub-search-input" style="background:#fff;"></select>
+        </div>
+
+        <button class="btn-modal-accept" id="confirm-checkout-btn">
+          COMPLETAR VENTA
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 4: Recarga Telefónica (Multiservicios) -->
+  <div class="modal-overlay" id="recharge-modal">
+    <div class="modal-sicar-dialog" style="max-width: 440px;">
+      <div class="modal-sicar-header">
+        <h3 id="recharge-carrier-title">Recarga Telefónica</h3>
+        <button class="menu-toggle-btn" onclick="App.closeModal('recharge-modal')">✕</button>
+      </div>
+      <div class="modal-sicar-body">
+        <div>
+          <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.3rem;">Número de Teléfono (10 dígitos):</label>
+          <input type="tel" id="recharge-phone-input" class="sub-search-input" style="background:#fff; font-size: 1.2rem; font-weight: 700; text-align: center;" placeholder="55 1234 5678" maxlength="10">
+        </div>
+
+        <div>
+          <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.4rem;">Monto de la Recarga:</label>
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem;">
+            <button class="meta-btn" onclick="MultiservicesModule.selectAmount(20)">$20</button>
+            <button class="meta-btn" onclick="MultiservicesModule.selectAmount(30)">$30</button>
+            <button class="meta-btn" onclick="MultiservicesModule.selectAmount(50)">$50</button>
+            <button class="meta-btn" onclick="MultiservicesModule.selectAmount(100)" style="border-color: var(--primary-blue); font-weight: 800;">$100</button>
+            <button class="meta-btn" onclick="MultiservicesModule.selectAmount(200)">$200</button>
+            <button class="meta-btn" onclick="MultiservicesModule.selectAmount(500)">$500</button>
+          </div>
+          <input type="hidden" id="recharge-amount-val" value="100">
+        </div>
+
+        <button class="btn-modal-accept" onclick="MultiservicesModule.processRecharge()">
+          APLICAR RECARGA
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 5: Venta a Granel -->
+  <div class="modal-overlay" id="bulk-modal">
+    <div class="modal-sicar-dialog" style="max-width: 420px;">
+      <div class="modal-sicar-header">
+        <h3>⚖️ Venta a Granel / Báscula</h3>
+        <button class="menu-toggle-btn" onclick="App.closeModal('bulk-modal')">✕</button>
+      </div>
+      <div class="modal-sicar-body">
+        <div style="text-align: center;">
+          <h4 id="bulk-product-title" style="font-size: 1.15rem; font-weight: 800;">Producto</h4>
+          <span id="bulk-price-ref" style="font-size: 0.9rem; color: var(--primary-blue); font-weight: 700;">$0.00 / kg</span>
+        </div>
+
+        <div>
+          <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Peso en Kilogramos (kg):</label>
+          <input type="number" id="bulk-weight-input" class="sub-search-input" style="background:#fff; font-size: 1.3rem; font-weight: 800; text-align: center;" step="0.005" value="1.000">
+        </div>
+
+        <!-- Botones rápidos de peso -->
+        <div style="display: flex; gap: 0.35rem; margin-top: 0.35rem; justify-content: center; flex-wrap: wrap;">
+          <button type="button" class="btn-secondary" onclick="PosModule.setBulkWeight(0.250)" style="padding: 0.2rem 0.55rem; font-size: 0.78rem; font-weight: 700;">¼ kg</button>
+          <button type="button" class="btn-secondary" onclick="PosModule.setBulkWeight(0.500)" style="padding: 0.2rem 0.55rem; font-size: 0.78rem; font-weight: 700;">½ kg</button>
+          <button type="button" class="btn-secondary" onclick="PosModule.setBulkWeight(0.750)" style="padding: 0.2rem 0.55rem; font-size: 0.78rem; font-weight: 700;">¾ kg</button>
+          <button type="button" class="btn-secondary" onclick="PosModule.setBulkWeight(1.000)" style="padding: 0.2rem 0.55rem; font-size: 0.78rem; font-weight: 700;">1.0 kg</button>
+          <button type="button" class="btn-secondary" onclick="PosModule.setBulkWeight(2.000)" style="padding: 0.2rem 0.55rem; font-size: 0.78rem; font-weight: 700;">2.0 kg</button>
+        </div>
+
+        <div style="text-align: center; color: var(--text-muted); font-size: 0.8rem; margin: 0.4rem 0;">— O bien importe deseado —</div>
+
+        <div>
+          <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Importe en Dinero ($ Pesos):</label>
+          <input type="number" id="bulk-money-input" class="sub-search-input" style="background:#fff; font-size: 1.3rem; font-weight: 800; text-align: center; color: var(--accent-green-dark);" step="1.0">
+        </div>
+
+        <!-- Botones rápidos de dinero -->
+        <div style="display: flex; gap: 0.35rem; margin-top: 0.35rem; justify-content: center; flex-wrap: wrap;">
+          <button type="button" class="btn-secondary" onclick="PosModule.setBulkMoney(10)" style="padding: 0.2rem 0.55rem; font-size: 0.78rem; font-weight: 700;">$10</button>
+          <button type="button" class="btn-secondary" onclick="PosModule.setBulkMoney(20)" style="padding: 0.2rem 0.55rem; font-size: 0.78rem; font-weight: 700;">$20</button>
+          <button type="button" class="btn-secondary" onclick="PosModule.setBulkMoney(30)" style="padding: 0.2rem 0.55rem; font-size: 0.78rem; font-weight: 700;">$30</button>
+          <button type="button" class="btn-secondary" onclick="PosModule.setBulkMoney(50)" style="padding: 0.2rem 0.55rem; font-size: 0.78rem; font-weight: 700;">$50</button>
+          <button type="button" class="btn-secondary" onclick="PosModule.setBulkMoney(100)" style="padding: 0.2rem 0.55rem; font-size: 0.78rem; font-weight: 700;">$100</button>
+        </div>
+
+        <!-- Módulo de Redondeo al Entero Superior -->
+        <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: var(--radius-md); padding: 0.65rem 0.85rem; margin: 0.8rem 0 0.5rem;">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; font-weight: 700; color: #166534; cursor: pointer; user-select: none;">
+              <input type="checkbox" id="bulk-round-up-checkbox" checked style="width: 17px; height: 17px; accent-color: #16a34a;">
+              <span>🔺 Redondear al superior entero</span>
+            </label>
+            <span id="bulk-rounding-badge" style="font-size: 0.72rem; font-weight: 800; background: #dcfce7; color: #15803d; padding: 0.15rem 0.45rem; border-radius: 4px;">ACTIVO</span>
+          </div>
+          <div id="bulk-calc-comparison" style="font-size: 0.8rem; color: #166534; margin-top: 0.35rem; display: flex; justify-content: space-between; align-items: center;">
+            <span>Exacto: <strong id="bulk-exact-money">$0.00</strong></span>
+            <span>➔ Cobrar: <strong id="bulk-rounded-money" style="font-size: 1rem; color: #15803d;">$0.00</strong></span>
+          </div>
+        </div>
+
+        <button class="btn-modal-accept" id="confirm-bulk-btn" style="margin-top: 0.5rem;">
+          ➕ AGREGAR A LA VENTA
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 6: Formulario de Producto -->
+  <div class="modal-overlay" id="product-form-modal">
+    <div class="modal-sicar-dialog" style="max-width: 500px;">
+      <div class="modal-sicar-header">
+        <h3 id="prod-modal-title">Producto de Abarrotes</h3>
+        <button class="menu-toggle-btn" onclick="App.closeModal('product-form-modal')">✕</button>
+      </div>
+      <div class="modal-sicar-body">
+        <!-- Sección para Tomar Foto al Producto -->
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 0.6rem; padding: 0.8rem; background: var(--bg-subtle); border-radius: var(--radius-md); border: 1px dashed var(--border-color);">
+          <div style="position: relative; width: 110px; height: 110px; border-radius: var(--radius-md); background: #ffffff; border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; overflow: hidden;" id="product-photo-preview-box">
+            <span id="product-photo-placeholder" style="font-size: 3rem; color: var(--text-muted);">📷</span>
+            <img id="product-photo-img" src="" style="display: none; width: 100%; height: 100%; object-fit: cover;" alt="Foto del producto">
+            <button type="button" id="btn-remove-photo" onclick="InventoryModule.removeSelectedPhoto()" style="display: none; position: absolute; top: 4px; right: 4px; background: rgba(239, 68, 68, 0.9); color: #fff; border: none; border-radius: 50%; width: 22px; height: 22px; font-size: 0.75rem; cursor: pointer;" title="Eliminar foto">✕</button>
+          </div>
+          <input type="hidden" id="prod-form-image-url" value="">
+          
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center;">
+            <button type="button" class="meta-btn" id="btn-open-camera" onclick="InventoryModule.startCamera()" style="border-color: var(--primary-blue); font-weight: 700;">
+              📸 Tomar Foto
+            </button>
+            <label class="meta-btn" style="cursor: pointer;">
+              📁 Galería
+              <input type="file" id="prod-photo-file-input" accept="image/*" capture="environment" onchange="InventoryModule.handleFilePhotoSelect(event)" style="display: none;">
+            </label>
+          </div>
+        </div>
+
+        <div>
+          <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Código de Barras:</label>
+          <input type="text" id="prod-form-barcode" class="sub-search-input" style="background:#fff;" placeholder="75010553...">
+        </div>
+        <div>
+          <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Nombre del Producto:</label>
+          <input type="text" id="prod-form-name" class="sub-search-input" style="background:#fff;" placeholder="ej. Papas Sabritas 45g">
+        </div>
+        <div>
+          <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Categoría:</label>
+          <select id="prod-form-category" class="sub-search-input" style="background:#fff;"></select>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem;">
+          <div>
+            <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Precio Costo ($):</label>
+            <input type="number" id="prod-form-cost" class="sub-search-input" style="background:#fff;" step="0.5" placeholder="0.00">
+          </div>
+          <div>
+            <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Precio Venta ($):</label>
+            <input type="number" id="prod-form-price" class="sub-search-input" style="background:#fff;" step="0.5" placeholder="0.00">
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem;">
+          <div>
+            <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Stock Inicial:</label>
+            <input type="number" id="prod-form-stock" class="sub-search-input" style="background:#fff;" value="10">
+          </div>
+          <div>
+            <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Unidad:</label>
+            <select id="prod-form-unit" class="sub-search-input" style="background:#fff;">
+              <option value="pz">Pieza (pz)</option>
+              <option value="kg">Kilo (kg)</option>
+              <option value="lt">Litro (lt)</option>
+            </select>
+          </div>
+        </div>
+        <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; cursor: pointer;">
+          <input type="checkbox" id="prod-form-bulk">
+          ⚖️ Producto a granel (pesaje fraccionado)
+        </label>
+
+        <button class="btn-modal-accept" id="btn-save-product">
+          GUARDAR PRODUCTO
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 7: Ticket Térmico -->
+  <div class="modal-overlay" id="ticket-modal">
+    <div class="modal-sicar-dialog" style="max-width: 380px;">
+      <div class="modal-sicar-header">
+        <h3>🧾 Ticket de Venta</h3>
+        <button class="menu-toggle-btn" onclick="App.closeModal('ticket-modal')">✕</button>
+      </div>
+      <div class="modal-sicar-body" style="padding: 1rem;">
+        <div id="receipt-content" style="background: #fff; font-family: monospace; font-size: 0.85rem; padding: 1rem; border: 1px dashed #cbd5e1; border-radius: 4px;">
+          <!-- Ticket dinámico -->
+        </div>
+
+        <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+          <button class="btn-modal-accept" style="flex: 1;" onclick="window.print()">
+            🖨️ Imprimir
+          </button>
+          <button class="meta-btn" onclick="App.closeModal('ticket-modal')">
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 8: Nuevo Cliente Fiado -->
+  <div class="modal-overlay" id="customer-modal">
+    <div class="modal-sicar-dialog" style="max-width: 440px;">
+      <div class="modal-sicar-header">
+        <h3 id="customer-modal-title">👥 Nuevo Cliente para Fiado</h3>
+        <button class="menu-toggle-btn" onclick="App.closeModal('customer-modal')">✕</button>
+      </div>
+      <div class="modal-sicar-body">
+        <input type="hidden" id="cust-form-id" value="">
+        <div>
+          <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Nombre Completo *:</label>
+          <input type="text" id="cust-form-name" class="sub-search-input" style="background:#fff;" placeholder="ej. Don Pedro">
+        </div>
+        <div>
+          <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Teléfono / WhatsApp (10 dígitos):</label>
+          <input type="tel" id="cust-form-phone" class="sub-search-input" style="background:#fff;" placeholder="ej. 5512345678">
+        </div>
+        <div>
+          <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Dirección:</label>
+          <input type="text" id="cust-form-address" class="sub-search-input" style="background:#fff;" placeholder="ej. Calle Reforma #10">
+        </div>
+        <div>
+          <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Límite de Crédito ($) — 0 = Sin límite:</label>
+          <input type="number" id="cust-form-limit" class="sub-search-input" style="background:#fff;" value="1500.00" step="0.01">
+        </div>
+        <div>
+          <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Notas:</label>
+          <input type="text" id="cust-form-notes" class="sub-search-input" style="background:#fff;" placeholder="ej. Paga quincenal">
+        </div>
+        <button class="btn-modal-accept" id="btn-save-customer">
+          💾 GUARDAR CLIENTE
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 9: Abono de Fiado -->
+  <div class="modal-overlay" id="customer-payment-modal">
+    <div class="modal-sicar-dialog" style="max-width: 400px;">
+      <div class="modal-sicar-header">
+        <h3>💵 Abonar a Cuenta de Fiado</h3>
+        <button class="menu-toggle-btn" onclick="App.closeModal('customer-payment-modal')">✕</button>
+      </div>
+      <div class="modal-sicar-body">
+        <div style="text-align: center;">
+          <h4 id="payment-customer-name" style="font-size: 1.1rem; font-weight: 800;">Cliente</h4>
+          <div style="font-size: 0.8rem; color: var(--text-secondary);">Deuda Actual:</div>
+          <div id="payment-current-debt" style="font-size: 1.8rem; font-weight: 900; font-family: var(--font-mono); color: var(--accent-red);">$0.00</div>
+        </div>
+
+        <div>
+          <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Monto a pagar hoy ($):</label>
+          <input type="number" id="payment-amount-input" class="sub-search-input" style="background:#fff; font-size: 1.4rem; font-weight: 800; text-align: center;">
+        </div>
+
+        <div>
+          <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Concepto / Nota:</label>
+          <input type="text" id="payment-notes-input" class="sub-search-input" style="background:#fff;" value="Abono en efectivo">
+        </div>
+
+        <button class="btn-modal-accept" id="btn-save-payment">
+          💵 REGISTRAR ABONO
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Historial de Movimientos del Cliente -->
+  <div class="modal-overlay" id="customer-history-modal">
+    <div class="modal-sicar-dialog" style="max-width: 520px;">
+      <div class="modal-sicar-header">
+        <h3>📜 Historial de Cuenta</h3>
+        <button class="menu-toggle-btn" onclick="App.closeModal('customer-history-modal')">✕</button>
+      </div>
+      <div class="modal-sicar-body" style="padding: 0;">
+        <div style="padding: 1rem 1.25rem; background: var(--bg-subtle); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+          <div>
+            <div style="font-size: 0.75rem; color: var(--text-secondary);">Cliente</div>
+            <div id="history-cust-name" style="font-size: 1.05rem; font-weight: 800;">—</div>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-size: 0.75rem; color: var(--text-secondary);">Saldo Actual</div>
+            <div id="history-cust-debt" style="font-size: 1.4rem; font-weight: 900; font-family: var(--font-mono); color: var(--accent-red);">$0.00</div>
+          </div>
+        </div>
+        <div id="history-transactions-list" style="max-height: 380px; overflow-y: auto; padding: 0.5rem 0;">
+          <div style="text-align: center; color: var(--text-dim); padding: 2rem;">Sin movimientos</div>
+        </div>
+        <div style="padding: 0.75rem 1rem; border-top: 1px solid var(--border-color); text-align: right;">
+          <button type="button" class="meta-btn" onclick="App.closeModal('customer-history-modal')">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Enviar WhatsApp a Cliente -->
+  <div class="modal-overlay" id="customer-whatsapp-modal">
+    <div class="modal-sicar-dialog" style="max-width: 480px;">
+      <div class="modal-sicar-header">
+        <h3 style="display: flex; align-items: center; gap: 0.5rem;">
+          <span style="color: #22c55e;">💬</span>
+          <span>Enviar WhatsApp a Cliente</span>
+        </h3>
+        <button class="menu-toggle-btn" onclick="App.closeModal('customer-whatsapp-modal')">✕</button>
+      </div>
+      <div class="modal-sicar-body" style="padding: 1.25rem;">
+        <input type="hidden" id="wa-customer-id" value="">
+        
+        <div style="display: flex; gap: 1rem; align-items: center; background: #f0fdf4; border: 1px solid #bbf7d0; padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 0.75rem;">
+          <div style="font-size: 1.8rem;">👤</div>
+          <div style="flex: 1;">
+            <div id="wa-customer-name" style="font-weight: 800; font-size: 1.05rem; color: #166534;">Cliente</div>
+            <div id="wa-customer-debt" style="font-size: 0.85rem; color: #15803d; font-weight: 700;">Saldo: $0.00</div>
+          </div>
+        </div>
+
+        <div>
+          <label style="font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">
+            Número de WhatsApp (10 dígitos):
+          </label>
+          <div style="display: flex; gap: 0.5rem;">
+            <span style="background: #e2e8f0; padding: 0.55rem 0.75rem; border-radius: 6px; font-weight: 700; font-size: 0.9rem; display: flex; align-items: center;">🇲🇽 +52</span>
+            <input type="tel" id="wa-phone-input" class="sub-search-input" style="flex: 1; background: #fff;" placeholder="ej. 5512345678" maxlength="15">
+          </div>
+          <span style="font-size: 0.72rem; color: #64748b;">Se actualizará en la ficha del cliente si es nuevo.</span>
+        </div>
+
+        <div style="margin-top: 0.5rem;">
+          <label style="font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">
+            Plantilla rápida:
+          </label>
+          <div style="display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 0.5rem;">
+            <button type="button" class="btn-secondary" style="font-size: 0.75rem; padding: 0.3rem 0.6rem;" onclick="CustomersModule.applyWhatsAppTemplate('debt')">🧾 Recordatorio Deuda</button>
+            <button type="button" class="btn-secondary" style="font-size: 0.75rem; padding: 0.3rem 0.6rem;" onclick="CustomersModule.applyWhatsAppTemplate('current')">🟢 Al Corriente</button>
+            <button type="button" class="btn-secondary" style="font-size: 0.75rem; padding: 0.3rem 0.6rem;" onclick="CustomersModule.applyWhatsAppTemplate('greeting')">👋 Saludo Cordial</button>
+          </div>
+        </div>
+
+        <div>
+          <label style="font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">
+            Mensaje a Enviar (Puedes editarlo):
+          </label>
+          <textarea id="wa-message-input" rows="5" class="sub-search-input" style="width: 100%; background: #fff; font-family: inherit; font-size: 0.88rem; line-height: 1.4; resize: vertical;"></textarea>
+        </div>
+
+        <div style="display: flex; gap: 0.5rem; margin-top: 0.75rem;">
+          <button type="button" class="btn-secondary" style="padding: 0.75rem 1rem;" onclick="CustomersModule.copyWhatsAppMessage()" title="Copiar texto al portapapeles">
+            📋 Copiar
+          </button>
+          <button type="button" class="btn-modal-accept" style="flex: 1; background: #22c55e; border-color: #16a34a; font-size: 0.95rem;" onclick="CustomersModule.sendWhatsAppNow()">
+            📱 Abrir WhatsApp
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 10: Cámara en Vivo para Tomar Foto a Producto -->
+  <div class="modal-overlay" id="camera-modal">
+    <div class="modal-sicar-dialog" style="max-width: 480px;">
+      <div class="modal-sicar-header">
+        <h3>📸 Tomar Foto al Producto</h3>
+        <button class="menu-toggle-btn" onclick="InventoryModule.stopCamera()">✕</button>
+      </div>
+      <div class="modal-sicar-body" style="padding: 1rem; align-items: center; text-align: center;">
+        <div style="position: relative; width: 100%; max-width: 400px; aspect-ratio: 4/3; background: #0f172a; border-radius: var(--radius-md); overflow: hidden; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-md);">
+          <video id="camera-video-feed" autoplay playsinline style="width: 100%; height: 100%; object-fit: cover;"></video>
+          <canvas id="camera-capture-canvas" style="display: none;"></canvas>
+          <button type="button" onclick="InventoryModule.switchCameraFacing()" style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.6); color: #fff; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 1.3rem; cursor: pointer; display: flex; align-items: center; justify-content: center;" title="Cambiar cámara (frontal/trasera)">🔄</button>
+        </div>
+
+        <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.4rem;">
+          Enfoque el producto y presione el botón para capturar la fotografía:
+        </p>
+
+        <div style="display: flex; justify-content: center; gap: 0.85rem; width: 100%; margin-top: 0.5rem;">
+          <button type="button" class="main-action-pill-btn" onclick="InventoryModule.capturePhoto()" style="background: var(--primary-blue); padding: 0.85rem 2rem; display: flex; align-items: center; gap: 0.5rem;">
+            ⚪ Capturar Foto
+          </button>
+          <button type="button" class="meta-btn" onclick="InventoryModule.stopCamera()">
+            Cancelar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 11: Importar Base de Datos Eleventa -->
+  <div class="modal-overlay" id="eleventa-modal">
+    <div class="modal-sicar-dialog" style="max-width: 550px;">
+      <div class="modal-sicar-header">
+        <h3>📥 Importar Base de Datos Eleventa</h3>
+        <button class="menu-toggle-btn" onclick="App.closeModal('eleventa-modal')">✕</button>
+      </div>
+      <div class="modal-sicar-body" style="padding: 1.25rem;">
+        <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 0.85rem;">
+          Migre automáticamente todo el catálogo de productos, existencias, clientes, cuentas de crédito (fiados) y el historial completo de ventas desde su instalación local de <strong>Eleventa</strong> (Abarrotes Punto de Venta).
+        </p>
+
+        <div class="form-group" style="margin-bottom: 0.85rem;">
+          <label class="form-label">Ruta de instalación de Eleventa:</label>
+          <input type="text" class="form-input" id="eleventa-path-input" value="C:\Program Files (x86)\AbarrotesPDV" placeholder="C:\Program Files (x86)\AbarrotesPDV">
+        </div>
+
+        <div id="eleventa-detection-info" style="margin-bottom: 1rem;">
+          <!-- Se llena dinámicamente -->
+        </div>
+
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: var(--radius-md); padding: 0.85rem; margin-bottom: 1rem;">
+          <div style="font-weight: 600; font-size: 0.88rem; margin-bottom: 0.5rem; color: var(--text-primary);">
+            Módulos a transferir:
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 0.35rem; font-size: 0.85rem;">
+            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+              <input type="checkbox" checked disabled>
+              <span>📦 Catálogo de Productos (Códigos, costos, precios y existencias)</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+              <input type="checkbox" checked disabled>
+              <span>👥 Clientes y Libreta de Fiados (Saldos y límites de crédito)</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+              <input type="checkbox" checked disabled>
+              <span>🏷️ Departamentos y Categorías</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+              <input type="checkbox" checked disabled>
+              <span>💵 Turnos y Movimientos de Caja (Cortes históricos)</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+              <input type="checkbox" id="chk-import-sales" checked>
+              <span>🧾 Historial Completo de Ventas (Tickets y partidas detalladas)</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Caja de Progreso Dinámico -->
+        <div id="eleventa-progress-box" style="display: none; margin-bottom: 1rem;">
+          <div style="font-size: 0.85rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--primary-blue);" id="eleventa-progress-text">
+            Procesando datos...
+          </div>
+          <div style="width: 100%; height: 10px; background: #e2e8f0; border-radius: 5px; overflow: hidden;">
+            <div id="eleventa-progress-bar" style="width: 0%; height: 100%; background: var(--primary-blue); transition: width 0.3s ease;"></div>
+          </div>
+          <div id="eleventa-stats-list"></div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 0.5rem;">
+          <button type="button" class="meta-btn" onclick="App.closeModal('eleventa-modal')">
+            Cerrar
+          </button>
+          <button type="button" class="btn-modal-accept" id="btn-start-eleventa-import" style="padding: 0.75rem 1.5rem;">
+            🚀 Iniciar Importación
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 12: Configuración del Sistema y Respaldos -->
+  <div class="modal-overlay" id="settings-modal">
+    <div class="modal-sicar-dialog" style="max-width: 580px;">
+      <div class="modal-sicar-header">
+        <h3>⚙️ Configuración y Respaldos</h3>
+        <button class="menu-toggle-btn" onclick="App.closeModal('settings-modal')">✕</button>
+      </div>
+      <div class="modal-sicar-body" style="padding: 1.25rem; max-height: 80vh; overflow-y: auto;">
+        
+        <!-- Sección 1: Datos de la Tienda -->
+        <h4 style="color: var(--primary-blue); font-size: 0.95rem; margin-bottom: 0.75rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.35rem; display: flex; align-items: center; gap: 0.4rem;">
+          <span>🏪</span> Datos del Negocio
+        </h4>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
+          <div class="form-group">
+            <label class="form-label">Nombre del Negocio:</label>
+            <input type="text" class="form-input" id="modal-cfg-store-name" placeholder="Mi Tienda de Abarrotes">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Teléfono / WhatsApp:</label>
+            <input type="text" class="form-input" id="modal-cfg-store-phone" placeholder="555-123-4567">
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 0.75rem;">
+          <label class="form-label">Dirección del Establecimiento:</label>
+          <input type="text" class="form-input" id="modal-cfg-store-address" placeholder="Av. Principal #123, Col. Centro">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 1rem;">
+          <label class="form-label">Pie de Ticket:</label>
+          <input type="text" class="form-input" id="modal-cfg-ticket-footer" placeholder="¡Gracias por su compra! Vuelva pronto.">
+        </div>
+
+        <button type="button" class="meta-btn" id="btn-save-store-settings" style="margin-bottom: 1.5rem; font-size: 0.85rem; padding: 0.45rem 1rem;">
+          💾 Guardar Datos del Negocio
+        </button>
+
+        <!-- Sección 2: Carpeta de Respaldos -->
+        <h4 style="color: var(--primary-blue); font-size: 0.95rem; margin-bottom: 0.75rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.35rem; display: flex; align-items: center; gap: 0.4rem;">
+          <span>📁</span> Carpeta de Respaldos de Base de Datos
+        </h4>
+
+        <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
+          Escriba o seleccione la carpeta donde se guardarán automáticamente las copias de seguridad de la base de datos al <strong>cerrar sesión</strong> o al pulsar "Crear Respaldo Ahora".
+        </p>
+
+        <div class="form-group" style="margin-bottom: 0.75rem;">
+          <label class="form-label">Ruta de la Carpeta de Respaldo:</label>
+          <div style="display: flex; gap: 0.5rem;">
+            <input type="text" class="form-input" id="setting-backup-folder-input" placeholder="D:\Git\PuntoDeVenta\respaldos" style="font-family: monospace; font-size: 0.85rem;">
+            <button type="button" class="btn-modal-accept" id="btn-save-backup-folder" style="white-space: nowrap; padding: 0.6rem 1.2rem; font-size: 0.85rem;">
+              💾 Guardar
+            </button>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin: 1rem 0 0.5rem; flex-wrap: wrap; gap: 0.5rem;">
+          <span style="font-weight: 700; font-size: 0.85rem; color: var(--text-primary);">Copias de Seguridad:</span>
+          <div style="display: flex; gap: 0.5rem;">
+            <button type="button" class="main-action-pill-btn" id="btn-create-manual-backup" style="font-size: 0.82rem; padding: 0.45rem 1rem; background: var(--accent-green);">
+              📦 Crear Respaldo Ahora
+            </button>
+            <button type="button" class="main-action-pill-btn" id="btn-optimize-database" style="font-size: 0.82rem; padding: 0.45rem 1rem; background: var(--primary-blue);">
+              🧹 Optimizar Base de Datos
+            </button>
+          </div>
+        </div>
+
+        <div id="recent-backups-list" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: var(--radius-md); padding: 0.5rem; margin-bottom: 1rem;">
+          <!-- Se llena dinámicamente -->
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; margin-top: 1rem;">
+          <button type="button" class="meta-btn" onclick="App.closeModal('settings-modal')">
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 13: Confirmar Cierre de Sesión con Respaldo -->
+  <div class="modal-overlay" id="logout-modal">
+    <div class="modal-sicar-dialog" style="max-width: 460px;">
+      <div class="modal-sicar-header" style="background: #0f172a;">
+        <h3>🔒 Cerrar Sesión y Respaldar</h3>
+        <button class="menu-toggle-btn" onclick="App.closeModal('logout-modal')">✕</button>
+      </div>
+      <div class="modal-sicar-body" style="padding: 1.5rem; text-align: center;">
+        <div style="font-size: 2.8rem; margin-bottom: 0.5rem;">🚪</div>
+        <h4 style="font-size: 1.15rem; color: var(--text-primary); margin-bottom: 0.5rem;">
+          ¿Desea cerrar la sesión actual?
+        </h4>
+        <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 1rem;">
+          Al cerrar sesión, el sistema generará automáticamente una copia de seguridad íntegra de la base de datos para proteger todas sus ventas y productos.
+        </p>
+
+        <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: var(--radius-md); padding: 0.75rem; text-align: left; margin-bottom: 1.25rem;">
+          <div style="font-size: 0.78rem; font-weight: 700; color: #1e40af; margin-bottom: 0.2rem;">
+            📁 Destino del Respaldo:
+          </div>
+          <code id="logout-backup-target-folder" style="font-size: 0.8rem; color: #1e3a8a; word-break: break-all;">
+            Cargando carpeta...
+          </code>
+        </div>
+
+        <div style="display: flex; justify-content: center; gap: 0.85rem;">
+          <button type="button" class="meta-btn" onclick="App.closeModal('logout-modal')">
+            Cancelar
+          </button>
+          <button type="button" class="btn-modal-accept" id="btn-confirm-logout" style="background: #dc2626; padding: 0.75rem 1.75rem;">
+            💾 Respaldar y Cerrar Sesión
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Abrir Turno de Caja -->
+  <div class="modal-overlay" id="modal-open-shift">
+    <div class="modal-sicar-dialog">
+      <div class="modal-sicar-header">
+        <h3>🔑 Abrir Turno de Caja</h3>
+        <button class="menu-toggle-btn" onclick="App.closeModal('modal-open-shift')">✕</button>
+      </div>
+      <div class="modal-sicar-body" style="padding: 1.5rem;">
+        <div style="margin-bottom: 1rem;">
+          <label class="form-label" style="font-size: 0.82rem; font-weight:700; margin-bottom: 0.3rem; display:block;">
+            Seleccione el Cajero / Usuario en Turno:
+          </label>
+          <select id="open-shift-cashier-input" class="sub-search-input" style="background:#fff; height: 42px; font-weight: 700;">
+            <option value="Admin" selected>Administrador (ADMIN)</option>
+          </select>
+        </div>
+
+        <div style="margin-bottom: 1.5rem;">
+          <label class="form-label" style="font-size: 0.82rem; font-weight:700; margin-bottom: 0.3rem; display:block;">
+            Dinero Inicial en Caja (Fondo de Cambio):
+          </label>
+          <div style="position: relative;">
+            <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-weight: 800; color: var(--text-secondary); font-size: 1.1rem;">$</span>
+            <input type="number" id="open-shift-initial-input" class="sub-search-input" style="background:#fff; height: 42px; padding-left: 2rem; font-family: var(--font-mono); font-size: 1.2rem; font-weight: 800;" value="500.00" step="10">
+          </div>
+          <span style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.3rem; display:block;">
+            Efectivo disponible en el cajón para cambio.
+          </span>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+          <button type="button" class="meta-btn" onclick="App.closeModal('modal-open-shift')">
+            Cancelar
+          </button>
+          <button type="button" class="main-action-pill-btn" id="btn-open-shift" style="padding: 0.75rem 1.8rem;">
+            Abrir Turno y Cobrar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Registrar Entrada / Salida de Efectivo -->
+  <div class="modal-overlay" id="cash-movement-modal">
+    <div class="modal-sicar-dialog">
+      <div class="modal-sicar-header">
+        <h3>💸 Movimiento de Caja</h3>
+        <button class="menu-toggle-btn" onclick="App.closeModal('cash-movement-modal')">✕</button>
+      </div>
+      <div class="modal-sicar-body" style="padding: 1.5rem;">
+        <div style="margin-bottom: 1rem;">
+          <label class="form-label" style="font-size: 0.82rem; font-weight:700; margin-bottom: 0.3rem; display:block;">
+            Tipo de Movimiento:
+          </label>
+          <select id="movement-type-select" class="sub-search-input" style="background:#fff; height: 40px; font-weight: 700;">
+            <option value="EGRESO" selected>Salida de Efectivo (Gasto / Pago a Proveedor)</option>
+            <option value="INGRESO">Entrada de Efectivo (Depósito Extraordinario)</option>
+          </select>
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+          <label class="form-label" style="font-size: 0.82rem; font-weight:700; margin-bottom: 0.3rem; display:block;">
+            Monto ($):
+          </label>
+          <input type="number" id="movement-amount-input" class="sub-search-input" style="background:#fff; height: 42px; font-family: var(--font-mono); font-size: 1.2rem; font-weight: 800;" placeholder="0.00" step="1">
+        </div>
+
+        <div style="margin-bottom: 1.5rem;">
+          <label class="form-label" style="font-size: 0.82rem; font-weight:700; margin-bottom: 0.3rem; display:block;">
+            Concepto o Motivo:
+          </label>
+          <input type="text" id="movement-concept-input" class="sub-search-input" style="background:#fff; height: 40px;" placeholder="Ej: Pago a repartidor Bimbo, compra de bolsas">
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+          <button type="button" class="meta-btn" onclick="App.closeModal('cash-movement-modal')">
+            Cancelar
+          </button>
+          <button type="button" class="main-action-pill-btn" id="btn-save-movement" style="padding: 0.75rem 1.8rem;">
+            Guardar Movimiento
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Cierre de Turno (Corte Z) -->
+  <div class="modal-overlay" id="close-shift-modal">
+    <div class="modal-sicar-dialog">
+      <div class="modal-sicar-header">
+        <h3>🔒 Cierre de Turno de Caja (Corte Z)</h3>
+        <button class="menu-toggle-btn" onclick="App.closeModal('close-shift-modal')">✕</button>
+      </div>
+      <div class="modal-sicar-body" style="padding: 1.5rem;">
+        <div style="background: var(--bg-subtle); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+          <div style="font-size: 0.8rem; color: var(--text-secondary);">EFECTIVO SISTEMA (ESPERADO):</div>
+          <div style="font-size: 1.6rem; font-weight: 900; font-family: var(--font-mono); color: var(--primary-blue);" id="close-shift-expected">$0.00</div>
+          <div style="font-size: 0.75rem; color: var(--text-secondary);">Fondo inicial + ventas en efectivo + entradas - salidas</div>
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+          <label class="form-label" style="font-size: 0.82rem; font-weight:700; margin-bottom: 0.3rem; display:block;">
+            Dinero Físico Contado en Caja ($):
+          </label>
+          <input type="number" id="close-shift-real-input" class="sub-search-input" style="background:#fff; height: 42px; font-family: var(--font-mono); font-size: 1.25rem; font-weight: 800;" placeholder="0.00" step="1">
+        </div>
+
+        <div style="margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; background: #fff; border: 1px solid var(--border-light); padding: 0.6rem 0.8rem; border-radius: 8px;">
+          <span style="font-size: 0.84rem; font-weight: 700;">Diferencia de Caja:</span>
+          <span id="close-shift-diff" style="font-family: var(--font-mono); font-weight: 900; font-size: 1rem; color: var(--primary-blue);">$0.00 (Cuadre exacto)</span>
+        </div>
+
+        <div style="margin-bottom: 1.5rem;">
+          <label class="form-label" style="font-size: 0.82rem; font-weight:700; margin-bottom: 0.3rem; display:block;">
+            Notas u Observaciones del Cierre:
+          </label>
+          <input type="text" id="close-shift-notes-input" class="sub-search-input" style="background:#fff; height: 38px;" placeholder="Opcional">
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+          <button type="button" class="meta-btn" onclick="App.closeModal('close-shift-modal')">
+            Cancelar
+          </button>
+          <button type="button" class="main-action-pill-btn" id="btn-confirm-close-shift" style="background: #dc2626; padding: 0.75rem 1.8rem;">
+            Confirmar y Cerrar Turno
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pantalla Completa de Sesión Cerrada / Bloqueo (Lock Screen) -->
+  <div class="lock-screen-overlay" id="lock-screen">
+    <div class="lock-card">
+      <div class="lock-avatar">🏪</div>
+      <h2 style="color: var(--text-primary); font-size: 1.5rem; font-weight: 800; margin-bottom: 0.25rem;">
+        Sesión Cerrada
+      </h2>
+      <p style="color: var(--text-secondary); font-size: 0.88rem; margin-bottom: 0.5rem;">
+        Terminal en Modo Seguro • Punto de Venta
+      </p>
+
+      <div id="lock-screen-backup-info">
+        <!-- Información del respaldo generado -->
+      </div>
+
+      <div class="form-group" style="text-align: left; margin-top: 1rem;">
+        <label class="form-label" style="font-size: 0.82rem;">Seleccione Usuario / Cajero:</label>
+        <select class="form-select" id="lock-user-select" style="font-size: 0.9rem;">
+          <option value="Administrador" selected>Administrador (Control Total)</option>
+        </select>
+      </div>
+
+      <button type="button" class="btn-unlock" id="btn-unlock-session">
+        🔓 Iniciar Sesión / Ingresar
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal: Agregar Nota al Ticket -->
+  <div class="modal-overlay" id="modal-ticket-notes">
+    <div class="modal-sicar-dialog" style="max-width: 440px;">
+      <div class="modal-sicar-header">
+        <h3>💬 Nota / Observación del Ticket</h3>
+        <button class="menu-toggle-btn" onclick="App.closeModal('modal-ticket-notes')">✕</button>
+      </div>
+      <div class="modal-sicar-body" style="padding: 1.5rem;">
+        <p style="font-size: 0.82rem; color: #64748b; margin-bottom: 0.75rem;">
+          Escriba notas adicionales para este ticket (ej. datos de entrega, instrucciones especiales):
+        </p>
+        <textarea id="ticket-note-textarea" class="sub-search-input" style="width: 100%; height: 95px; border-radius: 8px; padding: 0.75rem; font-family: inherit; font-size: 0.9rem; resize: vertical;" placeholder="Escriba la nota aquí..."></textarea>
+        <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.25rem;">
+          <button type="button" class="meta-btn" onclick="App.closeModal('modal-ticket-notes')">Cancelar</button>
+          <button type="button" class="main-action-pill-btn" onclick="PosModule.saveTicketNote()" style="padding: 0.65rem 1.5rem;">Guardar Nota</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Artículo Rápido / Común sin Código (⚡) -->
+  <div class="modal-overlay" id="modal-quick-item">
+    <div class="modal-sicar-dialog" style="max-width: 460px;">
+      <div class="modal-sicar-header">
+        <h3>⚡ Venta Rápida de Artículo Común</h3>
+        <button class="menu-toggle-btn" onclick="App.closeModal('modal-quick-item')">✕</button>
+      </div>
+      <div class="modal-sicar-body" style="padding: 1.5rem;">
+        <div style="margin-bottom: 1rem;">
+          <label class="form-label" style="font-size: 0.82rem; font-weight:700; margin-bottom: 0.3rem; display:block;">
+            Concepto / Descripción del Producto:
+          </label>
+          <input type="text" id="quick-item-name" class="sub-search-input" style="background:#fff; height: 42px;" placeholder="Ej: Recarga Telefónica, Hielo, Varios..." value="Artículo Común">
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+          <div>
+            <label class="form-label" style="font-size: 0.82rem; font-weight:700; margin-bottom: 0.3rem; display:block;">
+              Precio de Venta ($):
+            </label>
+            <input type="number" id="quick-item-price" class="sub-search-input" style="background:#fff; height: 42px; font-family: var(--font-mono); font-size: 1.2rem; font-weight: 800;" placeholder="0.00" step="0.5" autofocus>
+          </div>
+          <div>
+            <label class="form-label" style="font-size: 0.82rem; font-weight:700; margin-bottom: 0.3rem; display:block;">
+              Cantidad:
+            </label>
+            <input type="number" id="quick-item-qty" class="sub-search-input" style="background:#fff; height: 42px; font-family: var(--font-mono); font-size: 1.2rem; font-weight: 800;" value="1" min="1" step="1">
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+          <button type="button" class="meta-btn" onclick="App.closeModal('modal-quick-item')">Cancelar</button>
+          <button type="button" class="main-action-pill-btn" onclick="PosModule.addQuickItem()" style="padding: 0.65rem 1.5rem;">+ Agregar al Ticket</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Selector Rápido de Cliente para el Ticket -->
+  <div class="modal-overlay" id="modal-customer-selector">
+    <div class="modal-sicar-dialog" style="max-width: 520px; max-height: 85vh; display: flex; flex-direction: column;">
+      <div class="modal-sicar-header">
+        <h3>👤 Asignar Cliente a la Venta</h3>
+        <button class="menu-toggle-btn" onclick="App.closeModal('modal-customer-selector')">✕</button>
+      </div>
+      <div class="modal-sicar-body" style="padding: 1.25rem; flex: 1; overflow: hidden; display: flex; flex-direction: column;">
+        
+        <button type="button" class="meta-btn" onclick="PosModule.selectCustomer(null, 'Público General')" style="width: 100%; justify-content: flex-start; padding: 0.75rem 1rem; margin-bottom: 1rem; background: #e0f2fe; color: #0369a1; border-color: #bae6fd; font-weight: 700;">
+          <span>🏪</span>
+          <span>Público General (Venta sin crédito)</span>
+        </button>
+
+        <div style="position: relative; margin-bottom: 0.75rem;">
+          <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8;">🔍</span>
+          <input type="text" id="quick-customer-search-input" class="sub-search-input" placeholder="Buscar cliente por nombre o teléfono..." style="background:#fff; height: 40px; padding-left: 2.2rem;" oninput="PosModule.filterQuickCustomers(this.value)">
+        </div>
+
+        <div class="quick-customers-list" id="quick-customers-list" style="flex: 1; overflow-y: auto; max-height: 320px; display: flex; flex-direction: column; gap: 0.4rem; padding-right: 0.3rem;">
+          <!-- Clientes cargados dinámicamente -->
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Registrar o Editar Proveedor -->
+  <div class="modal-overlay" id="modal-supplier-form">
+    <div class="modal-sicar-dialog" style="max-width: 540px;">
+      <div class="modal-sicar-header">
+        <h3 id="modal-supplier-title">➕ Registrar Nuevo Proveedor</h3>
+        <button class="menu-toggle-btn" onclick="App.closeModal('modal-supplier-form')">✕</button>
+      </div>
+      <form id="supplier-form">
+        <div class="modal-sicar-body" style="padding: 1.25rem;">
+          <div class="form-group" style="margin-bottom: 0.85rem;">
+            <label class="form-label" style="font-weight: 700;">Nombre de la Empresa o Marca: *</label>
+            <input type="text" id="supplier-name" class="form-input" placeholder="Ej. Bimbo, Sabritas, Lácteos Lala" required>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.85rem;">
+            <div class="form-group">
+              <label class="form-label" style="font-weight: 700;">Nombre del Contacto / Repartidor:</label>
+              <input type="text" id="supplier-contact" class="form-input" placeholder="Ej. Juan Pérez (Ruta 14)">
+            </div>
+            <div class="form-group">
+              <label class="form-label" style="font-weight: 700;">Teléfono / WhatsApp:</label>
+              <input type="text" id="supplier-phone" class="form-input" placeholder="Ej. 555-987-6543">
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.85rem;">
+            <div class="form-group">
+              <label class="form-label" style="font-weight: 700;">RFC / Identificación:</label>
+              <input type="text" id="supplier-rfc" class="form-input" placeholder="Ej. BIM750101XYZ">
+            </div>
+            <div class="form-group">
+              <label class="form-label" style="font-weight: 700;">Correo Electrónico:</label>
+              <input type="email" id="supplier-email" class="form-input" placeholder="pedidos@empresa.com">
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0.85rem;">
+            <label class="form-label" style="font-weight: 700;">Dirección / Bodega / Reparto:</label>
+            <input type="text" id="supplier-address" class="form-input" placeholder="Ej. Parque Industrial Oriente Bodega 12">
+          </div>
+
+          <div class="form-group" style="margin-bottom: 1.25rem;">
+            <label class="form-label" style="font-weight: 700;">Notas y Días de Visita:</label>
+            <input type="text" id="supplier-notes" class="form-input" placeholder="Ej. Visita martes y viernes por la mañana. Crédito a 7 días.">
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+            <button type="button" class="meta-btn" onclick="App.closeModal('modal-supplier-form')">Cancelar</button>
+            <button type="submit" class="main-action-pill-btn" style="padding: 0.65rem 1.6rem; background: var(--primary-blue);">
+              💾 Guardar Proveedor
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Detalle de Compra Histórica -->
+  <div class="modal-overlay" id="modal-purchase-detail">
+    <div class="modal-sicar-dialog" style="max-width: 680px; max-height: 85vh; display: flex; flex-direction: column;">
+      <div class="modal-sicar-header">
+        <h3>🧾 Detalle de Compra: <span id="modal-purchase-detail-folio" style="color: var(--primary-blue); font-family: var(--font-mono);">COM-00001</span></h3>
+        <button class="menu-toggle-btn" onclick="App.closeModal('modal-purchase-detail')">✕</button>
+      </div>
+      <div class="modal-sicar-body" style="padding: 1.25rem; overflow-y: auto; flex: 1;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 1rem; background: #f8fafc; padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.85rem;">
+          <div>
+            <div>Proveedor: <strong id="modal-purchase-detail-supplier" style="color: var(--text-primary);">Bimbo</strong></div>
+            <div style="color: var(--text-secondary); margin-top: 0.2rem;">Fecha: <span id="modal-purchase-detail-date">--</span></div>
+          </div>
+          <div style="text-align: right;">
+            <div>Total Compra:</div>
+            <div style="font-size: 1.25rem; font-weight: 900; font-family: var(--font-mono); color: var(--accent-green-dark);" id="modal-purchase-detail-total">$0.00 MXN</div>
+          </div>
+        </div>
+
+        <table class="sicar-table">
+          <thead>
+            <tr>
+              <th style="width: 35px; text-align: center;">#</th>
+              <th>Producto</th>
+              <th style="text-align: center;">Cantidad</th>
+              <th style="text-align: right;">Costo Unit.</th>
+              <th style="text-align: right;">Subtotal</th>
+            </tr>
+          </thead>
+          <tbody id="modal-purchase-detail-tbody">
+            <!-- Partidas de la compra -->
+          </tbody>
+        </table>
+
+        <div style="display: flex; justify-content: flex-end; margin-top: 1.25rem;">
+          <button type="button" class="meta-btn" onclick="App.closeModal('modal-purchase-detail')">
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 14: Comprobante de Abono de Fiados -->
+  <div class="modal-overlay" id="payment-receipt-modal">
+    <div class="modal-sicar-dialog" style="max-width: 380px;">
+      <div class="modal-sicar-header">
+        <h3>🧾 Comprobante de Abono</h3>
+        <button class="menu-toggle-btn" onclick="App.closeModal('payment-receipt-modal')">✕</button>
+      </div>
+      <div class="modal-sicar-body" style="padding: 1rem;">
+        <div id="payment-receipt-content" style="background: #fff; font-family: monospace; font-size: 0.85rem; padding: 1rem; border: 1px dashed #cbd5e1; border-radius: 4px;">
+          <!-- Comprobante dinámico -->
+        </div>
+
+        <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+          <button type="button" class="btn-modal-accept" style="flex: 1;" onclick="CustomersModule.printPaymentReceipt()">
+            🖨️ Imprimir
+          </button>
+          <button type="button" class="meta-btn" onclick="App.closeModal('payment-receipt-modal')">
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 15: Sugerencias Inteligentes de Reabastecimiento -->
+  <div class="modal-overlay" id="modal-reorder-suggestions">
+    <div class="modal-sicar-dialog" style="max-width: 900px; max-height: 85vh; display: flex; flex-direction: column;">
+      <div class="modal-sicar-header">
+        <h3>💡 Sugerencias de Compra y Reabastecimiento</h3>
+        <button class="menu-toggle-btn" onclick="App.closeModal('modal-reorder-suggestions')">✕</button>
+      </div>
+      <div class="modal-sicar-body" style="padding: 1.25rem; overflow-y: auto; flex: 1;">
+        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">
+          Cálculo inteligente basado en el ritmo de venta histórica de los tickets y las existencias actuales. Proyectado para cubrir <strong>15 días</strong> de demanda.
+        </p>
+
+        <div class="table-view-container">
+          <div class="sicar-table-card">
+            <table class="sicar-table">
+              <thead>
+                <tr>
+                  <th>Producto</th>
+                  <th style="text-align: right;">Stock Actual</th>
+                  <th style="text-align: right;">Stock Mín.</th>
+                  <th style="text-align: right;">Venta Diaria</th>
+                  <th style="text-align: right;">Días Restantes</th>
+                  <th style="text-align: right; color: var(--primary-blue);">Sugerido a Comprar</th>
+                  <th style="text-align: center;">Prioridad</th>
+                </tr>
+              </thead>
+              <tbody id="reorder-table-body">
+                <!-- Se llena dinámicamente -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; margin-top: 1.25rem; gap: 0.75rem;">
+          <button type="button" class="meta-btn" onclick="App.closeModal('modal-reorder-suggestions')">
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 16: Importación de Catálogo CSV -->
+  <div class="modal-overlay" id="modal-import-csv">
+    <div class="modal-sicar-dialog" style="max-width: 520px;">
+      <div class="modal-sicar-header">
+        <h3>📥 Importar Catálogo desde Archivo CSV</h3>
+        <button class="menu-toggle-btn" onclick="App.closeModal('modal-import-csv')">✕</button>
+      </div>
+      <div class="modal-sicar-body" style="padding: 1.25rem;">
+        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">
+          Seleccione un archivo <code>.csv</code> (exportado previamente o editado en Excel). El sistema actualizará los productos existentes (por código o ID) y creará los nuevos automáticamente.
+        </p>
+
+        <div class="form-group" style="margin-bottom: 1rem;">
+          <label class="form-label">Seleccionar archivo CSV:</label>
+          <input type="file" id="csv-file-input" accept=".csv" class="form-input" style="padding: 0.5rem;">
+        </div>
+
+        <div id="csv-import-preview" style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 1rem;"></div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+          <button type="button" class="meta-btn" onclick="App.closeModal('modal-import-csv')">
+            Cancelar
+          </button>
+          <button type="button" class="btn-modal-accept" id="btn-confirm-csv-import" onclick="InventoryModule.processCsvImport()">
+            📥 Iniciar Importación
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenedor Flotante de Notificaciones Toast -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="/static/js/qr-generator.js?v=2.7"></script>
+  <script src="/static/js/barcode.js?v=2.7"></script>
+  <script src="/static/js/pos.js?v=2.7"></script>
+  <script src="/static/js/inventory.js?v=2.7"></script>
+  <script src="/static/js/customers.js?v=2.7"></script>
+  <script src="/static/js/cash.js?v=2.7"></script>
+  <script src="/static/js/users.js?v=2.7"></script>
+  <script src="/static/js/suppliers.js?v=2.7"></script>
+  <script src="/static/js/purchases.js?v=2.7"></script>
+  <script src="/static/js/reports.js?v=2.7"></script>
+  <script src="/static/js/eleventa.js?v=2.7"></script>
+  <script src="/static/js/settings.js?v=2.7"></script>
+  <script src="/static/js/backup.js?v=2.7"></script>
+  <script src="/static/js/app.js?v=2.7"></script>
+</body>
+</html>

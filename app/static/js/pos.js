@@ -1132,6 +1132,16 @@ const PosModule = {
     this.tickets[this.activeTab].customerId = id;
     this.tickets[this.activeTab].customerName = name || 'Público General';
     this.renderCart();
+
+    const checkoutCustDisplay = document.getElementById('checkout-customer-name-display');
+    if (checkoutCustDisplay) {
+      checkoutCustDisplay.innerText = name || 'Público General';
+    }
+    const custSelect = document.getElementById('checkout-customer-select');
+    if (custSelect && id) {
+      custSelect.value = id;
+    }
+
     App.closeModal('modal-customer-selector');
     App.showToast(`Cliente asignado: ${name || 'Público General'}`, 'info');
   },
@@ -1149,6 +1159,12 @@ const PosModule = {
     paidInput.value = total.toFixed(2);
 
     // Preseleccionar cliente si ya fue asignado en el ticket
+    const currentCustName = this.tickets[this.activeTab].customerName || 'Público General';
+    const checkoutCustDisplay = document.getElementById('checkout-customer-name-display');
+    if (checkoutCustDisplay) {
+      checkoutCustDisplay.innerText = currentCustName;
+    }
+
     const custSelect = document.getElementById('checkout-customer-select');
     if (custSelect && this.tickets[this.activeTab].customerId) {
       custSelect.value = this.tickets[this.activeTab].customerId;
@@ -1343,10 +1359,569 @@ const PosModule = {
         </div>
       `;
 
+      // Guardar datos completos para envío de WhatsApp
+      this.lastSaleTicketData = data;
+
+      // Configurar texto y visibilidad del botón de WhatsApp
+      const waBtn = document.getElementById('btn-ticket-whatsapp');
+      const waText = document.getElementById('ticket-whatsapp-text');
+      const hasCustomer = sale.customer_name && sale.customer_name !== 'Público General';
+
+      if (waBtn) {
+        waBtn.style.display = 'flex';
+        if (hasCustomer) {
+          const phoneLabel = sale.customer_phone ? ` (${sale.customer_phone})` : '';
+          waBtn.title = `Enviar ticket a WhatsApp de ${sale.customer_name}${phoneLabel}`;
+          if (waText) {
+            waText.innerHTML = `Enviar Ticket por WhatsApp a <strong>${sale.customer_name}</strong>`;
+          }
+        } else {
+          waBtn.title = 'Enviar ticket por WhatsApp ingresando número';
+          if (waText) {
+            waText.textContent = 'Enviar Ticket por WhatsApp';
+          }
+        }
+      }
+
       document.getElementById('ticket-modal').classList.add('active');
     } catch (e) {
       console.error(e);
     }
+  },
+
+  generateTicketCanvas(sale, items, settings) {
+    const canvas = document.createElement('canvas');
+    const width = 480;
+    const padding = 24;
+    const contentWidth = width - (padding * 2);
+
+    const fontPrimary = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
+    const fontMono = "'JetBrains Mono', 'Courier New', Courier, monospace";
+
+    // 1. Simulación y cálculo de altura dinámico
+    const tempCanvas = document.createElement('canvas');
+    const tempCtx = tempCanvas.getContext('2d');
+    tempCtx.font = `13px ${fontMono}`;
+
+    const formattedItems = (items || []).map(item => {
+      const qty = `${item.quantity} ${item.unit || 'pz'}`;
+      const price = `$${Number(item.subtotal || 0).toFixed(2)}`;
+      const name = item.product_name || 'Artículo';
+
+      const nameMaxWidth = contentWidth - 145;
+      const words = name.split(' ');
+      const lines = [];
+      let currentLine = words[0] || '';
+
+      for (let i = 1; i < words.length; i++) {
+        const testLine = currentLine + ' ' + words[i];
+        if (tempCtx.measureText(testLine).width < nameMaxWidth) {
+          currentLine = testLine;
+        } else {
+          lines.push(currentLine);
+          currentLine = words[i];
+        }
+      }
+      lines.push(currentLine);
+
+      return { qty, nameLines: lines, price };
+    });
+
+    let estimatedHeight = 35; // pad top
+    estimatedHeight += 30; // Nombre tienda
+    if (settings.store_address) estimatedHeight += 18;
+    if (settings.store_phone) estimatedHeight += 18;
+    estimatedHeight += 24; // divider
+    estimatedHeight += 24; // Ticket #
+    estimatedHeight += 18; // Fecha
+    estimatedHeight += 18; // Cajero & Método
+    if (sale.customer_name && sale.customer_name !== 'Público General') estimatedHeight += 20; // Cliente
+    estimatedHeight += 24; // divider
+    estimatedHeight += 22; // Table header
+    estimatedHeight += 8;  // gap
+
+    formattedItems.forEach(item => {
+      estimatedHeight += (item.nameLines.length * 17) + 6;
+    });
+
+    estimatedHeight += 24; // divider
+    estimatedHeight += 32; // Total
+    if (sale.payment_method === 'EFECTIVO' && sale.amount_paid) {
+      estimatedHeight += 36; // Paga con / Cambio
+    } else if (sale.payment_method === 'FIADO') {
+      estimatedHeight += 22; // Fiado badge
+    }
+    estimatedHeight += 24; // divider
+    estimatedHeight += 26; // Footer text
+    estimatedHeight += 65; // Barcode simulation & brand
+    estimatedHeight += 30; // padding bottom
+
+    // Escala x2 para nitidez en pantallas Retina y zoom de WhatsApp
+    const scale = 2;
+    canvas.width = width * scale;
+    canvas.height = Math.ceil(estimatedHeight) * scale;
+
+    const ctx = canvas.getContext('2d');
+    ctx.scale(scale, scale);
+
+    // Fondo blanco del papel de ticket con textura limpia
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, width, estimatedHeight);
+
+    // Borde sutil térmico
+    ctx.strokeStyle = '#e2e8f0';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(0, 0, width, estimatedHeight);
+
+    let y = 28;
+
+    // Encabezado de la tienda
+    ctx.fillStyle = '#0f172a';
+    ctx.font = `bold 18px ${fontPrimary}`;
+    ctx.textAlign = 'center';
+    const storeName = (settings.store_name || 'ABARROTES & MINI SÚPER').toUpperCase();
+    ctx.fillText(storeName, width / 2, y);
+    y += 20;
+
+    ctx.fillStyle = '#475569';
+    ctx.font = `12px ${fontPrimary}`;
+    if (settings.store_address) {
+      ctx.fillText(settings.store_address, width / 2, y);
+      y += 18;
+    }
+    if (settings.store_phone) {
+      ctx.fillText(`Tel: ${settings.store_phone}`, width / 2, y);
+      y += 18;
+    }
+
+    // Línea punteada
+    function drawDashedLine(posY) {
+      ctx.save();
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4, 3]);
+      ctx.beginPath();
+      ctx.moveTo(padding, posY);
+      ctx.lineTo(width - padding, posY);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    y += 6;
+    drawDashedLine(y);
+    y += 18;
+
+    // Folio del ticket
+    ctx.fillStyle = '#0f172a';
+    ctx.font = `bold 15px ${fontMono}`;
+    ctx.textAlign = 'center';
+    ctx.fillText(`TICKET DE VENTA #${sale.id}`, width / 2, y);
+    y += 18;
+
+    ctx.fillStyle = '#64748b';
+    ctx.font = `12px ${fontMono}`;
+    let dateStr = '';
+    try {
+      dateStr = new Date(sale.created_at).toLocaleString('es-MX', {
+        year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true
+      });
+    } catch (_) { dateStr = sale.created_at; }
+    ctx.fillText(dateStr, width / 2, y);
+    y += 20;
+
+    // Cajero y Método
+    ctx.font = `12px ${fontMono}`;
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#334155';
+    ctx.fillText(`Cajero: ${sale.cashier_name || 'Admin'}`, padding, y);
+    ctx.textAlign = 'right';
+    ctx.fillText(`Método: ${sale.payment_method || 'EFECTIVO'}`, width - padding, y);
+    y += 18;
+
+    // Cliente si fue seleccionado
+    if (sale.customer_name && sale.customer_name !== 'Público General') {
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#0f172a';
+      ctx.font = `bold 12px ${fontMono}`;
+      const phoneText = sale.customer_phone ? ` (${sale.customer_phone})` : '';
+      ctx.fillText(`Cliente: ${sale.customer_name}${phoneText}`, padding, y);
+      y += 18;
+    }
+
+    y += 4;
+    drawDashedLine(y);
+    y += 16;
+
+    // Cabecera de la tabla
+    ctx.font = `bold 12px ${fontMono}`;
+    ctx.fillStyle = '#0f172a';
+    ctx.textAlign = 'left';
+    ctx.fillText('CANT.', padding, y);
+    ctx.fillText('DESCRIPCIÓN', padding + 60, y);
+    ctx.textAlign = 'right';
+    ctx.fillText('TOTAL', width - padding, y);
+    y += 14;
+
+    // Lista de artículos
+    formattedItems.forEach(item => {
+      ctx.font = `12px ${fontMono}`;
+      ctx.fillStyle = '#1e293b';
+
+      ctx.textAlign = 'left';
+      ctx.fillText(item.qty, padding, y);
+
+      item.nameLines.forEach((lineText, idx) => {
+        ctx.fillText(lineText, padding + 60, y + (idx * 16));
+      });
+
+      ctx.textAlign = 'right';
+      ctx.font = `bold 12px ${fontMono}`;
+      ctx.fillText(item.price, width - padding, y);
+
+      y += (item.nameLines.length * 16) + 4;
+    });
+
+    y += 4;
+    drawDashedLine(y);
+    y += 22;
+
+    // Total destacado
+    ctx.fillStyle = '#0f172a';
+    ctx.font = `bold 16px ${fontPrimary}`;
+    ctx.textAlign = 'left';
+    ctx.fillText('TOTAL:', padding, y);
+    ctx.font = `bold 20px ${fontMono}`;
+    ctx.textAlign = 'right';
+    ctx.fillText(`$${Number(sale.total || 0).toFixed(2)}`, width - padding, y);
+    y += 22;
+
+    // Detalles de efectivo / cambio o fiado
+    if (sale.payment_method === 'EFECTIVO' && sale.amount_paid) {
+      ctx.font = `12px ${fontMono}`;
+      ctx.fillStyle = '#475569';
+      ctx.textAlign = 'left';
+      ctx.fillText('Paga con:', padding, y);
+      ctx.textAlign = 'right';
+      ctx.fillText(`$${Number(sale.amount_paid).toFixed(2)}`, width - padding, y);
+      y += 16;
+
+      ctx.textAlign = 'left';
+      ctx.fillText('Cambio:', padding, y);
+      ctx.textAlign = 'right';
+      ctx.fillText(`$${Number(sale.change_given || 0).toFixed(2)}`, width - padding, y);
+      y += 18;
+    } else if (sale.payment_method === 'FIADO') {
+      ctx.font = `bold 12px ${fontMono}`;
+      ctx.fillStyle = '#b91c1c';
+      ctx.textAlign = 'center';
+      ctx.fillText('*** COMPRA A CRÉDITO (FIADO) ***', width / 2, y);
+      y += 18;
+    }
+
+    y += 4;
+    drawDashedLine(y);
+    y += 18;
+
+    // Mensaje de pie de ticket
+    ctx.fillStyle = '#64748b';
+    ctx.font = `italic 11px ${fontPrimary}`;
+    ctx.textAlign = 'center';
+    const footerMsg = settings.ticket_footer || '¡Gracias por su preferencia! Vuelva pronto.';
+    ctx.fillText(footerMsg, width / 2, y);
+    y += 22;
+
+    // Código de barras térmico simulado
+    const barWidth = 2;
+    const barHeight = 24;
+    const startX = (width - (60 * barWidth)) / 2;
+    ctx.fillStyle = '#1e293b';
+    const pattern = [1,0,1,1,0,1,0,0,1,1,1,0,1,0,1,1,0,0,1,0,1,1,1,0,1,0,1,1,0,1,0,0,1,1,1,0,1,0,1,1,0,0,1,0,1,1,1,0,1,0,1,1,0,1,0,0,1,1,1,0];
+    for (let i = 0; i < pattern.length; i++) {
+      if (pattern[i] === 1) {
+        ctx.fillRect(startX + (i * barWidth), y, barWidth, barHeight);
+      }
+    }
+    y += barHeight + 12;
+
+    ctx.font = `9px ${fontMono}`;
+    ctx.fillStyle = '#94a3b8';
+    ctx.fillText(`* POS #${String(sale.id).padStart(8, '0')} *`, width / 2, y);
+
+    return canvas;
+  },
+
+  formatTicketTextForWhatsApp(sale, items, settings) {
+    const storeName = settings.store_name || 'Punto de Venta';
+    const storeAddress = settings.store_address ? `📍 ${settings.store_address}\n` : '';
+    const storePhone = settings.store_phone ? `📞 Tel: ${settings.store_phone}\n` : '';
+    const storeRfc = settings.store_rfc ? `📄 RFC: ${settings.store_rfc}\n` : '';
+
+    const divider = '----------------------------------------';
+
+    let itemsText = '';
+    (items || []).forEach(item => {
+      const qty = Number(item.quantity || 1);
+      const unit = item.unit || 'pz';
+      const name = item.product_name || 'Artículo';
+      const price = Number(item.unit_price || 0).toFixed(2);
+      const subtotal = Number(item.subtotal || 0).toFixed(2);
+      itemsText += `▫️ *${qty} ${unit}* x ${name} ($${price})\n     Subtotal: *$${subtotal}*\n`;
+    });
+
+    const paymentMethodNames = {
+      cash: 'Efectivo',
+      card: 'Tarjeta',
+      transfer: 'Transferencia',
+      credit: 'Crédito'
+    };
+    const methodStr = paymentMethodNames[sale.payment_method] || sale.payment_method || 'Efectivo';
+
+    let paymentDetails = `💳 *Método de Pago:* ${methodStr}\n`;
+    if (sale.payment_method === 'cash') {
+      const paid = Number(sale.amount_paid || sale.total || 0).toFixed(2);
+      const change = Number(sale.change_given || 0).toFixed(2);
+      paymentDetails += `💵 *Pagó con:* $${paid} MXN\n🪙 *Cambio:* $${change} MXN\n`;
+    }
+
+    const footer = settings.ticket_footer ? `\n_${settings.ticket_footer}_\n` : '\n_¡Gracias por su preferencia! Vuelva pronto._\n';
+
+    const textMessage = 
+`🧾 *TICKET DE COMPRA #${sale.id}*
+🏪 *${storeName}*
+${storeAddress}${storePhone}${storeRfc}${divider}
+📅 *Fecha:* ${sale.created_at || new Date().toLocaleString()}
+👤 *Cliente:* ${sale.customer_name || 'Público General'}
+${sale.folio ? `🏷️ *Folio:* ${sale.folio}\n` : ''}${divider}
+📋 *DETALLE DE PRODUCTOS:*
+${itemsText}${divider}
+💰 *TOTAL: $${Number(sale.total || 0).toFixed(2)} MXN*
+${paymentDetails}${divider}${footer}`;
+
+    return textMessage;
+  },
+
+  async sendTicketViaWhatsApp() {
+    if (!this.lastSaleTicketData) {
+      App.showToast('No hay datos del ticket disponibles', 'warning');
+      return;
+    }
+
+    const { sale, items, settings } = this.lastSaleTicketData;
+    let phone = (sale.customer_phone || '').trim();
+
+    // 1. Obtener número de teléfono del cliente si no está registrado
+    if (!phone) {
+      const isNamed = sale.customer_name && sale.customer_name !== 'Público General';
+      const promptMsg = isNamed
+        ? `El cliente "${sale.customer_name}" no tiene teléfono registrado.\n\nIngrese su número de WhatsApp (10 dígitos):`
+        : 'Ingrese el número de WhatsApp para enviar el ticket (10 dígitos):';
+      const input = prompt(promptMsg);
+      if (!input) return;
+      phone = input.trim();
+    }
+
+    // Normalizar a 10 dígitos y código país 52
+    let cleanPhone = phone.replace(/[^0-9]/g, '');
+    if (!cleanPhone || cleanPhone.length < 10) {
+      App.showToast('Ingrese un número de teléfono válido de al menos 10 dígitos', 'error');
+      return;
+    }
+    if (cleanPhone.length === 10) {
+      cleanPhone = '52' + cleanPhone;
+    }
+
+    // Guardar teléfono en el cliente si es nuevo
+    if (sale.customer_id && (!sale.customer_phone || sale.customer_phone !== phone)) {
+      try {
+        await fetch(`/api/customers/${sale.customer_id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone: phone })
+        });
+        sale.customer_phone = phone;
+        const custObj = this.allCustomers.find(c => c.id === sale.customer_id);
+        if (custObj) custObj.phone = phone;
+        if (window.CustomersModule && typeof CustomersModule.loadCustomers === 'function') {
+          CustomersModule.loadCustomers();
+        }
+      } catch (err) {
+        console.warn('No se pudo actualizar teléfono del cliente:', err);
+      }
+    }
+
+    // 2. Generar el mensaje de texto estructurado para WhatsApp
+    const textMessage = this.formatTicketTextForWhatsApp(sale, items, settings);
+
+    // 3. Abrir WhatsApp con el mensaje de texto
+    const waUrl = `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(textMessage)}`;
+    window.open(waUrl, '_blank');
+
+    App.showToast(`💬 Abriendo WhatsApp con el ticket en texto para ${sale.customer_name || 'el cliente'}...`, 'success');
+  },
+
+  async sendTicketAsImageToWhatsApp() {
+    if (!this.lastSaleTicketData) {
+      App.showToast('No hay datos del ticket disponibles', 'warning');
+      return;
+    }
+
+    const { sale, items, settings } = this.lastSaleTicketData;
+    let phone = (sale.customer_phone || '').trim();
+
+    // 1. Obtener número de teléfono del cliente si no está registrado
+    if (!phone) {
+      const isNamed = sale.customer_name && sale.customer_name !== 'Público General';
+      const promptMsg = isNamed
+        ? `El cliente "${sale.customer_name}" no tiene teléfono registrado.\n\nIngrese su número de WhatsApp (10 dígitos):`
+        : 'Ingrese el número de WhatsApp para enviar el ticket (10 dígitos):';
+      const input = prompt(promptMsg);
+      if (!input) return;
+      phone = input.trim();
+    }
+
+    // Normalizar a 10 dígitos y código país 52
+    let cleanPhone = phone.replace(/[^0-9]/g, '');
+    if (!cleanPhone || cleanPhone.length < 10) {
+      App.showToast('Ingrese un número de teléfono válido de al menos 10 dígitos', 'error');
+      return;
+    }
+    if (cleanPhone.length === 10) {
+      cleanPhone = '52' + cleanPhone;
+    }
+
+    // Guardar teléfono en el cliente si es nuevo
+    if (sale.customer_id && (!sale.customer_phone || sale.customer_phone !== phone)) {
+      try {
+        await fetch(`/api/customers/${sale.customer_id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone: phone })
+        });
+        sale.customer_phone = phone;
+        const custObj = this.allCustomers.find(c => c.id === sale.customer_id);
+        if (custObj) custObj.phone = phone;
+        if (window.CustomersModule && typeof CustomersModule.loadCustomers === 'function') {
+          CustomersModule.loadCustomers();
+        }
+      } catch (err) {
+        console.warn('No se pudo actualizar teléfono del cliente:', err);
+      }
+    }
+
+    // 2. Generar el Canvas con el Ticket como Imagen
+    const canvas = this.generateTicketCanvas(sale, items, settings);
+    this.currentTicketCanvas = canvas;
+    this.currentTicketPhone = cleanPhone;
+    this.currentTicketSaleId = sale.id;
+
+    // Convertir a Blob PNG
+    canvas.toBlob(async (blob) => {
+      if (!blob) {
+        App.showToast('Error generando imagen del ticket', 'error');
+        return;
+      }
+
+      this.currentTicketBlob = blob;
+      const dataUrl = canvas.toDataURL('image/png');
+      this.currentTicketDataUrl = dataUrl;
+
+      // Actualizar vista previa en el modal
+      const previewImg = document.getElementById('ticket-preview-img');
+      if (previewImg) previewImg.src = dataUrl;
+
+      const custName = sale.customer_name || 'Cliente';
+      const waLabel = document.getElementById('btn-open-wa-label');
+      if (waLabel) waLabel.textContent = `Abrir WhatsApp con ${custName}`;
+
+      // CASO A: Móvil o navegadores con soporte de Web Share API con archivos
+      const ticketFile = new File([blob], `Ticket_Venta_${sale.id}.png`, { type: 'image/png' });
+      if (navigator.canShare && navigator.canShare({ files: [ticketFile] })) {
+        try {
+          await navigator.share({
+            files: [ticketFile],
+            title: `Ticket de Venta #${sale.id}`,
+            text: `Ticket de compra #${sale.id} - ${(settings.store_name || 'Punto de Venta')}`
+          });
+          App.showToast('Ticket compartido exitosamente por WhatsApp', 'success');
+          return;
+        } catch (shareErr) {
+          if (shareErr.name !== 'AbortError') {
+            console.warn('Fallo en navigator.share:', shareErr);
+          }
+        }
+      }
+
+      // CASO B: Computadora / PC (WhatsApp Web)
+      let copied = false;
+      if (navigator.clipboard && window.ClipboardItem) {
+        try {
+          await navigator.clipboard.write([
+            new ClipboardItem({ 'image/png': blob })
+          ]);
+          copied = true;
+        } catch (clipErr) {
+          console.warn('No se pudo copiar directamente al portapapeles:', clipErr);
+        }
+      }
+
+      const alertEl = document.getElementById('ticket-image-alert-text');
+      if (alertEl) {
+        alertEl.innerHTML = copied
+          ? '<strong>¡Imagen copiada al portapapeles!</strong> En WhatsApp solo presiona <strong>Ctrl + V</strong> (Pegar) y Enviar.'
+          : 'Descarga la imagen o cópiala para adjuntarla en el chat de WhatsApp.';
+      }
+
+      // Descarga automática del archivo PNG para que el cajero lo tenga a mano
+      this.downloadTicketImage(`Ticket_${sale.id}.png`);
+
+      // Abrir el chat de WhatsApp del cliente
+      const waUrl = `https://api.whatsapp.com/send?phone=${cleanPhone}`;
+      window.open(waUrl, '_blank');
+
+      // Abrir modal de vista previa con opciones
+      document.getElementById('modal-ticket-image').classList.add('active');
+      App.showToast(copied ? '📋 ¡Imagen copiada! Pega con Ctrl + V en WhatsApp' : '🖼️ Ticket generado como imagen', 'success');
+    }, 'image/png');
+  },
+
+  async copyTicketImageToClipboard() {
+    if (!this.currentTicketBlob) {
+      App.showToast('No hay imagen disponible para copiar', 'warning');
+      return;
+    }
+    try {
+      if (navigator.clipboard && window.ClipboardItem) {
+        await navigator.clipboard.write([
+          new ClipboardItem({ 'image/png': this.currentTicketBlob })
+        ]);
+        App.showToast('✅ ¡Imagen copiada al portapapeles! Presione Ctrl + V en WhatsApp', 'success');
+      } else {
+        App.showToast('Haga clic derecho sobre la imagen y seleccione "Copiar imagen"', 'info');
+      }
+    } catch (e) {
+      console.warn(e);
+      App.showToast('Haga clic derecho sobre la imagen y seleccione "Copiar imagen"', 'info');
+    }
+  },
+
+  downloadTicketImage(customFilename) {
+    if (!this.currentTicketDataUrl) return;
+    const a = document.createElement('a');
+    a.href = this.currentTicketDataUrl;
+    a.download = customFilename || `Ticket_Venta_${this.currentTicketSaleId || Date.now()}.png`;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => a.remove(), 100);
+  },
+
+  openWhatsAppChatWithImage() {
+    if (!this.currentTicketPhone) {
+      App.showToast('No hay teléfono de WhatsApp disponible', 'warning');
+      return;
+    }
+    const url = `https://api.whatsapp.com/send?phone=${this.currentTicketPhone}`;
+    window.open(url, '_blank');
   },
 
   openQuickCatalogModal() {

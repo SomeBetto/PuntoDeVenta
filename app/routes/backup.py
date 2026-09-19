@@ -1,16 +1,12 @@
-"""
-Módulo de Respaldo de Base de Datos y Cierre de Sesión.
-Permite configurar la carpeta de destino y generar respaldos automáticos
-con sqlite3.backup() al cerrar sesión o de manera manual.
-"""
-
 import os
+import re
 import sqlite3
 from pathlib import Path
 from datetime import datetime
 from typing import Optional
 from pydantic import BaseModel
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, UploadFile, File
+from fastapi.responses import FileResponse
 
 from app.database import DB_PATH, get_db_connection
 
@@ -24,6 +20,9 @@ class BackupConfigUpdate(BaseModel):
 class BackupCreateRequest(BaseModel):
     reason: Optional[str] = "manual" # "manual" o "logout"
 
+class BackupRestoreRequest(BaseModel):
+    filename: str
+
 def get_configured_backup_folder() -> Path:
     conn = get_db_connection()
     row = conn.execute("SELECT value FROM settings WHERE key = 'backup_folder'").fetchone()
@@ -31,6 +30,68 @@ def get_configured_backup_folder() -> Path:
     if row and row["value"].strip():
         return Path(row["value"].strip())
     return DEFAULT_BACKUP_DIR
+
+def sanitize_filename(filename: str) -> str:
+    """Extrae únicamente el nombre base del archivo para evitar path traversal"""
+    clean_name = Path(filename).name
+    # Permitir solo caracteres alfanuméricos, guiones, puntos y guiones bajos
+    clean_name = re.sub(r'[^a-zA-Z0-9_\-\.]', '_', clean_name)
+    return clean_name
+
+def verify_sqlite_backup(file_path: Path):
+    """Verifica que el archivo sea una base de datos SQLite válida e íntegra del sistema"""
+    if not file_path.exists() or not file_path.is_file():
+        raise HTTPException(status_code=404, detail="El archivo de respaldo no existe.")
+    
+    if file_path.stat().st_size == 0:
+        raise HTTPException(status_code=400, detail="El archivo de respaldo está vacío (0 bytes).")
+
+    try:
+        test_conn = sqlite3.connect(file_path)
+        cur = test_conn.cursor()
+        cur.execute("PRAGMA integrity_check;")
+        res = cur.fetchone()
+        if not res or res[0].lower() != "ok":
+            test_conn.close()
+            raise HTTPException(status_code=400, detail=f"Error de integridad en el archivo: {res[0] if res else 'Corrupto'}")
+
+        cur.execute("SELECT name FROM sqlite_master WHERE type='table' AND name IN ('products', 'sales', 'settings', 'categories');")
+        matched_tables = [r[0] for r in cur.fetchall()]
+        test_conn.close()
+
+        if not matched_tables:
+            raise HTTPException(
+                status_code=400,
+                detail="El archivo no contiene tablas válidas del sistema de Punto de Venta (products, sales, settings)."
+            )
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"No se pudo leer el archivo SQLite: {str(e)}")
+
+def get_db_summary(db_file: Path) -> dict:
+    """Obtiene conteos clave de la base de datos para informar al usuario"""
+    try:
+        conn = sqlite3.connect(db_file)
+        cur = conn.cursor()
+        def count_table(name):
+            try:
+                cur.execute(f"SELECT COUNT(*) FROM {name}")
+                row = cur.fetchone()
+                return row[0] if row else 0
+            except Exception:
+                return 0
+
+        counts = {
+            "products": count_table("products"),
+            "customers": count_table("customers"),
+            "sales": count_table("sales"),
+            "categories": count_table("categories")
+        }
+        conn.close()
+        return counts
+    except Exception:
+        return {"products": 0, "customers": 0, "sales": 0, "categories": 0}
 
 @router.get("/config")
 def get_backup_config():
@@ -58,7 +119,7 @@ def get_backup_config():
         "backup_folder": str(folder),
         "folder_exists": folder_exists,
         "default_folder": str(DEFAULT_BACKUP_DIR),
-        "recent_backups": recent_backups[:10]
+        "recent_backups": recent_backups[:30]
     }
 
 @router.post("/config")
@@ -137,6 +198,120 @@ def create_backup(req: BackupCreateRequest = BackupCreateRequest()):
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error creando respaldo de base de datos: {str(e)}")
+
+@router.post("/restore")
+def restore_backup(req: BackupRestoreRequest):
+    """
+    Restaura la base de datos activa desde uno de los respaldos existentes.
+    Por seguridad total del usuario, crea automáticamente una copia de seguridad
+    previa antes de sobreescribir la base de datos activa.
+    """
+    clean_filename = sanitize_filename(req.filename)
+    if not clean_filename.lower().endswith(".db"):
+        raise HTTPException(status_code=400, detail="El archivo a restaurar debe tener extensión .db")
+
+    target_dir = get_configured_backup_folder()
+    backup_file = target_dir / clean_filename
+
+    # 1. Verificar existencia y validez del archivo de respaldo
+    verify_sqlite_backup(backup_file)
+
+    # 2. Crear respaldo de seguridad automático del estado actual antes de restaurar
+    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    safety_filename = f"respaldo_seguridad_previo_restaurar_{timestamp}.db"
+    safety_path = target_dir / safety_filename
+
+    try:
+        if Path(DB_PATH).exists():
+            curr_src = sqlite3.connect(DB_PATH)
+            safety_dst = sqlite3.connect(safety_path)
+            curr_src.backup(safety_dst)
+            safety_dst.close()
+            curr_src.close()
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"No se pudo crear el respaldo de seguridad previo: {str(e)}. Restauración cancelada por protección de datos."
+        )
+
+    # 3. Proceder con la restauración atómica usando sqlite3.backup()
+    try:
+        src_backup = sqlite3.connect(backup_file)
+        dest_live = sqlite3.connect(DB_PATH)
+        src_backup.backup(dest_live)
+        dest_live.close()
+        src_backup.close()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error crítico durante la restauración: {str(e)}")
+
+    # 4. Obtener estadísticas de la base de datos restaurada
+    counts = get_db_summary(DB_PATH)
+    file_size_mb = round(backup_file.stat().st_size / (1024 * 1024), 2)
+
+    return {
+        "success": True,
+        "filename": clean_filename,
+        "safety_backup": safety_filename,
+        "size_mb": file_size_mb,
+        "counts": counts,
+        "message": f"Respaldo '{clean_filename}' cargado exitosamente. Se guardó respaldo de seguridad previo: '{safety_filename}'."
+    }
+
+@router.post("/upload-restore")
+async def upload_and_restore(file: UploadFile = File(...)):
+    """
+    Permite subir un archivo .db desde la computadora y cargarlo directamente,
+    guardándolo en la carpeta de respaldos y creando respaldo de seguridad previo.
+    """
+    if not file.filename.lower().endswith(".db"):
+        raise HTTPException(status_code=400, detail="El archivo subido debe tener extensión .db")
+
+    target_dir = get_configured_backup_folder()
+    try:
+        target_dir.mkdir(parents=True, exist_ok=True)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error accediendo a carpeta de respaldos: {str(e)}")
+
+    safe_original = sanitize_filename(file.filename)
+    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    saved_filename = f"respaldo_subido_{timestamp}_{safe_original}"
+    dest_path = target_dir / saved_filename
+
+    # Guardar contenido subido
+    try:
+        content = await file.read()
+        with open(dest_path, "wb") as f:
+            f.write(content)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error guardando el archivo subido: {str(e)}")
+
+    # Validar y restaurar usando la función de restauración
+    try:
+        return restore_backup(BackupRestoreRequest(filename=saved_filename))
+    except Exception as e:
+        # Si falló, intentar borrar el archivo temporal subido
+        if dest_path.exists():
+            try:
+                dest_path.unlink()
+            except Exception:
+                pass
+        raise e
+
+@router.get("/download/{filename}")
+def download_backup(filename: str):
+    """Permite descargar un archivo de respaldo específico al navegador"""
+    clean_filename = sanitize_filename(filename)
+    target_dir = get_configured_backup_folder()
+    backup_file = target_dir / clean_filename
+
+    if not backup_file.exists() or not backup_file.is_file():
+        raise HTTPException(status_code=404, detail="Archivo de respaldo no encontrado.")
+
+    return FileResponse(
+        path=backup_file,
+        filename=clean_filename,
+        media_type="application/x-sqlite3"
+    )
 
 @router.post("/optimize")
 def optimize_database():

@@ -102,10 +102,16 @@ const SettingsModule = {
     this.setVal('modal-cfg-store-address', s.store_address || '');
     this.setVal('modal-cfg-ticket-footer', s.ticket_footer || '');
 
-    // Actualizar nombre de negocio visible en barra superior si existe
+    // Actualizar nombre de negocio visible en barra superior y tooltip del logo/avatar
     const brandName = document.getElementById('navbar-store-name');
     if (brandName && s.store_name) {
       brandName.innerText = s.store_name;
+    }
+
+    const storeAvatar = document.getElementById('top-store-avatar') || document.querySelector('.top-app-bar .store-avatar');
+    if (storeAvatar && s.store_name) {
+      storeAvatar.title = s.store_name;
+      storeAvatar.setAttribute('aria-label', s.store_name);
     }
   },
 
@@ -194,6 +200,11 @@ const SettingsModule = {
       // Actualizar estado local
       Object.assign(this.settings, payload.settings);
       this.populateFields(this.settings);
+
+      // Sincronizar de inmediato con CustomersModule
+      if (window.CustomersModule) {
+        CustomersModule.storeSettings = { ...(CustomersModule.storeSettings || {}), ...payload.settings };
+      }
 
       App.showToast(successMsg, 'success');
     } catch (err) {

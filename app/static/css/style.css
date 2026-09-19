@@ -136,6 +136,105 @@ body {
   white-space: nowrap;
 }
 
+.bar-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  max-width: 500px;
+  margin: 0 1rem;
+}
+
+.bar-day-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: var(--radius-pill, 9999px);
+  padding: 0.35rem 0.95rem;
+  color: #ffffff;
+  font-size: 0.86rem;
+  font-weight: 600;
+  user-select: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+  transition: all 0.2s ease;
+}
+
+.bar-day-badge:hover {
+  background: rgba(255, 255, 255, 0.24);
+  border-color: rgba(255, 255, 255, 0.45);
+}
+
+.day-icon {
+  font-size: 1rem;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+}
+
+.day-text {
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.time-text {
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 0.78rem;
+  font-weight: 700;
+  background: rgba(0, 0, 0, 0.22);
+  padding: 0.15rem 0.5rem;
+  border-radius: 6px;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.drawer-date-chip {
+  margin-top: 0.65rem;
+  padding: 0.4rem 0.75rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+@media (max-width: 900px) {
+  .bar-day-badge .time-text {
+    display: none;
+  }
+  .bar-center {
+    margin: 0 0.5rem;
+  }
+  .bar-day-badge {
+    padding: 0.28rem 0.65rem;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 580px) {
+  .bar-day-badge {
+    padding: 0.2rem 0.5rem;
+  }
+  .bar-day-badge .day-text {
+    font-size: 0.76rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .bar-center {
+    display: none;
+  }
+}
+
 .bar-right {
   display: flex;
   align-items: center;
@@ -158,6 +257,15 @@ body {
 
 .bar-action-icon:hover {
   background: rgba(255, 255, 255, 0.18);
+}
+
+.bar-action-icon svg {
+  display: block;
+}
+
+.bar-action-icon.active-fullscreen {
+  background: rgba(255, 255, 255, 0.28);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .bar-connect-mobile-btn {
@@ -2327,9 +2435,37 @@ body {
 }
 
 /* ==========================================================================
+   BOTÓN ENVIAR TICKET POR WHATSAPP
+   ========================================================================== */
+.btn-whatsapp-ticket {
+  background: #16a34a !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 8px !important;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-whatsapp-ticket:hover {
+  background: #15803d !important;
+  transform: translateY(-1px);
+  box-shadow: 0 5px 14px rgba(22, 163, 74, 0.45) !important;
+}
+
+.btn-whatsapp-ticket:active {
+  transform: scale(0.99);
+}
+
+/* ==========================================================================
    ESTILOS DE IMPRESIÓN DIRECTA DE TICKETS TÉRMICOS (58mm / 80mm)
    ========================================================================== */
 @media print {
+  .no-print,
+  .no-print * {
+    display: none !important;
+  }
+
   body * {
     visibility: hidden !important;
   }

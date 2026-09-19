@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <!-- CSS Estilos -->
-  <link rel="stylesheet" href="/static/css/style.css?v=2.8">
+  <link rel="stylesheet" href="/static/css/style.css?v=3.3">
 </head>
 <body>
 
@@ -20,15 +20,28 @@
       <button class="menu-toggle-btn" id="btn-open-drawer" title="Abrir menú">
         ☰
       </button>
-      <div class="store-avatar" title="Abarrotes La Esquina">
+      <div class="store-avatar" id="top-store-avatar" title="Punto de Venta" style="cursor: pointer;">
         🏪
       </div>
       <span class="bar-title" id="current-view-title">Venta</span>
     </div>
 
+    <div class="bar-center" id="bar-date-container">
+      <div class="bar-day-badge" id="bar-day-badge" title="Día y fecha actual">
+        <span class="day-icon">📅</span>
+        <span id="current-day-label" class="day-text">Cargando día...</span>
+        <span id="current-time-label" class="time-text">--:--</span>
+      </div>
+    </div>
+
     <div class="bar-right">
       <button class="bar-connect-mobile-btn" id="btn-connect-mobile" title="Abrir en celular o tablet">
         📱 Conectar Móvil
+      </button>
+      <button class="bar-action-icon" id="btn-fullscreen" onclick="togglePOSFullscreen(event)" title="Pantalla Completa (F11)">
+        <svg class="fs-icon-enter" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+        </svg>
       </button>
       <button class="bar-action-icon" onclick="InventoryModule.openProductModal()" title="Nuevo Producto">
         ➕
@@ -41,6 +54,109 @@
       </button>
     </div>
   </header>
+
+  <!-- Script Inmediato: Garantiza reloj y pantalla completa instantáneos -->
+  <script>
+    (function initImmediateClock() {
+      var days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+      var months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+      function updateClock() {
+        var now = new Date();
+        var dayLabel = document.getElementById('current-day-label');
+        var timeLabel = document.getElementById('current-time-label');
+        var drawerLabel = document.getElementById('drawer-day-label');
+
+        var dayName = days[now.getDay()];
+        var dayNumber = now.getDate();
+        var monthName = months[now.getMonth()];
+        var fullDateStr = dayName + ', ' + dayNumber + ' de ' + monthName;
+
+        if (dayLabel) {
+          dayLabel.textContent = fullDateStr;
+          if (dayLabel.parentElement) dayLabel.parentElement.title = fullDateStr + ' de ' + now.getFullYear();
+        }
+        if (drawerLabel) drawerLabel.textContent = '📅 ' + fullDateStr;
+
+        if (timeLabel) {
+          var hours = now.getHours();
+          var minutes = String(now.getMinutes()).padStart(2, '0');
+          var seconds = String(now.getSeconds()).padStart(2, '0');
+          var ampm = hours >= 12 ? 'PM' : 'AM';
+          hours = hours % 12;
+          hours = hours ? hours : 12;
+          timeLabel.textContent = String(hours).padStart(2, '0') + ':' + minutes + ':' + seconds + ' ' + ampm;
+        }
+      }
+      updateClock();
+      setInterval(updateClock, 1000);
+      window.updatePOSClock = updateClock;
+
+      // Cargar y actualizar inmediatamente el nombre comercial de la tienda en el logo/avatar
+      try {
+        fetch('/api/reports/settings')
+          .then(function(res) { return res.json(); })
+          .then(function(data) {
+            if (data && data.store_name) {
+              var avatar = document.getElementById('top-store-avatar');
+              if (avatar) {
+                avatar.title = data.store_name;
+                avatar.setAttribute('aria-label', data.store_name);
+              }
+            }
+          })
+          .catch(function() {});
+      } catch (e) {}
+    })();
+
+    function togglePOSFullscreen(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      try {
+        var isFs = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+        if (!isFs) {
+          var el = document.documentElement;
+          var req = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen || el.msRequestFullscreen;
+          if (req) {
+            var p = req.call(el);
+            if (p && p.catch) {
+              p.catch(function(err) {
+                console.warn('Pantalla completa no disponible:', err);
+                if (window.App && App.showToast) App.showToast('Presione F11 para pantalla completa', 'info');
+              });
+            }
+          } else {
+            if (window.App && App.showToast) App.showToast('Presione F11 para pantalla completa', 'info');
+          }
+        } else {
+          var exit = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
+          if (exit) {
+            exit.call(document);
+          }
+        }
+      } catch (err) {
+        console.warn('Error en togglePOSFullscreen:', err);
+      }
+    }
+
+    function syncPOSFullscreenIcon() {
+      var btn = document.getElementById('btn-fullscreen');
+      if (!btn) return;
+      var isFs = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+      if (isFs) {
+        btn.innerHTML = '<svg class="fs-icon fs-icon-exit" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/></svg>';
+        btn.title = 'Salir de Pantalla Completa (F11 o Esc)';
+        btn.classList.add('active-fullscreen');
+      } else {
+        btn.innerHTML = '<svg class="fs-icon fs-icon-enter" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>';
+        btn.title = 'Pantalla Completa (F11)';
+        btn.classList.remove('active-fullscreen');
+      }
+    }
+
+    document.addEventListener('fullscreenchange', syncPOSFullscreenIcon);
+    document.addEventListener('webkitfullscreenchange', syncPOSFullscreenIcon);
+    document.addEventListener('mozfullscreenchange', syncPOSFullscreenIcon);
+    document.addEventListener('MSFullscreenChange', syncPOSFullscreenIcon);
+  </script>
 
   <!-- ==================== 2. MENÚ LATERAL DESLIZABLE (DRAWER ESTILO CLOUD POS) ==================== -->
   <div class="drawer-backdrop" id="drawer-backdrop">
@@ -75,6 +191,11 @@
             <span>Sucursal 1 • Principal</span>
             <span class="exchange-icon" title="Cambiar sucursal">⇄</span>
           </div>
+        </div>
+
+        <!-- Indicador de Día en Menú Móvil -->
+        <div class="drawer-date-chip" id="drawer-day-label" title="Día actual">
+          📅 Cargando día...
         </div>
       </div>
 
@@ -1519,23 +1640,32 @@
             <div class="form-group" style="margin-bottom: 1rem;">
               <label class="form-label" style="font-weight: 700;">Ruta de la Carpeta de Respaldos:</label>
               <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
-                <input type="text" class="form-input" id="setting-backup-folder-input" style="flex: 1; min-width: 260px;" placeholder="C:\PuntoDeVenta\respaldos">
-                <button type="button" class="meta-btn" id="btn-save-backup-folder" style="white-space: nowrap;">
+                <input type="text" class="form-input setting-backup-folder-input" id="setting-backup-folder-input" style="flex: 1; min-width: 260px;" placeholder="C:\PuntoDeVenta\respaldos">
+                <button type="button" class="meta-btn btn-save-backup-folder" id="btn-save-backup-folder" style="white-space: nowrap;">
                   💾 Guardar Carpeta
                 </button>
               </div>
             </div>
 
             <div style="display: flex; gap: 0.75rem; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap;">
-              <button type="button" class="btn-modal-accept" id="btn-create-manual-backup" style="background: var(--accent-green); font-size: 0.88rem; padding: 0.6rem 1.4rem;">
+              <button type="button" class="btn-modal-accept btn-create-manual-backup" id="btn-create-manual-backup" style="background: var(--accent-green); font-size: 0.88rem; padding: 0.6rem 1.4rem;">
                 📦 Crear Respaldo Ahora
+              </button>
+              <button type="button" class="main-action-pill-btn btn-optimize-database" id="btn-optimize-database" style="font-size: 0.88rem; padding: 0.6rem 1.2rem; background: var(--primary-blue);">
+                🧹 Optimizar Base de Datos
+              </button>
+              <button type="button" class="meta-btn btn-upload-backup-file" id="btn-upload-backup-file" style="font-size: 0.88rem; padding: 0.6rem 1.2rem; display: inline-flex; align-items: center; gap: 0.35rem; cursor: pointer;">
+                📂 Subir y Cargar Respaldo (.db)
               </button>
             </div>
 
-            <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.5rem;">
-              Respaldos Recientes en Carpeta:
-            </h4>
-            <div id="recent-backups-list">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+              <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin: 0;">
+                Respaldos Disponibles en Carpeta:
+              </h4>
+              <span style="font-size: 0.78rem; color: var(--text-secondary);">Haga clic en <strong>🔄 Cargar</strong> para restaurar un respaldo</span>
+            </div>
+            <div id="recent-backups-list" class="recent-backups-list">
               <div style="color: var(--text-secondary); font-size: 0.85rem; padding: 0.5rem 0;">Cargando lista de respaldos...</div>
             </div>
           </div>
@@ -1646,6 +1776,20 @@
         <div style="text-align: center; background: var(--primary-blue-light); padding: 1.25rem; border-radius: var(--radius-lg);">
           <span style="font-size: 0.8rem; text-transform: uppercase; color: var(--primary-blue); font-weight: 700;">Total a Cobrar</span>
           <div style="font-size: 2.5rem; font-weight: 900; font-family: var(--font-mono); color: var(--primary-blue);" id="checkout-total-val">$0.00</div>
+        </div>
+
+        <!-- Cliente asignado a esta venta -->
+        <div id="checkout-customer-bar" style="display: flex; align-items: center; justify-content: space-between; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.55rem 0.85rem; margin-top: -0.25rem;">
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <span style="font-size: 1.15rem;">👤</span>
+            <div>
+              <span style="font-size: 0.72rem; color: #64748b; display: block; line-height: 1;">Cliente en esta venta:</span>
+              <strong id="checkout-customer-name-display" style="font-size: 0.88rem; color: #1e293b;">Público General</strong>
+            </div>
+          </div>
+          <button type="button" class="btn-secondary" onclick="PosModule.openCustomerSelectModal()" style="padding: 0.25rem 0.65rem; font-size: 0.78rem; font-weight: 700; border-radius: 6px; cursor: pointer;">
+            Cambiar
+          </button>
         </div>
 
         <!-- Métodos de pago con atajos F2, F3, F4, F5 -->
@@ -1891,14 +2035,63 @@
           <!-- Ticket dinámico -->
         </div>
 
-        <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
-          <button class="btn-modal-accept" style="flex: 1;" onclick="window.print()">
-            🖨️ Imprimir
+        <div class="ticket-modal-actions no-print" style="margin-top: 1rem; display: flex; flex-direction: column; gap: 0.55rem;">
+          <button type="button" class="btn-whatsapp-ticket" id="btn-ticket-whatsapp" onclick="PosModule.sendTicketViaWhatsApp()" style="display: flex; align-items: center; justify-content: center; gap: 0.55rem; width: 100%; padding: 0.75rem 1rem; font-size: 0.95rem; font-weight: 800; border-radius: 8px; box-shadow: 0 3px 10px rgba(22, 163, 74, 0.35);">
+            <span style="font-size: 1.3rem; line-height: 1;">💬</span>
+            <span id="ticket-whatsapp-text">Enviar Ticket por WhatsApp</span>
           </button>
-          <button class="meta-btn" onclick="App.closeModal('ticket-modal')">
-            Cerrar
+
+          <button type="button" class="meta-btn" onclick="PosModule.sendTicketAsImageToWhatsApp()" style="width: 100%; font-size: 0.8rem; padding: 0.45rem; display: flex; align-items: center; justify-content: center; gap: 0.4rem; background: #f8fafc; border: 1px dashed #cbd5e1; color: #475569;" title="Generar y enviar ticket como imagen PNG">
+            <span>🖼️</span> Enviar o Descargar como Imagen
           </button>
+
+          <div style="display: flex; gap: 0.5rem;">
+            <button class="btn-modal-accept" style="flex: 1;" onclick="window.print()">
+              🖨️ Imprimir
+            </button>
+            <button class="meta-btn" onclick="App.closeModal('ticket-modal')">
+              Cerrar
+            </button>
+          </div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 7B: Vista Previa y Envío de Ticket como Imagen PNG -->
+  <div class="modal-overlay" id="modal-ticket-image">
+    <div class="modal-sicar-dialog" style="max-width: 440px;">
+      <div class="modal-sicar-header">
+        <h3>🖼️ Ticket de Venta como Imagen</h3>
+        <button class="menu-toggle-btn" onclick="App.closeModal('modal-ticket-image')">✕</button>
+      </div>
+      <div class="modal-sicar-body" style="padding: 1rem; text-align: center;">
+        
+        <div id="ticket-image-alert" style="background: #f0fdf4; border: 1px solid #bbf7d0; color: #15803d; padding: 0.65rem 0.85rem; border-radius: 8px; font-size: 0.82rem; font-weight: 600; margin-bottom: 0.85rem; text-align: left; display: flex; align-items: center; gap: 0.5rem;">
+          <span style="font-size: 1.25rem;">📋</span>
+          <span id="ticket-image-alert-text">¡Imagen copiada al portapapeles! En WhatsApp presiona <strong>Ctrl + V</strong> para pegar y enviar.</span>
+        </div>
+
+        <div style="max-height: 380px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.5rem; background: #f8fafc; margin-bottom: 1rem; box-shadow: inset 0 2px 4px rgba(0,0,0,0.04);">
+          <img id="ticket-preview-img" src="" alt="Ticket PNG" style="width: 100%; height: auto; display: block; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 0.55rem;">
+          <button type="button" class="btn-whatsapp-ticket" id="btn-open-wa-chat" onclick="PosModule.openWhatsAppChatWithImage()" style="width: 100%; padding: 0.7rem 1rem; font-size: 0.95rem; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+            <span style="font-size: 1.2rem;">💬</span>
+            <span id="btn-open-wa-label">Abrir Chat de WhatsApp</span>
+          </button>
+
+          <div style="display: flex; gap: 0.5rem;">
+            <button type="button" class="btn-secondary" onclick="PosModule.copyTicketImageToClipboard()" style="flex: 1; padding: 0.55rem; font-size: 0.82rem; font-weight: 700; border-radius: 6px; display: flex; align-items: center; justify-content: center; gap: 0.35rem; background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe;">
+              <span>📋</span> <span>Copiar Imagen</span>
+            </button>
+            <button type="button" class="btn-secondary" onclick="PosModule.downloadTicketImage()" style="flex: 1; padding: 0.55rem; font-size: 0.82rem; font-weight: 700; border-radius: 6px; display: flex; align-items: center; justify-content: center; gap: 0.35rem;">
+              <span>⬇️</span> <span>Descargar PNG</span>
+            </button>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
@@ -2213,8 +2406,8 @@
         <div class="form-group" style="margin-bottom: 0.75rem;">
           <label class="form-label">Ruta de la Carpeta de Respaldo:</label>
           <div style="display: flex; gap: 0.5rem;">
-            <input type="text" class="form-input" id="setting-backup-folder-input" placeholder="D:\Git\PuntoDeVenta\respaldos" style="font-family: monospace; font-size: 0.85rem;">
-            <button type="button" class="btn-modal-accept" id="btn-save-backup-folder" style="white-space: nowrap; padding: 0.6rem 1.2rem; font-size: 0.85rem;">
+            <input type="text" class="form-input setting-backup-folder-input" id="modal-backup-folder-input" placeholder="D:\Git\PuntoDeVenta\respaldos" style="font-family: monospace; font-size: 0.85rem; flex: 1;">
+            <button type="button" class="btn-modal-accept btn-save-backup-folder" style="white-space: nowrap; padding: 0.6rem 1.2rem; font-size: 0.85rem;">
               💾 Guardar
             </button>
           </div>
@@ -2222,17 +2415,20 @@
 
         <div style="display: flex; justify-content: space-between; align-items: center; margin: 1rem 0 0.5rem; flex-wrap: wrap; gap: 0.5rem;">
           <span style="font-weight: 700; font-size: 0.85rem; color: var(--text-primary);">Copias de Seguridad:</span>
-          <div style="display: flex; gap: 0.5rem;">
-            <button type="button" class="main-action-pill-btn" id="btn-create-manual-backup" style="font-size: 0.82rem; padding: 0.45rem 1rem; background: var(--accent-green);">
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <button type="button" class="main-action-pill-btn btn-create-manual-backup" style="font-size: 0.82rem; padding: 0.45rem 1rem; background: var(--accent-green);">
               📦 Crear Respaldo Ahora
             </button>
-            <button type="button" class="main-action-pill-btn" id="btn-optimize-database" style="font-size: 0.82rem; padding: 0.45rem 1rem; background: var(--primary-blue);">
+            <button type="button" class="main-action-pill-btn btn-optimize-database" style="font-size: 0.82rem; padding: 0.45rem 1rem; background: var(--primary-blue);">
               🧹 Optimizar Base de Datos
+            </button>
+            <button type="button" class="meta-btn btn-upload-backup-file" style="font-size: 0.82rem; padding: 0.45rem 0.85rem; display: inline-flex; align-items: center; gap: 0.25rem; cursor: pointer;">
+              📂 Subir Respaldo (.db)
             </button>
           </div>
         </div>
 
-        <div id="recent-backups-list" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: var(--radius-md); padding: 0.5rem; margin-bottom: 1rem;">
+        <div class="recent-backups-list" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: var(--radius-md); padding: 0.5rem; margin-bottom: 1rem;">
           <!-- Se llena dinámicamente -->
         </div>
 
@@ -2723,23 +2919,122 @@
     </div>
   </div>
 
+  <!-- Modal 17: Confirmar y Cargar / Restaurar Respaldo -->
+  <div class="modal-overlay" id="modal-confirm-restore">
+    <div class="modal-sicar-dialog" style="max-width: 500px;">
+      <div class="modal-sicar-header" style="background: #1e293b;">
+        <h3>🔄 Cargar y Restaurar Respaldo</h3>
+        <button class="menu-toggle-btn" onclick="App.closeModal('modal-confirm-restore')">✕</button>
+      </div>
+      <div class="modal-sicar-body" style="padding: 1.5rem;">
+        <div style="text-align: center; font-size: 2.6rem; margin-bottom: 0.5rem;">📦</div>
+        <h4 style="font-size: 1.1rem; color: var(--text-primary); text-align: center; margin-bottom: 0.5rem;">
+          ¿Desea restaurar este respaldo en el sistema?
+        </h4>
+
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: var(--radius-md); padding: 0.85rem; margin-bottom: 1rem; font-size: 0.84rem;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 0.35rem; gap: 0.5rem;">
+            <span style="color: var(--text-secondary);">Archivo:</span>
+            <strong id="restore-modal-filename" style="color: var(--text-primary); font-family: monospace; word-break: break-all; text-align: right;"></strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 0.35rem;">
+            <span style="color: var(--text-secondary);">Fecha de creación:</span>
+            <span id="restore-modal-date" style="font-weight: 600;"></span>
+          </div>
+          <div style="display: flex; justify-content: space-between;">
+            <span style="color: var(--text-secondary);">Tamaño:</span>
+            <span id="restore-modal-size" style="font-weight: 700; color: #0284c7;"></span>
+          </div>
+        </div>
+
+        <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: var(--radius-md); padding: 0.85rem; margin-bottom: 0.85rem; font-size: 0.82rem; color: #92400e; line-height: 1.4;">
+          <div style="font-weight: 700; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.4rem;">
+            <span>⚠️</span> Advertencia Importante:
+          </div>
+          <div>Esta acción reemplazará la base de datos actual con los datos del respaldo seleccionado (catálogo de productos, inventario, clientes y ventas registradas).</div>
+        </div>
+
+        <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: var(--radius-md); padding: 0.75rem; margin-bottom: 1.25rem; font-size: 0.8rem; color: #166534; line-height: 1.35;">
+          <div style="font-weight: 700; margin-bottom: 0.2rem; display: flex; align-items: center; gap: 0.4rem;">
+            <span>🛡️</span> Protección Automática:
+          </div>
+          <div>Por seguridad, el sistema creará automáticamente un respaldo previo del estado actual antes de proceder, para que nunca pierda su información.</div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+          <button type="button" class="meta-btn" onclick="App.closeModal('modal-confirm-restore')">
+            Cancelar
+          </button>
+          <button type="button" class="btn-modal-accept" id="btn-do-restore" style="background: #d97706; padding: 0.6rem 1.4rem; font-weight: 700;">
+            🔄 Confirmar y Cargar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 18: Éxito de Restauración de Base de Datos -->
+  <div class="modal-overlay" id="modal-restore-success">
+    <div class="modal-sicar-dialog" style="max-width: 480px;">
+      <div class="modal-sicar-header" style="background: #15803d;">
+        <h3>✅ Respaldo Restaurado con Éxito</h3>
+        <button class="menu-toggle-btn" onclick="App.closeModal('modal-restore-success')">✕</button>
+      </div>
+      <div class="modal-sicar-body" style="padding: 1.5rem; text-align: center;">
+        <div style="font-size: 3rem; margin-bottom: 0.5rem;">🎉</div>
+        <h4 style="font-size: 1.15rem; color: #166534; margin-bottom: 0.5rem;">
+          ¡Base de datos cargada correctamente!
+        </h4>
+        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">
+          Los datos del respaldo seleccionado han sido aplicados con éxito.
+        </p>
+
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: var(--radius-md); padding: 0.85rem; margin-bottom: 1rem; text-align: left; font-size: 0.85rem;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 0.35rem;">
+            <span style="color: var(--text-secondary);">📦 Productos en catálogo:</span>
+            <strong id="restore-success-products">0</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 0.35rem;">
+            <span style="color: var(--text-secondary);">👥 Clientes registrados:</span>
+            <strong id="restore-success-customers">0</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 0.35rem;">
+            <span style="color: var(--text-secondary);">🧾 Ventas registradas:</span>
+            <strong id="restore-success-sales">0</strong>
+          </div>
+          <div style="border-top: 1px dashed #cbd5e1; margin-top: 0.5rem; padding-top: 0.5rem; font-size: 0.78rem; color: #475569;">
+            <span>🛡️ Respaldo previo de seguridad:</span>
+            <div id="restore-success-safety" style="font-family: monospace; word-break: break-all; color: #0369a1; font-weight: 600;"></div>
+          </div>
+        </div>
+
+        <button type="button" class="btn-modal-accept" onclick="window.location.reload()" style="width: 100%; padding: 0.75rem; font-size: 0.95rem; background: #16a34a; font-weight: 700;">
+          🔄 Actualizar Sistema Ahora
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Input oculto para subir y restaurar archivo de base de datos .db -->
+  <input type="file" id="backup-file-upload-input" accept=".db" style="display: none;">
+
   <!-- Contenedor Flotante de Notificaciones Toast -->
   <div class="toast-container" id="toast-container"></div>
 
   <!-- Scripts -->
-  <script src="/static/js/qr-generator.js?v=2.8"></script>
-  <script src="/static/js/barcode.js?v=2.8"></script>
-  <script src="/static/js/pos.js?v=2.8"></script>
-  <script src="/static/js/inventory.js?v=2.8"></script>
-  <script src="/static/js/customers.js?v=2.8"></script>
-  <script src="/static/js/cash.js?v=2.8"></script>
-  <script src="/static/js/users.js?v=2.8"></script>
-  <script src="/static/js/suppliers.js?v=2.8"></script>
-  <script src="/static/js/purchases.js?v=2.8"></script>
-  <script src="/static/js/reports.js?v=2.8"></script>
-  <script src="/static/js/eleventa.js?v=2.8"></script>
-  <script src="/static/js/settings.js?v=2.8"></script>
-  <script src="/static/js/backup.js?v=2.8"></script>
-  <script src="/static/js/app.js?v=2.8"></script>
+  <script src="/static/js/qr-generator.js?v=3.7"></script>
+  <script src="/static/js/barcode.js?v=3.7"></script>
+  <script src="/static/js/pos.js?v=3.7"></script>
+  <script src="/static/js/inventory.js?v=3.7"></script>
+  <script src="/static/js/customers.js?v=3.7"></script>
+  <script src="/static/js/cash.js?v=3.7"></script>
+  <script src="/static/js/users.js?v=3.7"></script>
+  <script src="/static/js/suppliers.js?v=3.7"></script>
+  <script src="/static/js/purchases.js?v=3.7"></script>
+  <script src="/static/js/reports.js?v=3.7"></script>
+  <script src="/static/js/eleventa.js?v=3.7"></script>
+  <script src="/static/js/settings.js?v=3.7"></script>
+  <script src="/static/js/backup.js?v=3.7"></script>
+  <script src="/static/js/app.js?v=3.7"></script>
 </body>
 </html>

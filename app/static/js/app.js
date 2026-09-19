@@ -11,9 +11,12 @@ const App = {
   init() {
     this.bindDrawer();
     this.bindNavigation();
+    this.initFullscreen();
+    this.initDayClock();
     this.initNetworkInfo();
 
-    // Inicializar módulos
+    // Inicializar módulos (Settings primero para asegurar configuración global disponible)
+    if (window.SettingsModule) SettingsModule.init();
     if (window.PosModule) PosModule.init();
     if (window.InventoryModule) InventoryModule.init();
     if (window.CustomersModule) CustomersModule.init();
@@ -23,7 +26,6 @@ const App = {
     if (window.MultiservicesModule) MultiservicesModule.init();
     if (window.SuppliersModule) SuppliersModule.init();
     if (window.PurchasesModule) PurchasesModule.init();
-    if (window.SettingsModule) SettingsModule.init();
   },
 
   bindDrawer() {
@@ -83,6 +85,132 @@ const App = {
     if (copyBtn) {
       copyBtn.addEventListener('click', () => this.copyNetworkUrl());
     }
+  },
+
+  initFullscreen() {
+    const btn = document.getElementById('btn-fullscreen');
+    if (!btn) return;
+
+    btn.addEventListener('click', () => {
+      this.toggleFullscreen();
+    });
+
+    const updateFsState = () => {
+      const isFullscreen = !!(
+        document.fullscreenElement ||
+        document.webkitFullscreenElement ||
+        document.mozFullScreenElement ||
+        document.msFullscreenElement
+      );
+
+      if (isFullscreen) {
+        btn.innerHTML = `
+          <svg class="fs-icon fs-icon-exit" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/>
+          </svg>
+        `;
+        btn.title = 'Salir de Pantalla Completa (F11 o Esc)';
+        btn.classList.add('active-fullscreen');
+      } else {
+        btn.innerHTML = `
+          <svg class="fs-icon fs-icon-enter" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+          </svg>
+        `;
+        btn.title = 'Pantalla Completa (F11)';
+        btn.classList.remove('active-fullscreen');
+      }
+    };
+
+    document.addEventListener('fullscreenchange', updateFsState);
+    document.addEventListener('webkitfullscreenchange', updateFsState);
+    document.addEventListener('mozfullscreenchange', updateFsState);
+    document.addEventListener('MSFullscreenChange', updateFsState);
+  },
+
+  toggleFullscreen() {
+    try {
+      const isFullscreen = !!(
+        document.fullscreenElement ||
+        document.webkitFullscreenElement ||
+        document.mozFullScreenElement ||
+        document.msFullscreenElement
+      );
+
+      if (!isFullscreen) {
+        const docEl = document.documentElement;
+        if (docEl.requestFullscreen) {
+          docEl.requestFullscreen();
+        } else if (docEl.webkitRequestFullscreen) {
+          docEl.webkitRequestFullscreen();
+        } else if (docEl.mozRequestFullScreen) {
+          docEl.mozRequestFullScreen();
+        } else if (docEl.msRequestFullscreen) {
+          docEl.msRequestFullscreen();
+        }
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        } else if (document.mozCancelFullScreen) {
+          document.mozCancelFullScreen();
+        } else if (document.msExitFullscreen) {
+          document.msExitFullscreen();
+        }
+      }
+    } catch (err) {
+      console.warn('Error al alternar pantalla completa:', err);
+    }
+  },
+
+  initDayClock() {
+    const DAYS = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+    const MONTHS = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+
+    const updateDay = () => {
+      try {
+        const dayLabel = document.getElementById('current-day-label');
+        const timeLabel = document.getElementById('current-time-label');
+        const drawerDayLabel = document.getElementById('drawer-day-label');
+
+        const now = new Date();
+        const weekday = DAYS[now.getDay()];
+        const dayNum = now.getDate();
+        const month = MONTHS[now.getMonth()];
+        const year = now.getFullYear();
+
+        // Formato: "Sábado, 19 de Septiembre"
+        const fullDayText = `${weekday}, ${dayNum} de ${month}`;
+
+        if (dayLabel) {
+          dayLabel.textContent = fullDayText;
+          if (dayLabel.parentElement) {
+            dayLabel.parentElement.setAttribute('title', `${fullDayText} de ${year}`);
+          }
+        }
+
+        if (drawerDayLabel) {
+          drawerDayLabel.textContent = `📅 ${fullDayText}`;
+        }
+
+        if (timeLabel) {
+          let hours = now.getHours();
+          const minutes = String(now.getMinutes()).padStart(2, '0');
+          const seconds = String(now.getSeconds()).padStart(2, '0');
+          const ampm = hours >= 12 ? 'PM' : 'AM';
+          hours = hours % 12;
+          hours = hours ? hours : 12;
+          timeLabel.textContent = `${String(hours).padStart(2, '0')}:${minutes}:${seconds} ${ampm}`;
+        }
+      } catch (err) {
+        console.warn('Error en updateDay:', err);
+      }
+    };
+
+    updateDay();
+    if (this._clockInterval) clearInterval(this._clockInterval);
+    this._clockInterval = setInterval(updateDay, 1000);
   },
 
   switchView(viewName) {
@@ -238,6 +366,11 @@ const App = {
     });
   },
 
+  openModal(modalId) {
+    const el = document.getElementById(modalId);
+    if (el) el.classList.add('active');
+  },
+
   closeModal(modalId) {
     const el = document.getElementById(modalId);
     if (el) el.classList.remove('active');
@@ -330,6 +463,16 @@ const MultiservicesModule = {
 window.MultiservicesModule = MultiservicesModule;
 window.App = App;
 
-window.addEventListener('DOMContentLoaded', () => {
+// Exponer togglePOSFullscreen en App
+if (typeof togglePOSFullscreen === 'function') {
+  App.toggleFullscreen = togglePOSFullscreen;
+}
+
+// Inicialización segura contra estados de carga y caché
+if (document.readyState === 'loading') {
+  window.addEventListener('DOMContentLoaded', () => {
+    App.init();
+  });
+} else {
   App.init();
-});
+}

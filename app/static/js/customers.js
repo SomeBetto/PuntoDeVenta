@@ -6,10 +6,12 @@ const CustomersModule = {
   customers: [],
   selectedCustomerId: null,
   searchQuery: '',
+  storeSettings: null,
 
   init() {
     this.bindEvents();
     this.loadCustomers();
+    this.ensureStoreSettings();
   },
 
   bindEvents() {
@@ -303,7 +305,54 @@ const CustomersModule = {
     }
   },
 
-  openWhatsAppModal(customerId) {
+  async ensureStoreSettings() {
+    if (this.storeSettings && this.storeSettings.store_name) {
+      return this.storeSettings;
+    }
+    try {
+      const res = await fetch('/api/reports/settings');
+      if (res.ok) {
+        this.storeSettings = await res.json();
+        return this.storeSettings;
+      }
+    } catch (e) {
+      console.warn('Error cargando configuración de la tienda para WhatsApp:', e);
+    }
+    return null;
+  },
+
+  getStoreName() {
+    // 1. Configuración cargada en el módulo
+    if (this.storeSettings && this.storeSettings.store_name && this.storeSettings.store_name.trim()) {
+      return this.storeSettings.store_name.trim();
+    }
+    // 2. SettingsModule global
+    if (window.SettingsModule && SettingsModule.settings && SettingsModule.settings.store_name && SettingsModule.settings.store_name.trim()) {
+      return SettingsModule.settings.store_name.trim();
+    }
+    // 3. Input de la vista de Configuración
+    const cfgInput = document.getElementById('cfg-store-name');
+    if (cfgInput && cfgInput.value && cfgInput.value.trim()) {
+      return cfgInput.value.trim();
+    }
+    // 4. Input del modal de configuración
+    const modalInput = document.getElementById('modal-cfg-store-name');
+    if (modalInput && modalInput.value && modalInput.value.trim()) {
+      return modalInput.value.trim();
+    }
+    // 5. Nombre en la barra de navegación superior
+    const navbarBrand = document.getElementById('navbar-store-name');
+    if (navbarBrand && navbarBrand.innerText && navbarBrand.innerText.trim()) {
+      return navbarBrand.innerText.trim();
+    }
+    // 6. Respaldo
+    if (window.PosModule && PosModule.storeSettings && PosModule.storeSettings.store_name) {
+      return PosModule.storeSettings.store_name.trim();
+    }
+    return 'nuestra tienda';
+  },
+
+  async openWhatsAppModal(customerId) {
     const cust = this.customers.find(c => c.id === customerId);
     if (!cust) return;
 
@@ -329,6 +378,9 @@ const CustomersModule = {
     const phoneInput = document.getElementById('wa-phone-input');
     if (phoneInput) phoneInput.value = phoneDigits;
 
+    // Asegurar datos actualizados de la tienda antes de renderizar la plantilla
+    await this.ensureStoreSettings();
+
     this.applyWhatsAppTemplate(balance > 0 ? 'debt' : 'current');
 
     const modal = document.getElementById('customer-whatsapp-modal');
@@ -348,7 +400,7 @@ const CustomersModule = {
     const cust = this.customers.find(c => c.id === custId);
     const name = cust ? cust.name : (document.getElementById('wa-customer-name')?.innerText || 'Cliente');
     const balance = cust ? (Number(cust.current_balance) || 0) : 0;
-    const storeName = (window.PosModule && PosModule.storeSettings && PosModule.storeSettings.store_name) || 'la tienda';
+    const storeName = this.getStoreName();
 
     let text = '';
     if (type === 'debt') {

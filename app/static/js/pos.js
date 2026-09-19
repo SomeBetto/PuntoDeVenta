@@ -252,6 +252,22 @@ const PosModule = {
         this.holdCurrentTicket();
       }
 
+      // F8: Entrada de efectivo extraordinaria a caja
+      if (e.key === 'F8') {
+        e.preventDefault();
+        if (window.CashModule && typeof CashModule.openCashInModal === 'function') {
+          CashModule.openCashInModal();
+        }
+      }
+
+      // F9: Salida / Retiro de efectivo de caja
+      if (e.key === 'F9') {
+        e.preventDefault();
+        if (window.CashModule && typeof CashModule.openCashOutModal === 'function') {
+          CashModule.openCashOutModal();
+        }
+      }
+
       // F10: Cobro express con efectivo exacto
       if (e.key === 'F10') {
         e.preventDefault();
@@ -307,7 +323,7 @@ const PosModule = {
 
   async loadProducts() {
     try {
-      const res = await fetch('/api/products');
+      const res = await fetch(`/api/products?_t=${Date.now()}`);
       if (res.ok) {
         this.products = await res.json();
         this.renderProductsGrid();
@@ -356,8 +372,13 @@ const PosModule = {
   },
 
   getProductVisualHtml(p) {
-    if (p.image_url && p.image_url.startsWith('http')) {
-      return `<img src="${p.image_url}" class="product-card-img" alt="${p.name}" loading="lazy" onerror="this.onerror=null; this.parentNode.innerHTML='${this.getFallbackSvg(p)}'">`;
+    if (p.image_url && typeof p.image_url === 'string' && p.image_url.trim().length > 0) {
+      return `
+        <img src="${p.image_url}" class="product-card-img" alt="${p.name}" loading="lazy" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';">
+        <div class="product-fallback-wrap" style="display: none; width: 100%; height: 100%;">
+          ${this.getFallbackSvg(p)}
+        </div>
+      `;
     }
     return this.getFallbackSvg(p);
   },
@@ -800,8 +821,8 @@ const PosModule = {
           const totalItemVal = item.subtotal.toFixed(2);
 
           // Miniatura
-          let thumbImg = item.image_url 
-            ? `<img src="${item.image_url}" alt="${item.product_name}">` 
+          let thumbImg = (item.image_url && typeof item.image_url === 'string' && item.image_url.trim().length > 0)
+            ? `<img src="${item.image_url}" alt="${item.product_name}" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='block';"><div style="display:none; font-size: 1.5rem;">${item.icon || '📦'}</div>` 
             : `<div style="font-size: 1.5rem;">${item.icon || '📦'}</div>`;
 
           return `

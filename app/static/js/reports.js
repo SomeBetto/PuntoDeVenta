@@ -174,6 +174,16 @@ const ReportsModule = {
           }).join('');
         }
       }
+
+      // Renderizar flujo y balance de efectivo en caja
+      const setVal = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) el.innerText = val;
+      };
+      setVal('rep-cash-sales', `$${(d.cash_sales || 0).toLocaleString('es-MX', { minimumFractionDigits: 2 })}`);
+      setVal('rep-cash-inflows', `+$${(d.cash_inflows || 0).toLocaleString('es-MX', { minimumFractionDigits: 2 })} (${d.count_inflows || 0})`);
+      setVal('rep-cash-outflows', `-$${(d.cash_outflows || 0).toLocaleString('es-MX', { minimumFractionDigits: 2 })} (${d.count_outflows || 0})`);
+      setVal('rep-cash-net', `$${(d.net_cash || 0).toLocaleString('es-MX', { minimumFractionDigits: 2 })}`);
     } catch (e) {
       console.error(e);
     }

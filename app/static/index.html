@@ -439,7 +439,9 @@
           <div class="pos-shortcuts-bar">
             <span><kbd>F1</kbd> Buscar</span>
             <span><kbd>F2</kbd> Rápido</span>
-            <span><kbd>F3</kbd> En Espera</span>
+            <span><kbd>F3</kbd> Espera</span>
+            <span style="cursor: pointer;" onclick="CashModule.openCashInModal()" title="Entrada rápida de efectivo (F8)"><kbd style="background: #15803d; color: #fff; border-color: #15803d;">F8</kbd> Entrada</span>
+            <span style="cursor: pointer;" onclick="CashModule.openCashOutModal()" title="Salida rápida de efectivo (F9)"><kbd style="background: #b91c1c; color: #fff; border-color: #b91c1c;">F9</kbd> Salida</span>
             <span><kbd>F10</kbd> Exacto</span>
             <span><kbd>F12</kbd> Cobrar</span>
             <span><kbd>+/-</kbd> Cant.</span>
@@ -508,13 +510,19 @@
               <span id="btn-checkout-label">$0.00 MXN</span>
             </button>
 
-            <!-- Acciones Rápidas Complementarias: Congelar Venta y Cobro Express -->
-            <div style="display: flex; gap: 0.4rem; margin-top: 0.5rem;">
-              <button type="button" class="btn-secondary" onclick="PosModule.holdCurrentTicket()" title="Poner venta actual en espera (F3)" style="flex: 1; padding: 0.45rem 0.5rem; font-size: 0.78rem; font-weight: 700; background: #f0fdf4; color: #15803d; border: 1px solid #86efac; border-radius: var(--radius-sm);">
-                ❄️ En Espera (F3)
+            <!-- Acciones Rápidas Complementarias: Congelar Venta, Cobro Express, Entradas y Salidas de Caja -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; margin-top: 0.5rem;">
+              <button type="button" class="btn-secondary" onclick="PosModule.holdCurrentTicket()" title="Poner venta actual en espera (F3)" style="padding: 0.45rem 0.4rem; font-size: 0.76rem; font-weight: 700; background: #f0fdf4; color: #15803d; border: 1px solid #86efac; border-radius: var(--radius-sm);">
+                ❄️ Espera (F3)
               </button>
-              <button type="button" class="btn-secondary" onclick="PosModule.quickCheckoutExactCash()" title="Cobro rápido con efectivo exacto (F10)" style="flex: 1; padding: 0.45rem 0.5rem; font-size: 0.78rem; font-weight: 700; background: #eff6ff; color: #1d4ed8; border: 1px solid #93c5fd; border-radius: var(--radius-sm);">
+              <button type="button" class="btn-secondary" onclick="PosModule.quickCheckoutExactCash()" title="Cobro rápido con efectivo exacto (F10)" style="padding: 0.45rem 0.4rem; font-size: 0.76rem; font-weight: 700; background: #eff6ff; color: #1d4ed8; border: 1px solid #93c5fd; border-radius: var(--radius-sm);">
                 ⚡ Exacto (F10)
+              </button>
+              <button type="button" class="btn-secondary" onclick="CashModule.openCashInModal()" title="Entrada rápida de efectivo a caja (F8)" style="padding: 0.45rem 0.4rem; font-size: 0.76rem; font-weight: 700; background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; border-radius: var(--radius-sm);">
+                📥 Entrada (F8)
+              </button>
+              <button type="button" class="btn-secondary" onclick="CashModule.openCashOutModal()" title="Salida / Retiro de efectivo de caja (F9)" style="padding: 0.45rem 0.4rem; font-size: 0.76rem; font-weight: 700; background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; border-radius: var(--radius-sm);">
+                📤 Salida (F9)
               </button>
             </div>
 
@@ -973,9 +981,17 @@
             </div>
           </div>
           <div class="sub-meta-group">
-            <button class="meta-btn" id="btn-add-movement">
-              <span>💸</span>
-              <span>Registrar Entrada / Salida</span>
+            <button class="meta-btn" onclick="CashModule.openCashInModal()" style="background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0;">
+              <span>📥</span>
+              <span>Entrada (F8)</span>
+            </button>
+            <button class="meta-btn" onclick="CashModule.openCashOutModal()" style="background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca;">
+              <span>📤</span>
+              <span>Salida (F9)</span>
+            </button>
+            <button class="meta-btn" id="btn-view-corte-ticket" onclick="CashModule.openCorteTicketModal()" style="background: #10b981; color: #fff;">
+              <span>🖨️</span>
+              <span>Ver / Imprimir Corte</span>
             </button>
             <button class="meta-btn" id="btn-close-shift" style="background: var(--primary-blue); color: #fff;">
               <span>🔒</span>
@@ -986,22 +1002,30 @@
 
         <div class="table-view-container">
           <!-- Tarjetas Desglose de Caja -->
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
             <div class="sicar-table-card" style="padding: 1.2rem;">
               <div style="font-size: 0.8rem; color: var(--text-secondary);">FONDO INICIAL</div>
-              <div style="font-size: 1.5rem; font-weight: 900; font-family: var(--font-mono); margin-top: 0.2rem;" id="cash-initial-val">$0.00</div>
+              <div style="font-size: 1.4rem; font-weight: 900; font-family: var(--font-mono); margin-top: 0.2rem;" id="cash-initial-val">$0.00</div>
             </div>
             <div class="sicar-table-card" style="padding: 1.2rem;">
               <div style="font-size: 0.8rem; color: var(--text-secondary);">VENTAS EN EFECTIVO</div>
-              <div style="font-size: 1.5rem; font-weight: 900; font-family: var(--font-mono); color: var(--accent-green-dark); margin-top: 0.2rem;" id="cash-sales-val">$0.00</div>
+              <div style="font-size: 1.4rem; font-weight: 900; font-family: var(--font-mono); color: var(--accent-green-dark); margin-top: 0.2rem;" id="cash-sales-val">$0.00</div>
+            </div>
+            <div class="sicar-table-card" style="padding: 1.2rem; background: #f0fdf4; border-color: #86efac;">
+              <div style="font-size: 0.8rem; font-weight: 700; color: #15803d;">📥 ENTRADAS (F8)</div>
+              <div style="font-size: 1.4rem; font-weight: 900; font-family: var(--font-mono); color: #15803d; margin-top: 0.2rem;" id="cash-ingresos-val">+$0.00</div>
+            </div>
+            <div class="sicar-table-card" style="padding: 1.2rem; background: #fef2f2; border-color: #fca5a5;">
+              <div style="font-size: 0.8rem; font-weight: 700; color: #b91c1c;">📤 SALIDAS (F9)</div>
+              <div style="font-size: 1.4rem; font-weight: 900; font-family: var(--font-mono); color: #b91c1c; margin-top: 0.2rem;" id="cash-egresos-val">-$0.00</div>
             </div>
             <div class="sicar-table-card" style="padding: 1.2rem;">
               <div style="font-size: 0.8rem; color: var(--text-secondary);">TARJETAS / TRANSFERENCIAS</div>
-              <div style="font-size: 1.5rem; font-weight: 900; font-family: var(--font-mono); color: var(--primary-blue); margin-top: 0.2rem;" id="cash-card-val">$0.00</div>
+              <div style="font-size: 1.4rem; font-weight: 900; font-family: var(--font-mono); color: var(--primary-blue); margin-top: 0.2rem;" id="cash-card-val">$0.00</div>
             </div>
             <div class="sicar-table-card" style="padding: 1.2rem; background: var(--primary-blue-light); border-color: rgba(0,96,223,0.3);">
               <div style="font-size: 0.8rem; font-weight: 700; color: var(--primary-blue-dark);">EFECTIVO ESPERADO EN CAJA</div>
-              <div style="font-size: 1.8rem; font-weight: 900; font-family: var(--font-mono); color: var(--primary-blue-dark); margin-top: 0.2rem;" id="cash-expected-val">$0.00</div>
+              <div style="font-size: 1.6rem; font-weight: 900; font-family: var(--font-mono); color: var(--primary-blue-dark); margin-top: 0.2rem;" id="cash-expected-val">$0.00</div>
             </div>
           </div>
 
@@ -1280,6 +1304,32 @@
                   <!-- Renderizado dinámico -->
                 </tbody>
               </table>
+
+              <!-- Resumen de Flujo de Efectivo del Día / Período -->
+              <div style="margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid var(--border-light);">
+                <h4 style="font-size: 0.95rem; font-weight: 800; margin-bottom: 0.85rem; display: flex; align-items: center; gap: 0.5rem;">
+                  <span>💵</span>
+                  <span>Flujo y Cuadre de Efectivo en Caja (Corte del Período)</span>
+                </h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.85rem;">
+                  <div style="background: var(--bg-subtle); padding: 0.85rem 1rem; border-radius: 8px; border: 1px solid var(--border-light);">
+                    <div style="font-size: 0.76rem; color: var(--text-secondary); font-weight: 700;">VENTAS EN EFECTIVO</div>
+                    <div id="rep-cash-sales" style="font-family: var(--font-mono); font-weight: 900; font-size: 1.3rem; color: var(--primary-blue); margin-top: 0.2rem;">$0.00</div>
+                  </div>
+                  <div style="background: #f0fdf4; padding: 0.85rem 1rem; border-radius: 8px; border: 1px solid #86efac;">
+                    <div style="font-size: 0.76rem; color: #15803d; font-weight: 700;">(+) ENTRADAS EFECTIVO (F8)</div>
+                    <div id="rep-cash-inflows" style="font-family: var(--font-mono); font-weight: 900; font-size: 1.3rem; color: #15803d; margin-top: 0.2rem;">+$0.00 (0)</div>
+                  </div>
+                  <div style="background: #fef2f2; padding: 0.85rem 1rem; border-radius: 8px; border: 1px solid #fca5a5;">
+                    <div style="font-size: 0.76rem; color: #b91c1c; font-weight: 700;">(-) SALIDAS EFECTIVO (F9)</div>
+                    <div id="rep-cash-outflows" style="font-family: var(--font-mono); font-weight: 900; font-size: 1.3rem; color: #b91c1c; margin-top: 0.2rem;">-$0.00 (0)</div>
+                  </div>
+                  <div style="background: #eff6ff; padding: 0.85rem 1rem; border-radius: 8px; border: 1px solid #93c5fd;">
+                    <div style="font-size: 0.76rem; color: #1e40af; font-weight: 700;">(=) EFECTIVO NETO RESULTANTE</div>
+                    <div id="rep-cash-net" style="font-family: var(--font-mono); font-weight: 900; font-size: 1.35rem; color: #1e40af; margin-top: 0.2rem;">$0.00</div>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <!-- Pestaña 2: Ventas por Departamento -->
@@ -2524,7 +2574,7 @@
   <div class="modal-overlay" id="cash-movement-modal">
     <div class="modal-sicar-dialog">
       <div class="modal-sicar-header">
-        <h3>💸 Movimiento de Caja</h3>
+        <h3 id="cash-movement-modal-title">💸 Movimiento de Caja</h3>
         <button class="menu-toggle-btn" onclick="App.closeModal('cash-movement-modal')">✕</button>
       </div>
       <div class="modal-sicar-body" style="padding: 1.5rem;">
@@ -2603,6 +2653,29 @@
           </button>
           <button type="button" class="main-action-pill-btn" id="btn-confirm-close-shift" style="background: #dc2626; padding: 0.75rem 1.8rem;">
             Confirmar y Cerrar Turno
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Ver / Imprimir Ticket de Corte de Caja (Corte Z / X) -->
+  <div class="modal-overlay" id="modal-corte-ticket">
+    <div class="modal-sicar-dialog" style="max-width: 440px;">
+      <div class="modal-sicar-header">
+        <h3>🧾 Ticket de Corte de Caja</h3>
+        <button class="menu-toggle-btn" onclick="App.closeModal('modal-corte-ticket')">✕</button>
+      </div>
+      <div class="modal-sicar-body" style="padding: 1.25rem; max-height: 75vh; overflow-y: auto;">
+        <div id="corte-ticket-body">
+          <!-- Renderizado dinámico del ticket -->
+        </div>
+        <div style="display: flex; justify-content: space-between; gap: 0.75rem; margin-top: 1.25rem;">
+          <button type="button" class="meta-btn" onclick="App.closeModal('modal-corte-ticket')">
+            Cerrar
+          </button>
+          <button type="button" class="main-action-pill-btn" onclick="CashModule.printCorteTicket()" style="background: #10b981; padding: 0.75rem 1.6rem;">
+            🖨️ Imprimir Ticket
           </button>
         </div>
       </div>
@@ -3022,19 +3095,19 @@
   <div class="toast-container" id="toast-container"></div>
 
   <!-- Scripts -->
-  <script src="/static/js/qr-generator.js?v=3.7"></script>
-  <script src="/static/js/barcode.js?v=3.7"></script>
-  <script src="/static/js/pos.js?v=3.7"></script>
-  <script src="/static/js/inventory.js?v=3.7"></script>
-  <script src="/static/js/customers.js?v=3.7"></script>
-  <script src="/static/js/cash.js?v=3.7"></script>
-  <script src="/static/js/users.js?v=3.7"></script>
-  <script src="/static/js/suppliers.js?v=3.7"></script>
-  <script src="/static/js/purchases.js?v=3.7"></script>
-  <script src="/static/js/reports.js?v=3.7"></script>
-  <script src="/static/js/eleventa.js?v=3.7"></script>
-  <script src="/static/js/settings.js?v=3.7"></script>
-  <script src="/static/js/backup.js?v=3.7"></script>
-  <script src="/static/js/app.js?v=3.7"></script>
+  <script src="/static/js/qr-generator.js?v=3.9"></script>
+  <script src="/static/js/barcode.js?v=3.9"></script>
+  <script src="/static/js/pos.js?v=3.9"></script>
+  <script src="/static/js/inventory.js?v=3.9"></script>
+  <script src="/static/js/customers.js?v=3.9"></script>
+  <script src="/static/js/cash.js?v=3.9"></script>
+  <script src="/static/js/users.js?v=3.9"></script>
+  <script src="/static/js/suppliers.js?v=3.9"></script>
+  <script src="/static/js/purchases.js?v=3.9"></script>
+  <script src="/static/js/reports.js?v=3.9"></script>
+  <script src="/static/js/eleventa.js?v=3.9"></script>
+  <script src="/static/js/settings.js?v=3.9"></script>
+  <script src="/static/js/backup.js?v=3.9"></script>
+  <script src="/static/js/app.js?v=3.9"></script>
 </body>
 </html>

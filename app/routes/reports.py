@@ -118,15 +118,76 @@ def get_sales_summary(
     """
     methods_rows = conn.execute(payment_methods_query, params).fetchall()
     payment_methods = []
+    cash_sales = 0.0
     for m in methods_rows:
         amt = round(float(m["total_amount"]), 2)
         pct = round((amt / total_sales) * 100, 1) if total_sales > 0 else 0.0
+        method_name = m["method"]
+        if method_name.upper() == "EFECTIVO":
+            cash_sales = amt
         payment_methods.append({
-            "method": m["method"],
+            "method": method_name,
             "tickets": m["tickets"],
             "total_amount": amt,
             "pct": pct
         })
+
+    # 4. Movimientos extraordinarios de efectivo (Entradas F8 / Salidas F9) en el mismo rango de fechas
+    cm_clauses = []
+    cm_params = []
+    now = datetime.now()
+    if period == "today":
+        cm_clauses.append("DATE(created_at, 'localtime') = ?")
+        cm_params.append(now.strftime("%Y-%m-%d"))
+    elif period == "yesterday":
+        cm_clauses.append("DATE(created_at, 'localtime') = ?")
+        cm_params.append((now - timedelta(days=1)).strftime("%Y-%m-%d"))
+    elif period == "week":
+        cm_clauses.append("created_at >= ?")
+        cm_params.append((now - timedelta(days=7)).strftime("%Y-%m-%d 00:00:00"))
+    elif period == "month":
+        cm_clauses.append("created_at >= ?")
+        cm_params.append(now.strftime("%Y-%m-01 00:00:00"))
+    elif period == "last30":
+        cm_clauses.append("created_at >= ?")
+        cm_params.append((now - timedelta(days=30)).strftime("%Y-%m-%d 00:00:00"))
+    elif period == "year":
+        cm_clauses.append("created_at >= ?")
+        cm_params.append(now.strftime("%Y-01-01 00:00:00"))
+    elif period == "custom" and (start_date or end_date):
+        if start_date:
+            cm_clauses.append("created_at >= ?")
+            cm_params.append(f"{start_date} 00:00:00")
+        if end_date:
+            cm_clauses.append("created_at <= ?")
+            cm_params.append(f"{end_date} 23:59:59")
+
+    cm_where = ("WHERE " + " AND ".join(cm_clauses)) if cm_clauses else ""
+    cm_rows = conn.execute(f"""
+        SELECT 
+            type,
+            COALESCE(SUM(amount), 0) as total,
+            COUNT(*) as count
+        FROM cash_movements
+        {cm_where}
+        GROUP BY type
+    """, cm_params).fetchall()
+
+    cash_inflows = 0.0
+    cash_outflows = 0.0
+    count_inflows = 0
+    count_outflows = 0
+    for r in cm_rows:
+        t = (r["type"] or "").upper()
+        if t == "INGRESO":
+            cash_inflows = round(float(r["total"]), 2)
+            count_inflows = int(r["count"])
+        elif t == "EGRESO":
+            cash_outflows = round(float(r["total"]), 2)
+            count_outflows = int(r["count"])
+
+    # Efectivo neto resultante en caja (ventas efectivo + entradas - salidas)
+    net_cash = round(cash_sales + cash_inflows - cash_outflows, 2)
 
     conn.close()
 
@@ -144,7 +205,13 @@ def get_sales_summary(
         "total_cost": total_cost,
         "total_profit": total_profit,
         "margin_pct": margin_pct,
-        "payment_methods": payment_methods
+        "payment_methods": payment_methods,
+        "cash_sales": cash_sales,
+        "cash_inflows": cash_inflows,
+        "cash_outflows": cash_outflows,
+        "count_inflows": count_inflows,
+        "count_outflows": count_outflows,
+        "net_cash": net_cash
     }
 
 @router.get("/departments")

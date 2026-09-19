@@ -248,6 +248,9 @@ const App = {
 
     // Acciones específicas al entrar a una vista
     if (viewName === 'pos') {
+      if (window.PosModule && typeof PosModule.loadProducts === 'function') {
+        PosModule.loadProducts();
+      }
       setTimeout(() => document.getElementById('pos-search-input')?.focus(), 100);
     } else if (viewName === 'products') {
       InventoryModule.loadProducts();

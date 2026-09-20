@@ -30,19 +30,20 @@ lib/
 lib64/
 
 # --- Bases de Datos y Datos Sensibles / Pesados (>100MB) ---
+data/*
+!data/.gitkeep
+data/.eleventa_migrado
+data/eleventa_import_status.json
 data/*.db
 data/*.db-journal
 data/*.db-wal
 data/*.db-shm
 data/*.sqlite
 data/*.sqlite3
-data/eleventa_import_status.json
 *.db
 *.sqlite
 *.sqlite3
-
-# Preservar carpetas requeridas mediante .gitkeep
-!data/.gitkeep
+*.fdb
 
 # --- Copias de Seguridad y Respaldos ---
 respaldos/*

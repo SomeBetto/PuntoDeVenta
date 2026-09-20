@@ -3710,6 +3710,332 @@ body {
   }
 }
 
+/* ==========================================================================
+   16. TERMINAL MÓVIL EXCLUSIVA: AJUSTE Y CONTEO DE INVENTARIO
+   ========================================================================== */
+
+/* Por defecto en escritorio: ocultar tarjetas móviles y banner */
+.mobile-inventory-header-banner {
+  display: none;
+}
+.adjustment-mobile-cards-list {
+  display: none;
+}
+
+/* En modo móvil o resolución <= 860px */
+@media (max-width: 860px) {
+  /* En móvil, ocultar la tabla de escritorio de ajuste y mostrar tarjetas */
+  .adjustment-desktop-table {
+    display: none !important;
+  }
+  .adjustment-mobile-cards-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px 12px 120px 12px;
+    max-height: none;
+  }
+
+  .mobile-inventory-header-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: linear-gradient(135deg, #1e3a8a, #0284c7);
+    color: #ffffff;
+    border-radius: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* Si está activado body.mobile-inventory-mode (por ?mode=inventory o móvil) */
+body.mobile-inventory-mode .drawer-nav-section-title,
+body.mobile-inventory-mode .drawer-nav-item[data-view="pos"],
+body.mobile-inventory-mode .drawer-nav-item[data-view="products"],
+body.mobile-inventory-mode .drawer-nav-item[data-view="purchases"],
+body.mobile-inventory-mode .drawer-nav-item[data-view="customers"],
+body.mobile-inventory-mode .drawer-nav-item[data-view="suppliers"],
+body.mobile-inventory-mode .drawer-nav-item[data-view="cash"],
+body.mobile-inventory-mode .drawer-nav-item[data-view="multiservices"],
+body.mobile-inventory-mode .drawer-nav-item[data-view="users"],
+body.mobile-inventory-mode .drawer-nav-item[data-view="reports"],
+body.mobile-inventory-mode .drawer-nav-item[data-view="settings"],
+body.mobile-inventory-mode .drawer-nav-item#btn-open-eleventa-modal,
+body.mobile-inventory-mode .drawer-nav-item.logout-item,
+body.mobile-inventory-mode .bar-connect-mobile-btn,
+body.mobile-inventory-mode .bar-action-icon#btn-fullscreen,
+body.mobile-inventory-mode .bar-action-icon#btn-top-settings,
+body.mobile-inventory-mode .pos-mobile-nav-bar,
+body.mobile-inventory-mode .pos-mobile-floating-cart {
+  display: none !important;
+}
+
+body.mobile-inventory-mode .mobile-only-drawer-header {
+  display: block !important;
+}
+
+body.mobile-inventory-mode #view-inventory-adjust {
+  display: block !important;
+}
+
+body.mobile-inventory-mode .view-panel:not(#view-inventory-adjust) {
+  display: none !important;
+}
+
+/* Estilos de las tarjetas de conteo móvil */
+.adj-mobile-card {
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
+  transition: all 0.2s ease;
+}
+
+.adj-mobile-card.card-diff-pos {
+  border-color: #86efac;
+  background: #f0fdf4;
+}
+
+.adj-mobile-card.card-diff-neg {
+  border-color: #fca5a5;
+  background: #fef2f2;
+}
+
+.adj-mobile-card.card-highlight-pulse {
+  animation: cardPulse 1.2s ease;
+}
+
+@keyframes cardPulse {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(2, 132, 199, 0.7); }
+  50% { transform: scale(1.02); box-shadow: 0 0 0 8px rgba(2, 132, 199, 0); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(2, 132, 199, 0); }
+}
+
+.adj-card-top {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.adj-card-thumb {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  background: #f8fafc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid #e2e8f0;
+}
+
+.adj-card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.adj-card-barcode {
+  font-size: 0.72rem;
+  color: #64748b;
+  font-family: var(--font-mono, monospace);
+  display: block;
+}
+
+.adj-card-title {
+  font-size: 0.95rem;
+  color: #0f172a;
+  line-height: 1.25;
+  display: block;
+  margin: 2px 0 4px 0;
+}
+
+.adj-card-meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.78rem;
+  color: #475569;
+}
+
+.adj-meta-stock strong {
+  color: #0284c7;
+  font-size: 0.84rem;
+}
+
+.adj-meta-price {
+  font-weight: 700;
+  color: #15803d;
+}
+
+/* Fila de stepper táctil gigante */
+.adj-card-stepper-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-top: 6px;
+  border-top: 1px dashed #e2e8f0;
+}
+
+.adj-stepper-hint {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #334155;
+}
+
+.adj-stepper-touch {
+  display: inline-flex;
+  align-items: center;
+  background: #f1f5f9;
+  border-radius: 10px;
+  border: 1.5px solid #cbd5e1;
+  overflow: hidden;
+}
+
+.adj-step-btn {
+  width: 46px;
+  height: 42px;
+  background: #ffffff;
+  border: none;
+  font-size: 1.3rem;
+  font-weight: 900;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.adj-step-btn:active {
+  background: #e2e8f0;
+}
+
+.adj-step-btn.minus {
+  color: #dc2626;
+}
+
+.adj-step-btn.plus {
+  color: #16a34a;
+}
+
+.adj-stepper-input {
+  width: 65px;
+  height: 42px;
+  border: none;
+  background: transparent;
+  text-align: center;
+  font-size: 1.15rem;
+  font-weight: 800;
+  font-family: var(--font-mono, monospace);
+  color: #0f172a;
+}
+
+.adj-stepper-input:focus {
+  outline: none;
+  background: #ffffff;
+}
+
+/* Badge de diferencia */
+.adj-card-diff-badge {
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.adj-card-diff-badge.diff-zero {
+  background: #f1f5f9;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+}
+
+.adj-card-diff-badge.diff-pos {
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #86efac;
+}
+
+.adj-card-diff-badge.diff-neg {
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fca5a5;
+}
+
+/* Banner de encabezado */
+.mob-inv-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mob-inv-icon {
+  font-size: 1.8rem;
+}
+
+.mob-inv-title {
+  font-size: 1.05rem;
+  display: block;
+}
+
+.mob-inv-sub {
+  font-size: 0.74rem;
+  opacity: 0.9;
+  display: block;
+}
+
+/* Barra inferior fija de ajuste en móvil */
+@media (max-width: 860px) {
+  .adjustment-bottom-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #0f172a;
+    color: #ffffff;
+    padding: 10px 14px;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.25);
+  }
+
+  .adjustment-stats-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.72rem;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .adjustment-stats-row .stat-tag {
+    color: #94a3b8;
+  }
+
+  .btn-apply-adjustment {
+    width: 100%;
+    padding: 12px;
+    font-size: 0.95rem;
+    font-weight: 800;
+    background: #16a34a;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 3px 10px rgba(22, 163, 74, 0.4);
+    letter-spacing: 0.5px;
+  }
+}
+
+
 
 
 

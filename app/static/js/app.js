@@ -27,6 +27,17 @@ const App = {
     if (window.MultiservicesModule) MultiservicesModule.init();
     if (window.SuppliersModule) SuppliersModule.init();
     if (window.PurchasesModule) PurchasesModule.init();
+
+    // MODO MÓVIL EXCLUSIVO: Ajuste de Inventario
+    const urlParams = new URLSearchParams(window.location.search);
+    const modeParam = urlParams.get('mode');
+    const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 860;
+
+    if (modeParam === 'inventory' || isMobileDevice) {
+      this.isMobileMode = true;
+      document.body.classList.add('mobile-inventory-mode');
+      this.switchView('inventory-adjust');
+    }
   },
 
   bindDrawer() {
@@ -215,6 +226,11 @@ const App = {
   },
 
   switchView(viewName) {
+    // Si estamos en modo móvil exclusivo, restringir a ajuste de inventario
+    if (this.isMobileMode && viewName !== 'inventory-adjust') {
+      viewName = 'inventory-adjust';
+    }
+
     this.currentView = viewName;
 
     const titles = {
@@ -222,7 +238,7 @@ const App = {
       'products': 'Productos',
       'purchases': 'Compras a Proveedores',
       'suppliers': 'Directorio de Proveedores',
-      'inventory-adjust': 'Ajuste libre',
+      'inventory-adjust': this.isMobileMode ? 'Ajuste de Inventario Móvil' : 'Ajuste libre',
       'multiservices': 'Pago de Servicios',
       'customers': 'Libreta de Fiados',
       'cash': 'Control de Caja',
@@ -256,6 +272,11 @@ const App = {
         PosModule.updateMobileUI();
       }
       setTimeout(() => document.getElementById('pos-search-input')?.focus(), 100);
+    } else if (viewName === 'inventory-adjust') {
+      if (window.InventoryModule && typeof InventoryModule.loadProducts === 'function') {
+        InventoryModule.loadProducts();
+      }
+      setTimeout(() => document.getElementById('adjust-search-input')?.focus(), 150);
     } else if (viewName === 'products') {
       InventoryModule.loadProducts();
     } else if (viewName === 'purchases') {
@@ -319,7 +340,7 @@ const App = {
 
     const port = this.networkInfo.port || 8050;
     const selectedIp = customIp || this.networkInfo.local_ip;
-    const url = `http://${selectedIp}:${port}`;
+    const url = `http://${selectedIp}:${port}/?mode=inventory`;
 
     // Mostrar URL textual
     const urlEl = document.getElementById('qr-network-url');

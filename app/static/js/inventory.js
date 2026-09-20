@@ -29,6 +29,12 @@ const InventoryModule = {
     const adjustSearch = document.getElementById('adjust-search-input');
     if (adjustSearch) {
       adjustSearch.addEventListener('input', (e) => this.renderAdjustmentTable(e.target.value));
+      adjustSearch.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          this.handleBarcodeScanInAdjustment(adjustSearch.value.trim());
+        }
+      });
     }
 
     const saveProdBtn = document.getElementById('btn-save-product');
@@ -387,7 +393,12 @@ const InventoryModule = {
     if (!tbody) return;
 
     const q = filter.toLowerCase().trim();
-    const list = this.products.filter(p => !q || p.name.toLowerCase().includes(q));
+    const list = this.products.filter(p => {
+      if (!q) return true;
+      const b = (p.barcode || '').toLowerCase();
+      const n = (p.name || '').toLowerCase();
+      return n.includes(q) || b.includes(q);
+    });
 
     let sinDiffCount = 0;
     let posCount = 0;
@@ -395,6 +406,7 @@ const InventoryModule = {
     let negCount = 0;
     let negAmount = 0;
 
+    // 1. RENDERIZADO TABLA ESCRITORIO
     tbody.innerHTML = list.map((p, i) => {
       const adj = this.adjustmentsMap[p.id] || { counted: p.stock, difference: 0 };
       const diff = adj.difference;
@@ -438,12 +450,200 @@ const InventoryModule = {
       `;
     }).join('');
 
+    // 2. RENDERIZADO TARJETAS TÁCTILES MÓVILES
+    const cardsContainer = document.getElementById('adjustment-mobile-cards');
+    if (cardsContainer) {
+      if (list.length === 0) {
+        cardsContainer.innerHTML = `
+          <div style="text-align: center; padding: 3rem 1rem; color: #94a3b8;">
+            <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🔍</div>
+            <strong style="color: #475569;">No se encontraron productos</strong>
+            <p style="font-size: 0.8rem; margin-top: 0.25rem;">Intente con otro nombre o escanee el código de barras.</p>
+          </div>
+        `;
+      } else {
+        cardsContainer.innerHTML = list.map(p => {
+          const adj = this.adjustmentsMap[p.id] || { counted: p.stock, difference: 0 };
+          const diff = adj.difference;
+          const thumbHtml = p.image_url 
+            ? `<img src="${p.image_url}" style="width:100%; height:100%; object-fit:cover; border-radius:8px;" alt="${p.name}">` 
+            : `<span style="font-size:1.6rem;">${p.category_icon || '📦'}</span>`;
+
+          const diffClass = diff > 0 ? 'diff-pos' : (diff < 0 ? 'diff-neg' : 'diff-zero');
+          const diffText = diff > 0 
+            ? `+${diff} ${p.unit} (Sobrante: +$${(diff * p.sale_price).toFixed(2)})` 
+            : (diff < 0 
+              ? `${diff} ${p.unit} (Faltante: -$${Math.abs(diff * p.sale_price).toFixed(2)})` 
+              : `✓ Cuadra (Sin diferencia)`);
+
+          return `
+            <div class="adj-mobile-card ${diff > 0 ? 'card-diff-pos' : (diff < 0 ? 'card-diff-neg' : '')}" id="adj-card-${p.id}">
+              <div class="adj-card-top">
+                <div class="adj-card-thumb">${thumbHtml}</div>
+                <div class="adj-card-info">
+                  <span class="adj-card-barcode">🏷️ ${p.barcode || 'SIN CÓDIGO'} • ${p.unit.toUpperCase()}</span>
+                  <strong class="adj-card-title">${p.name}</strong>
+                  <div class="adj-card-meta-row">
+                    <span class="adj-meta-stock">Sistema: <strong>${p.stock} ${p.unit}</strong></span>
+                    <span class="adj-meta-price">$${p.sale_price.toFixed(2)} MXN</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="adj-card-stepper-row">
+                <span class="adj-stepper-hint">Conteo físico:</span>
+                <div class="adj-stepper-touch">
+                  <button type="button" class="adj-step-btn minus" onclick="InventoryModule.stepMobileAdjustment(${p.id}, -1)">−</button>
+                  <input type="number" class="adj-stepper-input" id="adj-input-${p.id}" value="${adj.counted}" step="any" onchange="InventoryModule.setMobileAdjustmentCount(${p.id}, this.value)">
+                  <button type="button" class="adj-step-btn plus" onclick="InventoryModule.stepMobileAdjustment(${p.id}, 1)">+</button>
+                </div>
+              </div>
+
+              <div class="adj-card-diff-badge ${diffClass}" id="adj-badge-${p.id}">
+                ${diffText}
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
     // Actualizar barra inferior de conteo
     document.getElementById('adj-stat-sindiff').innerText = `Sin diferencia (${sinDiffCount})`;
     document.getElementById('adj-stat-pos').innerText = `D. positiva (${posCount}) +$${posAmount.toFixed(2)}`;
     document.getElementById('adj-stat-neg').innerText = `D. negativa (${negCount}) -$${negAmount.toFixed(2)}`;
     const totalDiff = posAmount - negAmount;
     document.getElementById('adj-stat-total').innerText = `Total diferencia: ${totalDiff >= 0 ? '+' : ''}$${totalDiff.toFixed(2)}`;
+  },
+
+  stepMobileAdjustment(productId, delta) {
+    const prod = this.products.find(p => p.id === productId);
+    if (!prod) return;
+
+    if (!this.adjustmentsMap[productId]) {
+      this.adjustmentsMap[productId] = { counted: prod.stock, difference: 0 };
+    }
+
+    const currentCount = this.adjustmentsMap[productId].counted;
+    const newCount = parseFloat(Math.max(0, currentCount + delta).toFixed(2));
+    this.setMobileAdjustmentCount(productId, newCount);
+  },
+
+  setMobileAdjustmentCount(productId, countVal) {
+    const prod = this.products.find(p => p.id === productId);
+    if (!prod) return;
+
+    const counted = parseFloat(parseFloat(countVal || 0).toFixed(2));
+    const diff = parseFloat((counted - prod.stock).toFixed(2));
+
+    this.adjustmentsMap[productId] = {
+      counted: counted,
+      difference: diff
+    };
+
+    // Actualizar input del elemento si existe
+    const input = document.getElementById(`adj-input-${productId}`);
+    if (input && document.activeElement !== input) {
+      input.value = counted;
+    }
+
+    // Actualizar badge de diferencia de la tarjeta
+    const badge = document.getElementById(`adj-badge-${productId}`);
+    const card = document.getElementById(`adj-card-${productId}`);
+    if (badge) {
+      const diffClass = diff > 0 ? 'diff-pos' : (diff < 0 ? 'diff-neg' : 'diff-zero');
+      const diffText = diff > 0 
+        ? `+${diff} ${prod.unit} (Sobrante: +$${(diff * prod.sale_price).toFixed(2)})` 
+        : (diff < 0 
+          ? `${diff} ${prod.unit} (Faltante: -$${Math.abs(diff * prod.sale_price).toFixed(2)})` 
+          : `✓ Cuadra (Sin diferencia)`);
+      badge.className = `adj-card-diff-badge ${diffClass}`;
+      badge.innerHTML = diffText;
+    }
+    if (card) {
+      card.classList.toggle('card-diff-pos', diff > 0);
+      card.classList.toggle('card-diff-neg', diff < 0);
+    }
+
+    // Recalcular estadísticas globales de la barra inferior
+    this.recalculateAdjustmentStats();
+  },
+
+  recalculateAdjustmentStats() {
+    let sinDiffCount = 0;
+    let posCount = 0;
+    let posAmount = 0;
+    let negCount = 0;
+    let negAmount = 0;
+
+    this.products.forEach(p => {
+      const adj = this.adjustmentsMap[p.id] || { counted: p.stock, difference: 0 };
+      const diff = adj.difference;
+      if (diff === 0) sinDiffCount++;
+      else if (diff > 0) {
+        posCount++;
+        posAmount += (diff * p.sale_price);
+      } else {
+        negCount++;
+        negAmount += Math.abs(diff * p.sale_price);
+      }
+    });
+
+    const elSin = document.getElementById('adj-stat-sindiff');
+    const elPos = document.getElementById('adj-stat-pos');
+    const elNeg = document.getElementById('adj-stat-neg');
+    const elTot = document.getElementById('adj-stat-total');
+
+    if (elSin) elSin.innerText = `Sin diferencia (${sinDiffCount})`;
+    if (elPos) elPos.innerText = `D. positiva (${posCount}) +$${posAmount.toFixed(2)}`;
+    if (elNeg) elNeg.innerText = `D. negativa (${negCount}) -$${negAmount.toFixed(2)}`;
+    const totalDiff = posAmount - negAmount;
+    if (elTot) elTot.innerText = `Total diferencia: ${totalDiff >= 0 ? '+' : ''}$${totalDiff.toFixed(2)}`;
+  },
+
+  resetAllAdjustments() {
+    if (!confirm('¿Desea restablecer todos los conteos al stock actual del sistema?')) return;
+    this.products.forEach(p => {
+      this.adjustmentsMap[p.id] = {
+        counted: p.stock,
+        difference: 0
+      };
+    });
+    this.renderAdjustmentTable();
+    App.showToast('Conteos restablecidos a las existencias del sistema', 'info');
+  },
+
+  triggerBarcodePrompt() {
+    const code = prompt('Escriba o escanee el código de barras del producto a contar:');
+    if (code && code.trim()) {
+      this.handleBarcodeScanInAdjustment(code.trim());
+    }
+  },
+
+  handleBarcodeScanInAdjustment(rawCode) {
+    if (!rawCode) return;
+    const match = window.BarcodeUtils 
+      ? BarcodeUtils.findMatch(this.products, rawCode) 
+      : this.products.find(p => p.barcode === rawCode || p.barcode === rawCode.trim());
+
+    if (match) {
+      this.stepMobileAdjustment(match.id, 1);
+      App.showToast(`+1 ${match.name} (Conteo: ${this.adjustmentsMap[match.id].counted})`, 'success');
+
+      // Enfocar y hacer scroll a la tarjeta del producto
+      const card = document.getElementById(`adj-card-${match.id}`);
+      if (card) {
+        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        card.classList.add('card-highlight-pulse');
+        setTimeout(() => card.classList.remove('card-highlight-pulse'), 1200);
+      }
+
+      // Limpiar buscador para el siguiente escaneo
+      const search = document.getElementById('adjust-search-input');
+      if (search) search.value = '';
+    } else {
+      App.showToast(`Producto no encontrado para código: ${rawCode}`, 'error');
+    }
   },
 
   openAdjustModal(productId) {

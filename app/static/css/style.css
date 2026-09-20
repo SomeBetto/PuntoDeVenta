@@ -289,6 +289,292 @@ body {
 }
 
 /* ==========================================================================
+   BOTÓN Y MENÚ DE SESIÓN DE USUARIO ESTILO WINDOWS
+   ========================================================================== */
+
+.user-session-menu-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.bar-user-session-btn {
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: #ffffff;
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-pill);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  font-family: inherit;
+}
+
+.bar-user-session-btn:hover {
+  background: rgba(255, 255, 255, 0.28);
+  border-color: rgba(255, 255, 255, 0.55);
+}
+
+.user-session-avatar {
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+.user-session-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  max-width: 110px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.user-session-chevron {
+  font-size: 0.7rem;
+  opacity: 0.8;
+  margin-left: -0.1rem;
+}
+
+/* Menú Desplegable Estilo Windows Start Menu */
+.windows-session-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 295px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 14px 38px rgba(15, 23, 42, 0.16), 0 2px 6px rgba(15, 23, 42, 0.06);
+  z-index: 1050;
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+  animation: winDropdownSlide 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.windows-session-dropdown.active {
+  display: flex;
+}
+
+@keyframes winDropdownSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.win-session-header {
+  padding: 1rem 1.1rem;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.win-session-avatar-large {
+  width: 44px;
+  height: 44px;
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.45rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.06);
+  flex-shrink: 0;
+}
+
+.win-session-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.win-session-username {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.win-session-role {
+  font-size: 0.73rem;
+  font-weight: 700;
+  color: #0284c7;
+}
+
+.win-session-divider {
+  height: 1px;
+  background: #e2e8f0;
+  margin: 0;
+}
+
+.win-session-body {
+  padding: 0.45rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.win-session-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.65rem 0.85rem;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.12s ease-in-out;
+  font-family: inherit;
+}
+
+.win-session-item:hover {
+  background: #f1f5f9;
+  transform: translateX(2px);
+}
+
+.win-session-item .win-item-icon {
+  font-size: 1.25rem;
+  width: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.win-session-item .win-item-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.win-session-item .win-item-title {
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.win-session-item .win-item-desc {
+  font-size: 0.72rem;
+  color: #64748b;
+}
+
+.win-session-item.win-logout-item:hover {
+  background: #fef2f2;
+}
+
+/* Modal Cambiar de Usuario (Estilo Windows) */
+.switch-user-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  max-height: 290px;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.switch-user-card {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.75rem 1rem;
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+}
+
+.switch-user-card:hover {
+  border-color: #cbd5e1;
+  background: #f8fafc;
+  transform: translateY(-1px);
+}
+
+.switch-user-card.selected {
+  border-color: #0284c7;
+  background: #f0f7ff;
+  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.15);
+}
+
+.switch-user-avatar {
+  width: 40px;
+  height: 40px;
+  background: #f1f5f9;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.35rem;
+  flex-shrink: 0;
+}
+
+.switch-user-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.switch-user-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #0f172a;
+  display: block;
+}
+
+.switch-user-badges-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 0.2rem;
+}
+
+.switch-user-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.15rem 0.5rem;
+  border-radius: 5px;
+}
+
+.switch-user-badge.admin {
+  background: #e0f2fe;
+  color: #0284c7;
+}
+
+.switch-user-badge.cashier {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.current-session-tag {
+  font-size: 0.68rem;
+  font-weight: 700;
+  background: #fef3c7;
+  color: #b45309;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+}
+
+.switch-user-check {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #0284c7;
+  width: 22px;
+  text-align: center;
+}
+
+/* ==========================================================================
    2. MENÚ LATERAL DESLIZABLE (DRAWER)
    ========================================================================== */
 
@@ -2710,4 +2996,331 @@ body {
   font-weight: 800;
   letter-spacing: 0.5px;
 }
+
+/* ==========================================================================
+   MENÚ DE SESIÓN DE USUARIO (ESTILO WINDOWS)
+   ========================================================================== */
+.user-session-menu-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.bar-user-session-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 20px;
+  padding: 4px 12px 4px 6px;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 0.86rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  user-select: none;
+}
+
+.bar-user-session-btn:hover {
+  background: rgba(255, 255, 255, 0.26);
+  border-color: rgba(255, 255, 255, 0.45);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.16);
+}
+
+.bar-user-session-btn:active {
+  transform: translateY(0);
+}
+
+.user-session-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: #ffffff;
+  color: #1e293b;
+  border-radius: 50%;
+  font-size: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  flex-shrink: 0;
+}
+
+.user-session-name {
+  max-width: 110px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  letter-spacing: 0.2px;
+}
+
+.user-session-chevron {
+  font-size: 0.75rem;
+  opacity: 0.8;
+  transition: transform 0.2s ease;
+}
+
+.user-session-menu-wrapper.open .user-session-chevron {
+  transform: rotate(180deg);
+}
+
+/* Menú flotante estilo Windows 11 / Acrylic */
+.windows-session-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 290px;
+  background: #ffffff;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  border-radius: 14px;
+  box-shadow: 0 16px 36px -4px rgba(15, 23, 42, 0.22), 0 0 0 1px rgba(0, 0, 0, 0.04);
+  padding: 10px;
+  display: none;
+  z-index: 1050;
+  animation: winMenuFadeIn 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.windows-session-dropdown.active {
+  display: block;
+}
+
+@keyframes winMenuFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.win-session-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  margin-bottom: 6px;
+}
+
+.win-session-avatar-large {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  flex-shrink: 0;
+}
+
+.win-session-meta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.win-session-username {
+  font-size: 0.95rem;
+  color: #0f172a;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.win-session-role {
+  font-size: 0.74rem;
+  color: #0284c7;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 1px;
+}
+
+.win-session-divider {
+  height: 1px;
+  background: #e2e8f0;
+  margin: 6px 4px;
+}
+
+.win-session-body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.win-session-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 9px 12px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s ease;
+  font-family: inherit;
+  color: #1e293b;
+}
+
+.win-session-item:hover {
+  background: #f1f5f9;
+  transform: translateX(2px);
+}
+
+.win-session-item:active {
+  transform: scale(0.99);
+}
+
+.win-item-icon {
+  font-size: 1.25rem;
+  width: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.win-item-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.win-item-title {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #1e293b;
+  line-height: 1.2;
+}
+
+.win-item-desc {
+  font-size: 0.72rem;
+  color: #64748b;
+  line-height: 1.25;
+  margin-top: 2px;
+}
+
+.win-logout-item:hover {
+  background: #fef2f2 !important;
+}
+
+.win-logout-item:hover .win-item-title {
+  color: #ef4444 !important;
+}
+
+/* Grid de cambio de usuario en Modal */
+.switch-user-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 280px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.switch-user-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  background: #ffffff;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.switch-user-card:hover {
+  border-color: #0284c7;
+  background: #f0f9ff;
+  transform: translateY(-1px);
+}
+
+.switch-user-card.selected {
+  border-color: #0284c7;
+  background: #e0f2fe;
+  box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.25);
+}
+
+.switch-user-avatar {
+  font-size: 1.8rem;
+  width: 44px;
+  height: 44px;
+  background: #f8fafc;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.switch-user-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.switch-user-title {
+  font-size: 0.94rem;
+  color: #0f172a;
+  display: block;
+}
+
+.switch-user-badges-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 3px;
+  flex-wrap: wrap;
+}
+
+.switch-user-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.switch-user-badge.admin {
+  background: #fef3c7;
+  color: #b45309;
+  border: 1px solid #fde68a;
+}
+
+.switch-user-badge.cashier {
+  background: #e0f2fe;
+  color: #0369a1;
+  border: 1px solid #bae6fd;
+}
+
+.current-session-tag {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #16a34a;
+  background: #dcfce7;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.switch-user-check {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #0284c7;
+  width: 24px;
+  text-align: center;
+}
+
 

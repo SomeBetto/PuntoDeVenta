@@ -22,6 +22,7 @@ const App = {
     if (window.CustomersModule) CustomersModule.init();
     if (window.CashModule) CashModule.init();
     if (window.UsersModule) UsersModule.init();
+    if (window.SessionModule) SessionModule.init();
     if (window.ReportsModule) ReportsModule.init();
     if (window.MultiservicesModule) MultiservicesModule.init();
     if (window.SuppliersModule) SuppliersModule.init();

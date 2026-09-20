@@ -49,9 +49,55 @@
       <button class="bar-action-icon" id="btn-top-settings" title="Configuración y Respaldos">
         ⚙️
       </button>
-      <button class="bar-action-icon" id="btn-top-logout" style="color: #ef4444;" title="Cerrar Sesión y Respaldar">
-        🚪
-      </button>
+      <!-- Botón y Menú de Sesión de Usuario Estilo Windows -->
+      <div class="user-session-menu-wrapper" id="user-session-menu-wrapper">
+        <button class="bar-user-session-btn" id="btn-user-session" title="Cuenta de Usuario y Sesión">
+          <span class="user-session-avatar" id="top-user-avatar">👑</span>
+          <span class="user-session-name" id="top-user-name">Admin</span>
+          <span class="user-session-chevron">▾</span>
+        </button>
+
+        <!-- Menú Desplegable Estilo Windows -->
+        <div class="windows-session-dropdown" id="windows-session-dropdown">
+          <div class="win-session-header">
+            <div class="win-session-avatar-large" id="win-menu-user-avatar">👑</div>
+            <div class="win-session-meta">
+              <strong class="win-session-username" id="win-menu-user-name">Administrador</strong>
+              <span class="win-session-role" id="win-menu-user-role">👑 Administrador • Turno Activo</span>
+            </div>
+          </div>
+
+          <div class="win-session-divider"></div>
+
+          <div class="win-session-body">
+            <button type="button" class="win-session-item" id="win-btn-switch-user" onclick="SessionModule.openSwitchUserModal()">
+              <span class="win-item-icon">👥</span>
+              <div class="win-item-text">
+                <span class="win-item-title">Cambiar de usuario</span>
+                <span class="win-item-desc">Alternar cajero o cuenta activa</span>
+              </div>
+            </button>
+
+            <button type="button" class="win-session-item" id="win-btn-user-settings" onclick="SessionModule.openUserSettings()">
+              <span class="win-item-icon">⚙️</span>
+              <div class="win-item-text">
+                <span class="win-item-title">Configuración de usuarios</span>
+                <span class="win-item-desc">Permisos, contraseñas y perfiles</span>
+              </div>
+            </button>
+
+            <div class="win-session-divider"></div>
+
+            <button type="button" class="win-session-item win-logout-item" id="btn-top-logout" onclick="SessionModule.openLogout()">
+              <span class="win-item-icon" style="color: #ef4444;">🚪</span>
+              <div class="win-item-text">
+                <span class="win-item-title" style="color: #dc2626;">Cerrar sesión</span>
+                <span class="win-item-desc">Respaldar datos y bloquear terminal</span>
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   </header>
 
@@ -299,11 +345,11 @@
         <a href="https://wa.me/" target="_blank" class="floating-whatsapp-btn" title="Contactar soporte por WhatsApp">
           <span>💬</span>
         </a>
-        <div class="drawer-user-card">
+        <div class="drawer-user-card" onclick="App.closeDrawer(); SessionModule.openSwitchUserModal();" style="cursor: pointer;" title="Cambiar de Usuario / Cajero">
           <div class="drawer-user-avatar">👑</div>
           <div class="drawer-user-meta">
             <strong id="drawer-user-name">Admin</strong>
-            <span id="drawer-user-sub">Administrador</span>
+            <span id="drawer-user-sub">Administrador • Clic para cambiar</span>
           </div>
         </div>
       </div>
@@ -2478,6 +2524,43 @@
     </div>
   </div>
 
+  <!-- Modal: Cambiar de Usuario / Cajero (Estilo Windows) -->
+  <div class="modal-overlay" id="modal-switch-user">
+    <div class="modal-sicar-dialog" style="max-width: 480px;">
+      <div class="modal-sicar-header">
+        <h3>👥 Cambiar de Usuario / Cajero</h3>
+        <button class="menu-toggle-btn" onclick="App.closeModal('modal-switch-user')">✕</button>
+      </div>
+      <div class="modal-sicar-body" style="padding: 1.5rem;">
+        <p style="font-size: 0.82rem; color: #64748b; margin-bottom: 1rem;">
+          Seleccione la cuenta con la que desea operar el punto de venta:
+        </p>
+
+        <!-- Lista dinámica de usuarios disponibles -->
+        <div class="switch-user-grid" id="switch-user-grid">
+          <!-- Renderizado dinámico de tarjetas de usuarios -->
+        </div>
+
+        <!-- Campo de PIN si el usuario seleccionado lo requiere -->
+        <div id="switch-user-pin-wrap" style="display: none; margin-top: 1rem; padding: 0.85rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;">
+          <label style="display: block; font-size: 0.82rem; font-weight: 700; color: #334155; margin-bottom: 0.4rem;">
+            Ingrese el PIN del usuario seleccionado:
+          </label>
+          <input type="password" id="switch-user-pin-input" class="sub-search-input" style="width: 100%; height: 40px; font-size: 1.2rem; letter-spacing: 4px; text-align: center;" maxlength="10" placeholder="••••">
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
+          <button type="button" class="meta-btn" onclick="App.closeModal('modal-switch-user')">
+            Cancelar
+          </button>
+          <button type="button" class="main-action-pill-btn" id="btn-confirm-switch-user" onclick="SessionModule.confirmSwitchUser()" style="padding: 0.65rem 1.6rem;">
+            Cambiar a este Usuario
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Modal: Abrir Turno de Caja -->
   <div class="modal-overlay" id="modal-open-shift">
     <div class="modal-sicar-dialog">
@@ -3038,6 +3121,44 @@
     </div>
   </div>
 
+  <!-- Modal: Cambiar de Usuario (Estilo Windows) -->
+  <div class="modal-overlay" id="modal-switch-user">
+    <div class="modal-sicar-dialog" style="max-width: 480px;">
+      <div class="modal-sicar-header" style="background: linear-gradient(135deg, #1e3a8a, #0284c7);">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <span style="font-size: 1.25rem;">👥</span>
+          <h3>Cambiar de Usuario / Cajero</h3>
+        </div>
+        <button class="menu-toggle-btn" onclick="App.closeModal('modal-switch-user')">✕</button>
+      </div>
+      <div class="modal-sicar-body" style="padding: 1.25rem;">
+        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">
+          Seleccione la cuenta con la que desea operar el punto de venta:
+        </p>
+
+        <!-- Grid de usuarios registrados -->
+        <div class="switch-user-grid" id="switch-user-grid"></div>
+
+        <!-- Entrada de PIN si el usuario lo requiere -->
+        <div id="switch-user-pin-wrap" style="display: none; margin-top: 1rem; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: var(--radius-md); padding: 0.85rem;">
+          <label style="font-size: 0.82rem; font-weight: 700; color: #334155; display: block; margin-bottom: 0.35rem;">
+            🔒 Ingrese el PIN de seguridad del usuario:
+          </label>
+          <input type="password" id="switch-user-pin-input" maxlength="6" placeholder="PIN de 4-6 dígitos" style="width: 100%; font-size: 1.2rem; text-align: center; letter-spacing: 0.3em; padding: 0.5rem; border: 1.5px solid #94a3b8; border-radius: 6px;" onkeydown="if(event.key==='Enter') SessionModule.confirmSwitchUser()">
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.25rem; border-top: 1px solid #e2e8f0; padding-top: 1rem;">
+          <button type="button" class="meta-btn" onclick="App.closeModal('modal-switch-user')">
+            Cancelar
+          </button>
+          <button type="button" class="btn-modal-accept" onclick="SessionModule.confirmSwitchUser()" style="background: #0284c7; padding: 0.6rem 1.4rem; font-weight: 700;">
+            ✓ Iniciar con este Usuario
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Input oculto para subir y restaurar archivo de base de datos .db -->
   <input type="file" id="backup-file-upload-input" accept=".db" style="display: none;">
 
@@ -3058,6 +3179,7 @@
   <script src="/static/js/eleventa.js?v=4.0"></script>
   <script src="/static/js/settings.js?v=4.0"></script>
   <script src="/static/js/backup.js?v=4.0"></script>
+  <script src="/static/js/session.js?v=4.0"></script>
   <script src="/static/js/app.js?v=4.0"></script>
 </body>
 </html>

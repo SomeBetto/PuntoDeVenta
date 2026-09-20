@@ -444,6 +444,10 @@ const PosModule = {
   },
 
   renderProductsGrid() {
+    if (this.isTableView) {
+      return this.renderProductsTable();
+    }
+
     const grid = document.getElementById('pos-products-grid');
     if (!grid) return;
 
@@ -471,7 +475,7 @@ const PosModule = {
         <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 1rem; color: #64748b;">
           <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🔍</div>
           <strong style="font-size: 1.1rem; color: #1e293b;">No se encontraron productos</strong>
-          <p style="font-size: 0.85rem; margin-top: 0.25rem;">Intente buscar con otro nombre o seleccione otra categoría</p>
+          <p style="font-size: 0.85rem; margin-top: 0.25rem;">Intente buscar con otro nombre o código en el buscador</p>
         </div>
       `;
       return;
@@ -503,6 +507,79 @@ const PosModule = {
             </div>
           </div>
         </div>
+      `;
+    }).join('');
+  },
+
+  renderProductsTable() {
+    const tbody = document.getElementById('pos-products-table-body');
+    if (!tbody) return;
+
+    let filtered = this.products;
+
+    if (this.activeCategory !== 'all') {
+      filtered = filtered.filter(p => {
+        return String(p.category_id) === String(this.activeCategory) || 
+               (p.category_name && p.category_name.toLowerCase() === this.activeCategory.toLowerCase());
+      });
+    }
+
+    if (this.searchQuery) {
+      filtered = filtered.filter(p => {
+        const name = (p.name || '').toLowerCase();
+        const code = (p.barcode || '').toLowerCase();
+        return name.includes(this.searchQuery) || code.includes(this.searchQuery);
+      });
+    }
+
+    if (filtered.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="6" style="text-align: center; padding: 3.5rem 1rem; color: #64748b;">
+            <div style="font-size: 2.2rem; margin-bottom: 0.5rem;">🔍</div>
+            <strong style="font-size: 1.05rem; color: #1e293b;">No se encontraron productos</strong>
+            <p style="font-size: 0.85rem; margin-top: 0.25rem;">Intente buscar con otro nombre o código en el buscador</p>
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    const displayItems = filtered.slice(0, 150);
+
+    tbody.innerHTML = displayItems.map(p => {
+      const isWeight = (p.unit === 'kg' || p.allow_fractions === 1);
+      const unitLabel = isWeight ? ' / kg' : ` (${p.unit || 'pza'})`;
+      const stock = p.stock != null ? p.stock : 0;
+      const stockBadge = stock <= 0 
+        ? `<span class="stock-chip stock-zero">0 ${p.unit || ''}</span>`
+        : (stock <= 5 
+          ? `<span class="stock-chip stock-low">${stock} ${p.unit || ''}</span>`
+          : `<span class="stock-chip stock-ok">${stock} ${p.unit || ''}</span>`);
+
+      return `
+        <tr class="pos-catalog-table-row" onclick="PosModule.onProductCardClick(${p.id})">
+          <td>
+            <code class="pos-table-code">${p.barcode || 'S/C'}</code>
+          </td>
+          <td>
+            <div class="pos-table-prod-name">${p.name}</div>
+          </td>
+          <td>
+            <span class="pos-table-cat-badge">${p.category_name || 'General'}</span>
+          </td>
+          <td style="text-align: center;">
+            ${stockBadge}
+          </td>
+          <td style="text-align: right; font-family: var(--font-mono); font-weight: 700; color: #0f172a; font-size: 0.95rem;">
+            $${p.sale_price.toFixed(2)}<span style="font-size: 0.72rem; color: #64748b; font-weight: normal;">${unitLabel}</span>
+          </td>
+          <td style="text-align: center;" onclick="event.stopPropagation();">
+            <button type="button" class="btn-table-add-action" onclick="PosModule.onProductCardClick(${p.id})" title="Agregar al ticket">
+              ${isWeight ? '⚖️ Pesar' : '➕ Agregar'}
+            </button>
+          </td>
+        </tr>
       `;
     }).join('');
   },
@@ -1023,11 +1100,13 @@ const PosModule = {
     if (this.isTableView) {
       if (gridWrap) gridWrap.style.display = 'none';
       if (tableWrap) tableWrap.style.display = 'block';
-      if (label) label.innerText = '🖼️ Ver en Modo Cuadrícula';
+      if (label) label.innerText = '🔲 Ver en Tarjetas';
+      this.renderProductsTable();
     } else {
       if (gridWrap) gridWrap.style.display = 'block';
       if (tableWrap) tableWrap.style.display = 'none';
       if (label) label.innerText = '📋 Ver en Modo Tabla';
+      this.renderProductsGrid();
     }
   },
 

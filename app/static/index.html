@@ -323,23 +323,11 @@
         <!-- COLUMNA CENTRAL: Catálogo Visual de Productos -->
         <main class="cloud-pos-catalog">
 
-          <!-- Barra Superior del Catálogo: Categorías Horizontales y Herramientas -->
+          <!-- Barra Superior del Catálogo: Herramientas y Acciones -->
           <div class="catalog-header-bar">
             
-            <!-- Barra de Píldoras de Categorías con Scroll Horizontal -->
-            <div class="category-pills-scroll" id="pos-category-pills">
-              <button class="cat-pill active" data-cat="all">Todas</button>
-              <button class="cat-pill" data-cat="abarrote">Abarrotes</button>
-              <button class="cat-pill" data-cat="Lacteos">Lácteos & Cremería</button>
-              <button class="cat-pill" data-cat="frutas y verduras">Frutas & Verduras</button>
-              <button class="cat-pill" data-cat="coca caloricos">Refrescos & Bebidas</button>
-              <button class="cat-pill" data-cat="sabritas calorico">Sabritas & Botanas</button>
-              <button class="cat-pill" data-cat="Caloricos">Dulces & Galletas</button>
-              <button class="cat-pill" data-cat="articulo de limpieza">Limpieza & Hogar</button>
-            </div>
-
-            <!-- Acciones Superiores: Impuestos, Pestañas de Ventas Múltiples y Opciones -->
-            <div class="catalog-top-actions">
+            <!-- Izquierda: Estado de impuestos y Pestañas de Ventas Múltiples -->
+            <div class="catalog-left-tools">
               <span class="tax-status-pill">Precios con impuestos</span>
 
               <!-- Pestañas de Ventas Múltiples (Venta A, Venta B, etc.) -->
@@ -347,22 +335,19 @@
                 <button class="ticket-tab active" data-tab-id="A">Venta A</button>
                 <button class="btn-add-ticket-tab" id="btn-add-ticket-tab" title="Abrir otra venta">+</button>
               </div>
+            </div>
 
-              <!-- Menú de Opciones del Mostrador -->
-              <div class="dropdown-more-wrap">
-                <button class="btn-catalog-more" id="btn-catalog-more" title="Más opciones de vista">⋮</button>
-                <div class="catalog-dropdown-menu" id="catalog-dropdown-menu">
-                  <button type="button" id="btn-toggle-view-mode" onclick="PosModule.toggleTableView()">
-                    <span id="pos-view-mode-label">📋 Ver en Modo Tabla</span>
-                  </button>
-                  <button type="button" onclick="PosModule.openQuickCatalogModal()">
-                    <span>🔍 Búsqueda en Catálogo</span>
-                  </button>
-                  <button type="button" onclick="PosModule.clearCurrentSale()">
-                    <span>🗑️ Vaciar Carrito</span>
-                  </button>
-                </div>
-              </div>
+            <!-- Derecha: Acciones directas visibles -->
+            <div class="catalog-right-actions">
+              <button type="button" class="btn-header-action" id="btn-toggle-view-mode" onclick="PosModule.toggleTableView()" title="Alternar entre vista de tabla o cuadrícula">
+                <span id="pos-view-mode-label">📋 Ver en Modo Tabla</span>
+              </button>
+              <button type="button" class="btn-header-action" onclick="PosModule.openQuickCatalogModal()" title="Búsqueda rápida en catálogo">
+                <span>🔍 Búsqueda en Catálogo</span>
+              </button>
+              <button type="button" class="btn-header-action btn-header-danger" onclick="PosModule.clearCurrentSale()" title="Vaciar todos los artículos del carrito actual">
+                <span>🗑️ Vaciar Carrito</span>
+              </button>
             </div>
 
           </div>
@@ -374,23 +359,22 @@
             </div>
           </div>
 
-          <!-- Vista Alternativa Secundaria: Modo Tabla Clásica -->
+          <!-- Vista Alternativa Secundaria: Catálogo en Modo Tabla Clásica -->
           <div class="table-view-container" id="pos-table-view-container" style="display: none;">
             <div class="sicar-table-card">
               <table class="sicar-table">
                 <thead>
                   <tr>
-                    <th style="width: 40px; text-align: center;">○</th>
-                    <th style="width: 130px;">Cant.</th>
-                    <th style="width: 120px;">Ud. / Factor</th>
-                    <th>Producto</th>
-                    <th style="text-align: right; width: 140px;">Precio</th>
-                    <th style="text-align: right; width: 150px;">Importe Total</th>
-                    <th style="width: 50px; text-align: center;"></th>
+                    <th style="width: 140px;">Código</th>
+                    <th>Descripción / Producto</th>
+                    <th style="width: 160px;">Categoría</th>
+                    <th style="width: 110px; text-align: center;">Stock</th>
+                    <th style="width: 130px; text-align: right;">Precio Venta</th>
+                    <th style="width: 110px; text-align: center;">Acción</th>
                   </tr>
                 </thead>
-                <tbody id="pos-cart-table-body">
-                  <!-- Renderizado dinámico de filas de la tabla -->
+                <tbody id="pos-products-table-body">
+                  <!-- Renderizado dinámico de productos en modo tabla -->
                 </tbody>
               </table>
             </div>

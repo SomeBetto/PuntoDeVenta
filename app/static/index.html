@@ -102,6 +102,10 @@
                 avatar.title = data.store_name;
                 avatar.setAttribute('aria-label', data.store_name);
               }
+              var drawerTitle = document.getElementById('drawer-store-name');
+              if (drawerTitle) {
+                drawerTitle.textContent = data.store_name;
+              }
             }
           })
           .catch(function() {});
@@ -162,64 +166,26 @@
   <div class="drawer-backdrop" id="drawer-backdrop">
     <aside class="drawer-menu cloud-pos-drawer">
       
-      <!-- Cabecera de Tienda / Sucursal y Caja -->
+      <!-- Cabecera de Tienda con Nombre del Abarrote -->
       <div class="drawer-header-cloud">
-        <div class="drawer-header-top">
+        <div class="drawer-header-top" style="margin-bottom: 0;">
           <div class="store-brand-badge">
-            <div class="cloud-logo-icon">☁️</div>
+            <div class="cloud-logo-icon">🏪</div>
             <div class="store-brand-text">
-              <span class="brand-title">Happy POS</span>
+              <span class="brand-title" id="drawer-store-name">Abarrotes</span>
               <span class="brand-sub">Punto de Venta</span>
             </div>
           </div>
-          <button class="menu-toggle-btn" id="btn-close-drawer" style="font-size: 1.1rem; color: #64748b;">✕</button>
-        </div>
-
-        <!-- Selector de Caja y Almacén -->
-        <div class="branch-selector-card">
-          <div class="branch-row">
-            <span class="branch-icon">🏪</span>
-            <div class="branch-details">
-              <div class="caja-select-wrap">
-                <strong>Caja 1</strong>
-                <span class="dropdown-arrow">▾</span>
-              </div>
-              <span class="storage-text">Almacén 1</span>
-            </div>
-          </div>
-          <div class="sucursal-pill">
-            <span>Sucursal 1 • Principal</span>
-            <span class="exchange-icon" title="Cambiar sucursal">⇄</span>
-          </div>
-        </div>
-
-        <!-- Indicador de Día en Menú Móvil -->
-        <div class="drawer-date-chip" id="drawer-day-label" title="Día actual">
-          📅 Cargando día...
+          <button class="menu-toggle-btn" id="btn-close-drawer" style="font-size: 1.1rem; color: #64748b;" title="Cerrar menú">✕</button>
         </div>
       </div>
 
       <!-- Navegación por Secciones -->
       <nav class="drawer-nav cloud-drawer-nav">
-        <button class="drawer-nav-item" data-view="pos">
-          <div class="nav-item-left">
-            <span class="nav-icon">🏠</span>
-            <span>Inicio</span>
-          </div>
-          <span class="theme-toggle-indicator" title="Modo Claro / Oscuro">☀️</span>
-        </button>
-
         <button class="drawer-nav-item active" data-view="pos">
           <div class="nav-item-left">
             <span class="nav-icon">🛒</span>
             <span>Ventas</span>
-          </div>
-        </button>
-
-        <button class="drawer-nav-item" data-view="pos" onclick="App.showToast('Módulo de Cotizaciones disponible próximamente', 'info')">
-          <div class="nav-item-left">
-            <span class="nav-icon">📋</span>
-            <span>Cotizaciones</span>
           </div>
         </button>
 
@@ -3095,19 +3061,19 @@
   <div class="toast-container" id="toast-container"></div>
 
   <!-- Scripts -->
-  <script src="/static/js/qr-generator.js?v=3.9"></script>
-  <script src="/static/js/barcode.js?v=3.9"></script>
-  <script src="/static/js/pos.js?v=3.9"></script>
-  <script src="/static/js/inventory.js?v=3.9"></script>
-  <script src="/static/js/customers.js?v=3.9"></script>
-  <script src="/static/js/cash.js?v=3.9"></script>
-  <script src="/static/js/users.js?v=3.9"></script>
-  <script src="/static/js/suppliers.js?v=3.9"></script>
-  <script src="/static/js/purchases.js?v=3.9"></script>
-  <script src="/static/js/reports.js?v=3.9"></script>
-  <script src="/static/js/eleventa.js?v=3.9"></script>
-  <script src="/static/js/settings.js?v=3.9"></script>
-  <script src="/static/js/backup.js?v=3.9"></script>
-  <script src="/static/js/app.js?v=3.9"></script>
+  <script src="/static/js/qr-generator.js?v=4.0"></script>
+  <script src="/static/js/barcode.js?v=4.0"></script>
+  <script src="/static/js/pos.js?v=4.0"></script>
+  <script src="/static/js/inventory.js?v=4.0"></script>
+  <script src="/static/js/customers.js?v=4.0"></script>
+  <script src="/static/js/cash.js?v=4.0"></script>
+  <script src="/static/js/users.js?v=4.0"></script>
+  <script src="/static/js/suppliers.js?v=4.0"></script>
+  <script src="/static/js/purchases.js?v=4.0"></script>
+  <script src="/static/js/reports.js?v=4.0"></script>
+  <script src="/static/js/eleventa.js?v=4.0"></script>
+  <script src="/static/js/settings.js?v=4.0"></script>
+  <script src="/static/js/backup.js?v=4.0"></script>
+  <script src="/static/js/app.js?v=4.0"></script>
 </body>
 </html>

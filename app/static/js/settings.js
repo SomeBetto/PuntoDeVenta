@@ -102,10 +102,15 @@ const SettingsModule = {
     this.setVal('modal-cfg-store-address', s.store_address || '');
     this.setVal('modal-cfg-ticket-footer', s.ticket_footer || '');
 
-    // Actualizar nombre de negocio visible en barra superior y tooltip del logo/avatar
+    // Actualizar nombre de negocio visible en barra superior, drawer lateral y tooltip del logo/avatar
     const brandName = document.getElementById('navbar-store-name');
     if (brandName && s.store_name) {
       brandName.innerText = s.store_name;
+    }
+
+    const drawerTitle = document.getElementById('drawer-store-name');
+    if (drawerTitle && s.store_name) {
+      drawerTitle.innerText = s.store_name;
     }
 
     const storeAvatar = document.getElementById('top-store-avatar') || document.querySelector('.top-app-bar .store-avatar');

@@ -17,6 +17,7 @@ const PosModule = {
   activeCategory: 'all',
   searchQuery: '',
   isTableView: false,
+  mobileTab: 'catalog',
 
   // Cobro y granel
   pendingBulkProduct: null,
@@ -39,6 +40,9 @@ const PosModule = {
   },
 
   bindEvents() {
+    // Escuchar cambios de tamaño/orientación en móviles
+    window.addEventListener('resize', () => this.updateMobileUI());
+
     // Buscador en el ticket de venta
     const searchInput = document.getElementById('pos-search-input');
     if (searchInput) {
@@ -964,6 +968,71 @@ const PosModule = {
             </td>
           </tr>
         `).join('');
+      }
+    }
+
+    // 3. Sincronizar estado en dispositivos móviles (Badge y barra flotante)
+    this.updateMobileUI(total, count);
+  },
+
+  // Alternar entre pestañas Catálogo y Carrito en dispositivos móviles
+  switchMobileTab(tab) {
+    this.mobileTab = tab;
+    const viewPos = document.getElementById('view-pos');
+    const tabCat = document.getElementById('btn-pos-tab-catalog');
+    const tabCart = document.getElementById('btn-pos-tab-cart');
+
+    if (viewPos) {
+      viewPos.setAttribute('data-mobile-tab', tab);
+    }
+
+    if (tabCat && tabCart) {
+      if (tab === 'catalog') {
+        tabCat.classList.add('active');
+        tabCart.classList.remove('active');
+      } else {
+        tabCat.classList.remove('active');
+        tabCart.classList.add('active');
+      }
+    }
+
+    // Actualizar visibilidad de la barra flotante
+    this.updateMobileUI();
+
+    // Desplazar suavemente a la parte superior
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  },
+
+  updateMobileUI(total = null, count = null) {
+    if (total === null) total = this.getCartTotal();
+    if (count === null) count = this.cart.reduce((sum, i) => sum + i.quantity, 0);
+
+    const badge = document.getElementById('pos-mobile-cart-badge');
+    const floatingBar = document.getElementById('pos-mobile-floating-cart');
+    const floatQty = document.getElementById('pos-mobile-floating-qty');
+    const floatLabel = document.getElementById('pos-mobile-floating-label');
+    const floatTotal = document.getElementById('pos-mobile-floating-total');
+
+    // Badge en la pestaña de carrito
+    if (badge) {
+      if (this.cart.length > 0) {
+        badge.style.display = 'inline-block';
+        badge.textContent = Math.round(count);
+      } else {
+        badge.style.display = 'none';
+      }
+    }
+
+    // Barra flotante inferior de carrito (visible en móvil en la pestaña catálogo si hay productos)
+    if (floatingBar) {
+      const isMobile = window.innerWidth <= 860;
+      if (isMobile && this.mobileTab === 'catalog' && this.cart.length > 0) {
+        floatingBar.style.display = 'flex';
+        if (floatQty) floatQty.textContent = Math.round(count);
+        if (floatLabel) floatLabel.textContent = `${this.cart.length} ${this.cart.length === 1 ? 'producto' : 'productos'} (${count} ${count === 1 ? 'art.' : 'arts.'})`;
+        if (floatTotal) floatTotal.textContent = `$${total.toFixed(2)} MXN`;
+      } else {
+        floatingBar.style.display = 'none';
       }
     }
   },

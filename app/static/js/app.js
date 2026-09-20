@@ -252,6 +252,9 @@ const App = {
       if (window.PosModule && typeof PosModule.loadProducts === 'function') {
         PosModule.loadProducts();
       }
+      if (window.PosModule && typeof PosModule.updateMobileUI === 'function') {
+        PosModule.updateMobileUI();
+      }
       setTimeout(() => document.getElementById('pos-search-input')?.focus(), 100);
     } else if (viewName === 'products') {
       InventoryModule.loadProducts();

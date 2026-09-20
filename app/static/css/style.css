@@ -3323,4 +3323,393 @@ body {
   text-align: center;
 }
 
+/* ==========================================================================
+   15. OPTIMIZACIÓN EXCLUSIVA PARA DISPOSITIVOS MÓVILES (TELÉFONOS Y TABLETS)
+   ========================================================================== */
+
+/* Barra segmentada móvil para POS */
+.pos-mobile-nav-bar {
+  display: none;
+}
+
+.pos-mobile-floating-cart {
+  display: none;
+}
+
+@media (max-width: 860px) {
+  /* BARRA SUPERIOR */
+  .bar-connect-mobile-btn {
+    display: none !important;
+  }
+  .bar-action-icon#btn-fullscreen {
+    display: none !important;
+  }
+  .top-app-bar {
+    padding: 0 0.65rem;
+    height: 52px;
+  }
+  .bar-title {
+    font-size: 1.05rem;
+  }
+  .bar-user-session-btn {
+    padding: 3px 8px 3px 5px;
+    font-size: 0.82rem;
+  }
+  .user-session-name {
+    max-width: 75px;
+  }
+
+  /* BARRA SEGMENTADA POS */
+  .pos-mobile-nav-bar {
+    display: flex;
+    gap: 8px;
+    padding: 8px 12px;
+    background: #ffffff;
+    border-bottom: 1px solid #e2e8f0;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+  }
+
+  .pos-mobile-tab-btn {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 9px 12px;
+    border-radius: 10px;
+    border: 1.5px solid transparent;
+    background: #f1f5f9;
+    color: #475569;
+    font-family: inherit;
+    font-size: 0.88rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+    user-select: none;
+  }
+
+  .pos-mobile-tab-btn:active {
+    transform: scale(0.97);
+  }
+
+  .pos-mobile-tab-btn.active {
+    background: var(--primary-blue, #0060df);
+    color: #ffffff;
+    border-color: var(--primary-blue, #0060df);
+    box-shadow: 0 3px 8px rgba(0, 96, 223, 0.28);
+  }
+
+  .pos-mobile-cart-badge {
+    background: #ef4444;
+    color: #ffffff;
+    font-size: 0.72rem;
+    font-weight: 800;
+    padding: 1px 7px;
+    border-radius: 10px;
+    line-height: 1.2;
+    box-shadow: 0 1px 3px rgba(239, 68, 68, 0.4);
+  }
+
+  .pos-mobile-tab-btn.active .pos-mobile-cart-badge {
+    background: #ffffff;
+    color: #0060df;
+  }
+
+  /* LAYOUT POS EN MÓVIL */
+  .cloud-pos-layout {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    min-height: calc(100vh - 105px);
+    overflow: visible;
+    padding-bottom: 75px;
+  }
+
+  /* Control de visibilidad según pestaña activa */
+  #view-pos[data-mobile-tab="cart"] .cloud-pos-catalog {
+    display: none !important;
+  }
+  #view-pos[data-mobile-tab="cart"] .cloud-pos-ticket {
+    display: flex !important;
+    width: 100% !important;
+  }
+  #view-pos:not([data-mobile-tab="cart"]) .cloud-pos-catalog {
+    display: flex !important;
+    width: 100% !important;
+  }
+  #view-pos:not([data-mobile-tab="cart"]) .cloud-pos-ticket {
+    display: none !important;
+  }
+
+  /* Catálogo en móvil */
+  .cloud-pos-catalog {
+    border-right: none;
+  }
+  .catalog-header-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.6rem;
+    padding: 0.5rem 0.75rem;
+  }
+  .catalog-left-tools {
+    justify-content: space-between;
+  }
+  .catalog-right-actions {
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+  .catalog-right-actions .btn-header-action {
+    flex: 1 1 auto;
+    justify-content: center;
+    font-size: 0.76rem;
+    padding: 0.4rem 0.6rem;
+  }
+  .pos-products-grid {
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)) !important;
+    gap: 0.6rem !important;
+    padding: 0.65rem !important;
+  }
+
+  /* Ticket / Carrito en móvil */
+  .cloud-pos-ticket {
+    width: 100%;
+    min-height: calc(100vh - 110px);
+    padding-bottom: 20px;
+  }
+  .pos-shortcuts-bar {
+    display: flex;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    padding: 0.45rem 0.6rem;
+    gap: 0.4rem;
+  }
+  .pos-shortcuts-bar span {
+    flex-shrink: 0;
+    font-size: 0.74rem;
+  }
+  .ticket-search-box {
+    padding: 0.5rem 0.75rem;
+  }
+  .ticket-actions-bar {
+    padding: 0.4rem 0.75rem;
+  }
+  .ticket-items-list {
+    max-height: none;
+    min-height: 250px;
+    padding: 0.5rem 0.75rem;
+  }
+  .ticket-item-row {
+    padding: 0.65rem 0.5rem;
+    gap: 0.6rem;
+  }
+  .item-ctrl-btn {
+    width: 34px !important;
+    height: 34px !important;
+    font-size: 1.1rem !important;
+  }
+
+  /* Barra Flotante Inferior de Carrito (Pestaña Catálogo) */
+  .pos-mobile-floating-cart {
+    position: fixed;
+    bottom: 12px;
+    left: 12px;
+    right: 12px;
+    background: #0f172a;
+    color: #ffffff;
+    border-radius: 14px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.1);
+    z-index: 99;
+    cursor: pointer;
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    animation: winMenuFadeIn 0.2s ease-out;
+  }
+
+  .pos-mobile-floating-cart:active {
+    transform: scale(0.98);
+  }
+
+  .pos-mobile-cart-summary {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .pos-mobile-cart-icon-wrap {
+    position: relative;
+    width: 36px;
+    height: 36px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+  }
+
+  .pos-mobile-floating-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: #ef4444;
+    color: #ffffff;
+    font-size: 0.68rem;
+    font-weight: 800;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1.5px solid #0f172a;
+  }
+
+  .pos-mobile-cart-text {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .pos-mobile-cart-label {
+    font-size: 0.72rem;
+    color: #94a3b8;
+  }
+
+  .pos-mobile-cart-total {
+    font-size: 1rem;
+    font-weight: 800;
+    color: #38bdf8;
+    font-family: var(--font-mono, monospace);
+  }
+
+  .pos-mobile-cart-action-btn {
+    background: var(--accent-green, #16a34a);
+    color: #ffffff;
+    font-size: 0.82rem;
+    font-weight: 800;
+    padding: 7px 14px;
+    border-radius: 8px;
+    border: none;
+    box-shadow: 0 2px 6px rgba(22, 163, 74, 0.4);
+    pointer-events: none;
+  }
+
+  /* MODALES EN MÓVIL */
+  .modal-sicar-dialog {
+    width: 95vw !important;
+    max-width: 95vw !important;
+    margin: 8px auto !important;
+    max-height: 94vh !important;
+    border-radius: 14px !important;
+  }
+
+  /* VISTA PRODUCTOS EN MÓVIL */
+  .master-detail-grid {
+    grid-template-columns: 1fr !important;
+    height: auto !important;
+    display: flex;
+    flex-direction: column;
+  }
+  .master-col {
+    height: auto;
+    max-height: 48vh;
+  }
+  .detail-col {
+    height: auto;
+    border-top: 2px solid #e2e8f0;
+  }
+  .product-hero-card {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.85rem !important;
+  }
+  .product-hero-card .btn-modal-accept {
+    width: 100% !important;
+    justify-content: center;
+  }
+
+  /* SUB-TOOLBARS Y TABLAS */
+  .sub-toolbar {
+    flex-direction: column;
+    align-items: stretch !important;
+    gap: 0.6rem !important;
+    padding: 0.65rem 0.85rem !important;
+  }
+  .sub-search-wrapper {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  .sub-meta-group {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+  .sub-meta-group .meta-btn {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+  .table-view-container {
+    padding: 0.5rem !important;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .sicar-table-card {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+  }
+  .sicar-table {
+    min-width: 580px;
+  }
+
+  /* CAJA Y REPORTES EN MÓVIL */
+  .cash-stats-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.5rem !important;
+  }
+  .cash-action-cards {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .bar-center {
+    display: none !important;
+  }
+  .user-session-name {
+    display: none !important;
+  }
+  .bar-user-session-btn {
+    padding: 3px 6px;
+  }
+  .cash-stats-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Evitar auto-zoom molesto en inputs en iOS y Android */
+  input[type="text"],
+  input[type="number"],
+  input[type="password"],
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+
+  /* Billetes rápidos en modal de cobro en pantallas estrechas */
+  .bill-btn {
+    padding: 0.6rem 0.2rem !important;
+    font-size: 0.85rem !important;
+    font-weight: 700 !important;
+  }
+}
+
+
+
 

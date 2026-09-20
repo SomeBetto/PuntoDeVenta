@@ -364,6 +364,17 @@
          VISTA 1: VENTA / MOSTRADOR (ESTILO CLOUD POS / HAPPY DAY)
          ==================================================================== -->
     <section id="view-pos" class="view-panel active">
+      <!-- Barra Segmentada de Navegación Móvil (Solo visible en pantallas <= 860px) -->
+      <div class="pos-mobile-nav-bar" id="pos-mobile-nav-bar">
+        <button type="button" class="pos-mobile-tab-btn active" id="btn-pos-tab-catalog" onclick="PosModule.switchMobileTab('catalog')">
+          <span>📦 Catálogo</span>
+        </button>
+        <button type="button" class="pos-mobile-tab-btn" id="btn-pos-tab-cart" onclick="PosModule.switchMobileTab('cart')">
+          <span>🛒 Carrito de Venta</span>
+          <span class="pos-mobile-cart-badge" id="pos-mobile-cart-badge" style="display: none;">0</span>
+        </button>
+      </div>
+
       <div class="cloud-pos-layout">
 
         <!-- COLUMNA CENTRAL: Catálogo Visual de Productos -->
@@ -526,6 +537,23 @@
 
         </aside>
 
+      </div>
+
+      <!-- Barra Flotante Inferior de Carrito para Móviles -->
+      <div class="pos-mobile-floating-cart" id="pos-mobile-floating-cart" onclick="PosModule.switchMobileTab('cart')" style="display: none;">
+        <div class="pos-mobile-cart-summary">
+          <div class="pos-mobile-cart-icon-wrap">
+            <span>🛒</span>
+            <span class="pos-mobile-floating-badge" id="pos-mobile-floating-qty">0</span>
+          </div>
+          <div class="pos-mobile-cart-text">
+            <span class="pos-mobile-cart-label" id="pos-mobile-floating-label">0 productos</span>
+            <strong class="pos-mobile-cart-total" id="pos-mobile-floating-total">$0.00 MXN</strong>
+          </div>
+        </div>
+        <div class="pos-mobile-cart-action-btn">
+          <span>Ver Carrito / Cobrar →</span>
+        </div>
       </div>
     </section>
 

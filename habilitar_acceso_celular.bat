@@ -19,7 +19,7 @@ if %errorlevel% equ 0 (
     echo [EXITO] Regla agregada correctamente en el Firewall de Windows.
     echo.
     echo Ahora tu celular podra acceder a la direccion:
-    echo   http://192.168.1.86:8050 (o la IP que muestre el sistema)
+    echo   http://192.168.1.86:8050 [o la IP que muestre el sistema]
     echo.
     echo Asegurate de que tu celular este conectado a la misma red Wi-Fi.
     echo.

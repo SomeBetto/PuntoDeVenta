@@ -1,0 +1,1 @@
+@echo [*] Deteniendo Punto de Venta... & (for /f "tokens=5" %%a in ('netstat -ano ^| findstr :8050.*LISTENING') do @taskkill /F /PID %%a /T >nul 2>&1) & echo [✓] Servicio detenido. & timeout /t 2 >nul

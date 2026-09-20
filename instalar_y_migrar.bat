@@ -41,7 +41,7 @@ if %errorlevel% equ 0 (
     
     where winget >nul 2>&1
     if !errorlevel! equ 0 (
-        echo [*] Descargando e instalando Git via Windows Package Manager (winget)...
+        echo [*] Descargando e instalando Git via Windows Package Manager [winget]...
         winget install --id Git.Git -e --source winget --silent --accept-source-agreements --accept-package-agreements
     ) else (
         echo [*] Descargando instalador oficial de Git para Windows...
@@ -56,7 +56,7 @@ if %errorlevel% equ 0 (
         )
     )
     
-    :: Agregar Git al PATH de la sesion actual
+    REM Agregar Git al PATH de la sesion actual
     if exist "%ProgramFiles%\Git\cmd" set "PATH=%ProgramFiles%\Git\cmd;!PATH!"
     if exist "!PF86!\Git\cmd" set "PATH=!PF86!\Git\cmd;!PATH!"
     
@@ -109,18 +109,18 @@ if not defined PYTHON_EXE (
 if defined PYTHON_EXE (
     for /f "tokens=*" %%p in ('!PYTHON_EXE! --version 2^>nul') do echo [✓] Python detectado: %%p
 ) else (
-    echo [*] Python 3.10+ (64-bit) no detectado. Iniciando instalacion silenciosa...
+    echo [*] Python 3.10+ [64-bit] no detectado. Iniciando instalacion silenciosa...
     
     where winget >nul 2>&1
     if !errorlevel! equ 0 (
         echo [*] Descargando e instalando Python 3.12 via winget...
         winget install --id Python.Python.3.12 -e --source winget --silent --accept-source-agreements --accept-package-agreements
     ) else (
-        echo [*] Descargando instalador oficial de Python 3.12 (64-bit)...
+        echo [*] Descargando instalador oficial de Python 3.12 [64-bit]...
         set "PY_INSTALLER=%TEMP%\python_312_setup.exe"
         curl.exe -L -s -o "!PY_INSTALLER!" "https://www.python.org/ftp/python/3.12.9/python-3.12.9-amd64.exe"
         if exist "!PY_INSTALLER!" (
-            echo [*] Ejecutando instalador silencioso de Python (con PATH y pip)...
+            echo [*] Ejecutando instalador silencioso de Python [con PATH y pip]...
             start /wait "" "!PY_INSTALLER!" /quiet InstallAllUsers=1 PrependPath=1 Include_test=0 Include_pip=1 SimpleInstall=1
             del "!PY_INSTALLER!" >nul 2>&1
         ) else (
@@ -128,7 +128,7 @@ if defined PYTHON_EXE (
         )
     )
 
-    :: Refrescar rutas en la sesion actual
+    REM Refrescar rutas en la sesion actual
     if exist "%ProgramFiles%\Python312" (
         set "PATH=%ProgramFiles%\Python312;%ProgramFiles%\Python312\Scripts;!PATH!"
         set "PYTHON_EXE=%ProgramFiles%\Python312\python.exe"
@@ -167,7 +167,7 @@ echo [*] Actualizando gestor de paquetes pip...
 ".venv\Scripts\python.exe" -m pip install --upgrade pip --quiet
 
 if exist "requirements.txt" (
-    echo [*] Instalando librerias requeridas (FastAPI, Uvicorn, Pydantic, etc.)...
+    echo [*] Instalando librerias requeridas [FastAPI, Uvicorn, Pydantic, etc.]...
     ".venv\Scripts\python.exe" -m pip install -r requirements.txt --quiet
     if !errorlevel! equ 0 (
         echo [✓] Todas las dependencias se instalaron correctamente.
@@ -184,12 +184,32 @@ echo.
 :: 5. DETECTAR BASE DE DATOS DE ELEVENTA E IMPORTAR
 :: ==============================================================================
 echo ------------------------------------------------------------------------------
-echo [4/5] Deteccion y migracion de Base de Datos Eleventa (Firebird PDVDATA.FDB)...
+echo [4/5] Deteccion y migracion de Base de Datos Eleventa...
 echo ------------------------------------------------------------------------------
+
+REM 1. Comprobar si ya fue migrado previamente
+if exist "data\.eleventa_migrado" (
+    echo [✓] La base de datos de Eleventa ya fue migrada en la instalacion inicial.
+    echo [*] Paso omitido automaticamente para preservar la informacion actual.
+    echo [*] Si desea volver a sincronizar o migrar en el futuro, use: importar_eleventa.bat
+    goto :fin_migracion_eleventa
+)
+
+if exist "data\tienda.db" (
+    for %%F in ("data\tienda.db") do (
+        if %%~zF gtr 500000 (
+            echo [✓] Se detecto una base de datos existente en data\tienda.db.
+            echo [*] La migracion inicial ya fue realizada. Se omite para no duplicar datos.
+            echo [*] Si desea volver a sincronizar en el futuro, use: importar_eleventa.bat
+            echo Migracion previa registrada > "data\.eleventa_migrado"
+            goto :fin_migracion_eleventa
+        )
+    )
+)
 
 set "ELEVENTA_DIR="
 
-:: Deteccion automatica de rutas comunes
+REM Deteccion automatica de rutas comunes
 if exist "!PF86!\AbarrotesPDV\db\PDVDATA.FDB" (
     set "ELEVENTA_DIR=!PF86!\AbarrotesPDV"
 ) else if exist "C:\Program Files\AbarrotesPDV\db\PDVDATA.FDB" (
@@ -206,7 +226,7 @@ if defined ELEVENTA_DIR (
     echo.
 ) else (
     echo [?] No se encontro Eleventa en las rutas predeterminadas.
-    set /p "CUSTOM_DIR=Ingrese la ruta de la carpeta de Eleventa (o presione Enter para omitir): "
+    set /p "CUSTOM_DIR=Ingrese la ruta de la carpeta de Eleventa [o presione Enter para omitir]: "
     if defined CUSTOM_DIR (
         if exist "!CUSTOM_DIR!\db\PDVDATA.FDB" (
             set "ELEVENTA_DIR=!CUSTOM_DIR!"
@@ -217,7 +237,7 @@ if defined ELEVENTA_DIR (
 )
 
 if defined ELEVENTA_DIR (
-    :: Verificar si el proceso de Eleventa esta abierto
+    REM Verificar si el proceso de Eleventa esta abierto
     tasklist /fi "imagename eq Abarrotes.exe" 2>nul | findstr /i "Abarrotes.exe" >nul 2>&1
     if !errorlevel! equ 0 (
         echo.
@@ -234,9 +254,15 @@ if defined ELEVENTA_DIR (
     ) else (
         echo [ERROR] No se encontro el importador en tools\eleventa_importer.py.
     )
+
+    if !errorlevel! equ 0 (
+        echo Migracion completada exitosamente el %date% %time% > "data\.eleventa_migrado"
+    )
 ) else (
-    echo [*] Paso de migracion omitido (la base de datos se puede migrar luego con importar_eleventa.bat).
+    echo [*] Paso de migracion omitido [la base de datos se puede migrar luego con importar_eleventa.bat].
 )
+
+:fin_migracion_eleventa
 echo.
 
 :: ==============================================================================
@@ -248,7 +274,7 @@ echo ---------------------------------------------------------------------------
 netsh advfirewall firewall delete rule name="PuntoDeVenta-8050" >nul 2>&1
 netsh advfirewall firewall add rule name="PuntoDeVenta-8050" dir=in action=allow protocol=TCP localport=8050 profile=any >nul 2>&1
 if %errorlevel% equ 0 (
-    echo [✓] Puerto 8050 habilitado para red local (Wi-Fi).
+    echo [✓] Puerto 8050 habilitado para red local [Wi-Fi].
 ) else (
     echo [!] No se pudo configurar la regla de firewall automaticamente.
 )
@@ -271,8 +297,13 @@ echo.
 set /p "START_NOW=¿Desea iniciar el Punto de Venta ahora? (S/N): "
 if /i "!START_NOW!"=="S" (
     echo.
-    echo [*] Iniciando servidor del Punto de Venta...
-    start "" ".venv\Scripts\python.exe" run.py
+    echo [*] Iniciando servidor del Punto de Venta en segundo plano...
+    if exist ".venv\Scripts\pythonw.exe" (
+        start "" ".venv\Scripts\pythonw.exe" run.py
+    ) else (
+        start "" ".venv\Scripts\python.exe" run.py
+    )
+    echo [✓] Punto de Venta ejecutandose en segundo plano [http://localhost:8050].
 )
 
 echo.

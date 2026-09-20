@@ -492,6 +492,10 @@ def run_eleventa_migration(eleventa_dir: str = DEFAULT_ELEVENTA_DIR, import_sale
         print(msg)
         print(f"============================================================\n")
         update_status(False, "completed", msg, 100, stats)
+        try:
+            (DATA_DIR / ".eleventa_migrado").write_text(f"Migrado: {datetime.now().isoformat()}\nProductos: {stats.get('products')}\nVentas: {stats.get('sales')}", encoding="utf-8")
+        except Exception:
+            pass
         return {"success": True, "elapsed_seconds": round(elapsed, 1), "stats": stats}
 
     except Exception as e:

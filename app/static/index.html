@@ -1,17 +1,21 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Punto de Venta - Tienda de Abarrotes</title>
-  
+
   <!-- Tipografía moderna Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
   <!-- CSS Estilos -->
-  <link rel="stylesheet" href="/static/css/style.css?v=3.3">
+  <link rel="stylesheet" href="/static/css/style.css?v=4.1">
 </head>
+
 <body>
 
   <!-- ==================== 1. BARRA SUPERIOR AZUL REY (TOP APP BAR) ==================== -->
@@ -35,12 +39,14 @@
     </div>
 
     <div class="bar-right">
-      <button class="bar-connect-mobile-btn" id="btn-connect-mobile" title="Abrir en celular o tablet">
-        📱 Conectar Móvil
+      <button class="bar-connect-mobile-btn" id="btn-connect-mobile" title="Realizar inventario en celular o tablet">
+        📋 Realizar Inventario
       </button>
-      <button class="bar-action-icon" id="btn-fullscreen" onclick="togglePOSFullscreen(event)" title="Pantalla Completa (F11)">
-        <svg class="fs-icon-enter" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+      <button class="bar-action-icon" id="btn-fullscreen" onclick="togglePOSFullscreen(event)"
+        title="Pantalla Completa (F11)">
+        <svg class="fs-icon-enter" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
         </svg>
       </button>
       <button class="bar-action-icon" onclick="InventoryModule.openProductModal()" title="Nuevo Producto">
@@ -70,7 +76,8 @@
           <div class="win-session-divider"></div>
 
           <div class="win-session-body">
-            <button type="button" class="win-session-item" id="win-btn-switch-user" onclick="SessionModule.openSwitchUserModal()">
+            <button type="button" class="win-session-item" id="win-btn-switch-user"
+              onclick="SessionModule.openSwitchUserModal()">
               <span class="win-item-icon">👥</span>
               <div class="win-item-text">
                 <span class="win-item-title">Cambiar de usuario</span>
@@ -78,7 +85,8 @@
               </div>
             </button>
 
-            <button type="button" class="win-session-item" id="win-btn-user-settings" onclick="SessionModule.openUserSettings()">
+            <button type="button" class="win-session-item" id="win-btn-user-settings"
+              onclick="SessionModule.openUserSettings()">
               <span class="win-item-icon">⚙️</span>
               <div class="win-item-text">
                 <span class="win-item-title">Configuración de usuarios</span>
@@ -88,7 +96,8 @@
 
             <div class="win-session-divider"></div>
 
-            <button type="button" class="win-session-item win-logout-item" id="btn-top-logout" onclick="SessionModule.openLogout()">
+            <button type="button" class="win-session-item win-logout-item" id="btn-top-logout"
+              onclick="SessionModule.openLogout()">
               <span class="win-item-icon" style="color: #ef4444;">🚪</span>
               <div class="win-item-text">
                 <span class="win-item-title" style="color: #dc2626;">Cerrar sesión</span>
@@ -140,8 +149,8 @@
       // Cargar y actualizar inmediatamente el nombre comercial de la tienda en el logo/avatar
       try {
         fetch('/api/reports/settings')
-          .then(function(res) { return res.json(); })
-          .then(function(data) {
+          .then(function (res) { return res.json(); })
+          .then(function (data) {
             if (data && data.store_name) {
               var avatar = document.getElementById('top-store-avatar');
               if (avatar) {
@@ -154,8 +163,8 @@
               }
             }
           })
-          .catch(function() {});
-      } catch (e) {}
+          .catch(function () { });
+      } catch (e) { }
     })();
 
     function togglePOSFullscreen(e) {
@@ -168,7 +177,7 @@
           if (req) {
             var p = req.call(el);
             if (p && p.catch) {
-              p.catch(function(err) {
+              p.catch(function (err) {
                 console.warn('Pantalla completa no disponible:', err);
                 if (window.App && App.showToast) App.showToast('Presione F11 para pantalla completa', 'info');
               });
@@ -211,7 +220,7 @@
   <!-- ==================== 2. MENÚ LATERAL DESLIZABLE (DRAWER ESTILO CLOUD POS) ==================== -->
   <div class="drawer-backdrop" id="drawer-backdrop">
     <aside class="drawer-menu cloud-pos-drawer">
-      
+
       <!-- Cabecera de Tienda con Nombre del Abarrote -->
       <div class="drawer-header-cloud">
         <div class="drawer-header-top" style="margin-bottom: 0;">
@@ -222,14 +231,16 @@
               <span class="brand-sub">Punto de Venta</span>
             </div>
           </div>
-          <button class="menu-toggle-btn" id="btn-close-drawer" style="font-size: 1.1rem; color: #64748b;" title="Cerrar menú">✕</button>
+          <button class="menu-toggle-btn" id="btn-close-drawer" style="font-size: 1.1rem; color: #64748b;"
+            title="Cerrar menú">✕</button>
         </div>
       </div>
 
       <!-- Navegación por Secciones -->
       <nav class="drawer-nav cloud-drawer-nav">
         <!-- Aviso exclusivo en Drawer en modo móvil -->
-        <div class="mobile-only-drawer-header" style="display: none; padding: 12px; margin: 8px 12px; background: #e0f2fe; border: 1px solid #bae6fd; border-radius: 8px; font-size: 0.82rem; color: #0369a1; text-align: center;">
+        <div class="mobile-only-drawer-header"
+          style="display: none; padding: 12px; margin: 8px 12px; background: #e0f2fe; border: 1px solid #bae6fd; border-radius: 8px; font-size: 0.82rem; color: #0369a1; text-align: center;">
           <strong style="display: block; font-size: 0.9rem; margin-bottom: 2px;">📦 Terminal Móvil</strong>
           Conteo Físico y Ajuste de Inventario
         </div>
@@ -326,8 +337,8 @@
         </button>
         <button class="drawer-nav-item sub-item" onclick="App.openConnectModal()">
           <div class="nav-item-left">
-            <span class="nav-icon">📱</span>
-            <span>Conectar Móvil / Tablet</span>
+            <span class="nav-icon">📋</span>
+            <span>Realizar Inventario (Móvil)</span>
           </div>
         </button>
 
@@ -351,7 +362,8 @@
         <a href="https://wa.me/" target="_blank" class="floating-whatsapp-btn" title="Contactar soporte por WhatsApp">
           <span>💬</span>
         </a>
-        <div class="drawer-user-card" onclick="App.closeDrawer(); SessionModule.openSwitchUserModal();" style="cursor: pointer;" title="Cambiar de Usuario / Cajero">
+        <div class="drawer-user-card" onclick="App.closeDrawer(); SessionModule.openSwitchUserModal();"
+          style="cursor: pointer;" title="Cambiar de Usuario / Cajero">
           <div class="drawer-user-avatar">👑</div>
           <div class="drawer-user-meta">
             <strong id="drawer-user-name">Admin</strong>
@@ -372,10 +384,12 @@
     <section id="view-pos" class="view-panel active">
       <!-- Barra Segmentada de Navegación Móvil (Solo visible en pantallas <= 860px) -->
       <div class="pos-mobile-nav-bar" id="pos-mobile-nav-bar">
-        <button type="button" class="pos-mobile-tab-btn active" id="btn-pos-tab-catalog" onclick="PosModule.switchMobileTab('catalog')">
+        <button type="button" class="pos-mobile-tab-btn active" id="btn-pos-tab-catalog"
+          onclick="PosModule.switchMobileTab('catalog')">
           <span>📦 Catálogo</span>
         </button>
-        <button type="button" class="pos-mobile-tab-btn" id="btn-pos-tab-cart" onclick="PosModule.switchMobileTab('cart')">
+        <button type="button" class="pos-mobile-tab-btn" id="btn-pos-tab-cart"
+          onclick="PosModule.switchMobileTab('cart')">
           <span>🛒 Carrito de Venta</span>
           <span class="pos-mobile-cart-badge" id="pos-mobile-cart-badge" style="display: none;">0</span>
         </button>
@@ -388,7 +402,7 @@
 
           <!-- Barra Superior del Catálogo: Herramientas y Acciones -->
           <div class="catalog-header-bar">
-            
+
             <!-- Izquierda: Estado de impuestos y Pestañas de Ventas Múltiples -->
             <div class="catalog-left-tools">
               <span class="tax-status-pill">Precios con impuestos</span>
@@ -402,13 +416,16 @@
 
             <!-- Derecha: Acciones directas visibles -->
             <div class="catalog-right-actions">
-              <button type="button" class="btn-header-action" id="btn-toggle-view-mode" onclick="PosModule.toggleTableView()" title="Alternar entre vista de tabla o cuadrícula">
+              <button type="button" class="btn-header-action" id="btn-toggle-view-mode"
+                onclick="PosModule.toggleTableView()" title="Alternar entre vista de tabla o cuadrícula">
                 <span id="pos-view-mode-label">📋 Ver en Modo Tabla</span>
               </button>
-              <button type="button" class="btn-header-action" onclick="PosModule.openQuickCatalogModal()" title="Búsqueda rápida en catálogo">
+              <button type="button" class="btn-header-action" onclick="PosModule.openQuickCatalogModal()"
+                title="Búsqueda rápida en catálogo">
                 <span>🔍 Búsqueda en Catálogo</span>
               </button>
-              <button type="button" class="btn-header-action btn-header-danger" onclick="PosModule.clearCurrentSale()" title="Vaciar todos los artículos del carrito actual">
+              <button type="button" class="btn-header-action btn-header-danger" onclick="PosModule.clearCurrentSale()"
+                title="Vaciar todos los artículos del carrito actual">
                 <span>🗑️ Vaciar Carrito</span>
               </button>
             </div>
@@ -450,30 +467,20 @@
 
           <!-- Barra de Atajos Rápidos del Teclado -->
           <div class="pos-shortcuts-bar">
-            <span><kbd>F1</kbd> Buscar</span>
+            <!--<span><kbd>F1</kbd> Buscar</span>-->
             <span><kbd>F2</kbd> Rápido</span>
-            <span><kbd>F3</kbd> Espera</span>
-            <span style="cursor: pointer;" onclick="CashModule.openCashInModal()" title="Entrada rápida de efectivo (F8)"><kbd style="background: #15803d; color: #fff; border-color: #15803d;">F8</kbd> Entrada</span>
-            <span style="cursor: pointer;" onclick="CashModule.openCashOutModal()" title="Salida rápida de efectivo (F9)"><kbd style="background: #b91c1c; color: #fff; border-color: #b91c1c;">F9</kbd> Salida</span>
-            <span><kbd>F10</kbd> Exacto</span>
             <span><kbd>F12</kbd> Cobrar</span>
             <span><kbd>+/-</kbd> Cant.</span>
           </div>
 
           <!-- Encabezado del Ticket: Buscador con Escáner y Acciones Rápidas -->
           <div class="ticket-header-card">
-            
+
             <!-- Buscador y Lector de Código de Barras -->
             <div class="ticket-search-box">
               <span class="ticket-search-icon">🔍</span>
-              <input 
-                type="text" 
-                id="pos-search-input" 
-                class="ticket-search-input" 
-                placeholder="Buscar por nombre o código... (F1)" 
-                autofocus
-                autocomplete="off"
-              >
+              <input type="text" id="pos-search-input" class="ticket-search-input"
+                placeholder="Buscar por nombre o código... (F1)" autofocus autocomplete="off">
               <button class="btn-scanner-icon" id="btn-pos-scanner" title="Escanear código de barras">
                 ⛶
               </button>
@@ -481,16 +488,19 @@
 
             <!-- Fila de Acciones Rápidas del Ticket -->
             <div class="ticket-actions-bar">
-              <button class="ticket-action-btn" id="btn-quick-custom" title="Venta rápida de artículo común (⚡ - F2)" onclick="PosModule.openQuickItemModal()">
+              <button class="ticket-action-btn" id="btn-quick-custom" title="Venta rápida de artículo común (⚡ - F2)"
+                onclick="PosModule.openQuickItemModal()">
                 ⚡
               </button>
-              <button class="ticket-action-btn" id="btn-ticket-notes" title="Agregar nota al ticket (💬)" onclick="PosModule.openTicketNotesModal()">
+              <button class="ticket-action-btn" id="btn-ticket-notes" title="Agregar nota al ticket (💬)"
+                onclick="PosModule.openTicketNotesModal()">
                 💬
               </button>
               <div class="cashier-initials-badge" id="cashier-initials-badge" title="Cajero Activo: Admin">
                 AD
               </div>
-              <button class="ticket-customer-btn" id="btn-customer-selector" onclick="PosModule.openCustomerSelectModal()" title="Seleccionar o cambiar cliente">
+              <button class="ticket-customer-btn" id="btn-customer-selector"
+                onclick="PosModule.openCustomerSelectModal()" title="Seleccionar o cambiar cliente">
                 <span id="pos-client-display">Cliente</span>
                 <span class="customer-badge-icon">👤</span>
               </button>
@@ -505,7 +515,7 @@
 
           <!-- Pie del Ticket: Subtotal, Descuento y Botón Verde Gigante de Cobro -->
           <div class="ticket-checkout-footer">
-            
+
             <div class="ticket-breakdown-row">
               <div class="country-flag-badge" title="Moneda: Peso Mexicano (MXN)">🇲🇽</div>
               <div class="ticket-amounts-col">
@@ -525,16 +535,24 @@
 
             <!-- Acciones Rápidas Complementarias: Congelar Venta, Cobro Express, Entradas y Salidas de Caja -->
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; margin-top: 0.5rem;">
-              <button type="button" class="btn-secondary" onclick="PosModule.holdCurrentTicket()" title="Poner venta actual en espera (F3)" style="padding: 0.45rem 0.4rem; font-size: 0.76rem; font-weight: 700; background: #f0fdf4; color: #15803d; border: 1px solid #86efac; border-radius: var(--radius-sm);">
+              <button type="button" class="btn-secondary" onclick="PosModule.holdCurrentTicket()"
+                title="Poner venta actual en espera (F3)"
+                style="padding: 0.45rem 0.4rem; font-size: 0.76rem; font-weight: 700; background: #f0fdf4; color: #15803d; border: 1px solid #86efac; border-radius: var(--radius-sm);">
                 ❄️ Espera (F3)
               </button>
-              <button type="button" class="btn-secondary" onclick="PosModule.quickCheckoutExactCash()" title="Cobro rápido con efectivo exacto (F10)" style="padding: 0.45rem 0.4rem; font-size: 0.76rem; font-weight: 700; background: #eff6ff; color: #1d4ed8; border: 1px solid #93c5fd; border-radius: var(--radius-sm);">
+              <button type="button" class="btn-secondary" onclick="PosModule.quickCheckoutExactCash()"
+                title="Cobro rápido con efectivo exacto (F10)"
+                style="padding: 0.45rem 0.4rem; font-size: 0.76rem; font-weight: 700; background: #eff6ff; color: #1d4ed8; border: 1px solid #93c5fd; border-radius: var(--radius-sm);">
                 ⚡ Exacto (F10)
               </button>
-              <button type="button" class="btn-secondary" onclick="CashModule.openCashInModal()" title="Entrada rápida de efectivo a caja (F8)" style="padding: 0.45rem 0.4rem; font-size: 0.76rem; font-weight: 700; background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; border-radius: var(--radius-sm);">
+              <button type="button" class="btn-secondary" onclick="CashModule.openCashInModal()"
+                title="Entrada rápida de efectivo a caja (F8)"
+                style="padding: 0.45rem 0.4rem; font-size: 0.76rem; font-weight: 700; background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; border-radius: var(--radius-sm);">
                 📥 Entrada (F8)
               </button>
-              <button type="button" class="btn-secondary" onclick="CashModule.openCashOutModal()" title="Salida / Retiro de efectivo de caja (F9)" style="padding: 0.45rem 0.4rem; font-size: 0.76rem; font-weight: 700; background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; border-radius: var(--radius-sm);">
+              <button type="button" class="btn-secondary" onclick="CashModule.openCashOutModal()"
+                title="Salida / Retiro de efectivo de caja (F9)"
+                style="padding: 0.45rem 0.4rem; font-size: 0.76rem; font-weight: 700; background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; border-radius: var(--radius-sm);">
                 📤 Salida (F9)
               </button>
             </div>
@@ -546,7 +564,8 @@
       </div>
 
       <!-- Barra Flotante Inferior de Carrito para Móviles -->
-      <div class="pos-mobile-floating-cart" id="pos-mobile-floating-cart" onclick="PosModule.switchMobileTab('cart')" style="display: none;">
+      <div class="pos-mobile-floating-cart" id="pos-mobile-floating-cart" onclick="PosModule.switchMobileTab('cart')"
+        style="display: none;">
         <div class="pos-mobile-cart-summary">
           <div class="pos-mobile-cart-icon-wrap">
             <span>🛒</span>
@@ -571,27 +590,27 @@
       <div class="sub-toolbar">
         <div class="sub-search-wrapper">
           <span class="sub-search-icon">🔍</span>
-          <input 
-            type="text" 
-            id="products-search-input" 
-            class="sub-search-input" 
-            placeholder="Buscar productos en catálogo..."
-          >
+          <input type="text" id="products-search-input" class="sub-search-input"
+            placeholder="Buscar productos en catálogo...">
         </div>
         <div class="sub-meta-group" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
           <button class="meta-btn" onclick="InventoryModule.openProductModal()">
             <span>➕</span>
             <span>Nuevo Producto</span>
           </button>
-          <button class="meta-btn" onclick="InventoryModule.openReorderSuggestionsModal()" title="Sugerencias inteligentes de reabastecimiento" style="background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe;">
+          <button class="meta-btn" onclick="InventoryModule.openReorderSuggestionsModal()"
+            title="Sugerencias inteligentes de reabastecimiento"
+            style="background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe;">
             <span>💡</span>
             <span>Sugerencias de Compra</span>
           </button>
-          <button class="meta-btn" onclick="InventoryModule.exportCatalogCSV()" title="Descargar catálogo en formato CSV compatible con Excel">
+          <button class="meta-btn" onclick="InventoryModule.exportCatalogCSV()"
+            title="Descargar catálogo en formato CSV compatible con Excel">
             <span>📥</span>
             <span>Exportar CSV</span>
           </button>
-          <button class="meta-btn" onclick="InventoryModule.openImportCsvModal()" title="Cargar o actualizar catálogo masivamente por CSV">
+          <button class="meta-btn" onclick="InventoryModule.openImportCsvModal()"
+            title="Cargar o actualizar catálogo masivamente por CSV">
             <span>📤</span>
             <span>Importar CSV</span>
           </button>
@@ -600,7 +619,7 @@
 
       <!-- Layout Dividido Maestro-Detalle -->
       <div class="master-detail-grid">
-        
+
         <!-- Columna Izquierda: Lista Scrolleable de Productos -->
         <div class="master-col">
           <div class="master-list-scroll" id="master-products-list">
@@ -610,7 +629,7 @@
 
         <!-- Columna Derecha: Detalle del Producto e Historial de Movimientos -->
         <div class="detail-col" id="product-detail-container">
-          
+
           <!-- Ficha Hero del Producto -->
           <div class="product-hero-card" style="display: flex; justify-content: space-between; align-items: center;">
             <div style="display: flex; align-items: center; gap: 1.25rem;">
@@ -622,7 +641,9 @@
                 <div class="hero-category" id="detail-product-category">Categoría: Abarrotes</div>
               </div>
             </div>
-            <button type="button" class="btn-modal-accept" id="btn-edit-current-product" onclick="InventoryModule.openEditCurrentProduct()" style="padding: 0.65rem 1.25rem; font-size: 0.88rem; display: flex; align-items: center; gap: 0.4rem; background: var(--primary-blue); cursor: pointer; white-space: nowrap;">
+            <button type="button" class="btn-modal-accept" id="btn-edit-current-product"
+              onclick="InventoryModule.openEditCurrentProduct()"
+              style="padding: 0.65rem 1.25rem; font-size: 0.88rem; display: flex; align-items: center; gap: 0.4rem; background: var(--primary-blue); cursor: pointer; white-space: nowrap;">
               ✏️ Modificar Producto
             </button>
           </div>
@@ -670,11 +691,14 @@
          ==================================================================== -->
     <section id="view-purchases" class="view-panel">
       <!-- Pestañas Superiores de Compras -->
-      <div style="display: flex; gap: 0.5rem; padding: 0.75rem 1.25rem; background: #fff; border-bottom: 1px solid var(--border-light); align-items: center;">
-        <button type="button" class="report-tab-btn active" id="tab-purchase-new" style="border-radius: var(--radius-md); padding: 0.5rem 1.2rem; font-weight: 700;">
+      <div
+        style="display: flex; gap: 0.5rem; padding: 0.75rem 1.25rem; background: #fff; border-bottom: 1px solid var(--border-light); align-items: center;">
+        <button type="button" class="report-tab-btn active" id="tab-purchase-new"
+          style="border-radius: var(--radius-md); padding: 0.5rem 1.2rem; font-weight: 700;">
           <span>➕</span> <span>Registrar Nueva Compra</span>
         </button>
-        <button type="button" class="report-tab-btn" id="tab-purchase-history" style="border-radius: var(--radius-md); padding: 0.5rem 1.2rem; font-weight: 700;">
+        <button type="button" class="report-tab-btn" id="tab-purchase-history"
+          style="border-radius: var(--radius-md); padding: 0.5rem 1.2rem; font-weight: 700;">
           <span>📜</span> <span>Historial de Compras</span>
         </button>
       </div>
@@ -683,7 +707,8 @@
       <div id="pane-purchase-new">
         <div class="sub-toolbar" style="flex-wrap: wrap; gap: 0.75rem;">
           <div style="display: flex; align-items: center; gap: 0.5rem; flex: 1; min-width: 250px;">
-            <label style="font-size: 0.82rem; font-weight: 700; color: var(--text-secondary); white-space: nowrap;">Proveedor:</label>
+            <label
+              style="font-size: 0.82rem; font-weight: 700; color: var(--text-secondary); white-space: nowrap;">Proveedor:</label>
             <select id="purchase-supplier-select" class="sub-search-input" style="background:#fff; font-weight: 600;">
               <option value="">Cargando proveedores...</option>
             </select>
@@ -695,32 +720,35 @@
               <strong id="purchase-folio-display">COM-00001</strong>
               <input type="hidden" id="purchase-folio-input" value="COM-00001">
             </div>
-            <input type="text" id="purchase-invoice-input" class="sub-search-input" placeholder="# Factura / Remisión" style="background:#fff; max-width: 160px; height: 34px;">
-            <select id="purchase-payment-method" class="sub-search-input" style="background:#fff; max-width: 160px; height: 34px; font-weight: 600;">
+            <input type="text" id="purchase-invoice-input" class="sub-search-input" placeholder="# Factura / Remisión"
+              style="background:#fff; max-width: 160px; height: 34px;">
+            <select id="purchase-payment-method" class="sub-search-input"
+              style="background:#fff; max-width: 160px; height: 34px; font-weight: 600;">
               <option value="EFECTIVO" selected>💵 Efectivo de Caja</option>
               <option value="TRANSFERENCIA">🏦 Transferencia</option>
               <option value="TARJETA">💳 Tarjeta</option>
               <option value="CREDITO">⏳ Crédito a Proveedor</option>
             </select>
-            <button type="button" class="meta-btn" id="btn-clear-purchase" style="color: #ef4444;" title="Vaciar lista de compra actual">
+            <button type="button" class="meta-btn" id="btn-clear-purchase" style="color: #ef4444;"
+              title="Vaciar lista de compra actual">
               <span>🗑️</span>
             </button>
           </div>
         </div>
 
         <!-- Barra de Búsqueda de Productos para Compra con Autocompletado -->
-        <div style="padding: 0.6rem 1.25rem; background: var(--bg-subtle); border-bottom: 1px solid var(--border-light); position: relative;">
+        <div
+          style="padding: 0.6rem 1.25rem; background: var(--bg-subtle); border-bottom: 1px solid var(--border-light); position: relative;">
           <div style="position: relative;">
-            <span style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 1.1rem; color: #94a3b8;">🔍</span>
-            <input 
-              type="text" 
-              id="purchase-product-search" 
-              class="sub-search-input" 
-              placeholder="Escanear código de barras o escribir nombre del producto a comprar... (Enter para agregar)" 
-              style="padding-left: 2.5rem; background: #fff; height: 42px; border-radius: var(--radius-md); font-size: 0.95rem; width: 100%;" 
-              autocomplete="off"
-            >
-            <div id="purchase-search-results" style="display:none; position:absolute; top: 100%; left: 0; right: 0; background: #fff; border: 1px solid #cbd5e1; border-radius: var(--radius-md); box-shadow: 0 10px 25px -5px rgba(0,0,0,0.15); z-index: 1000; max-height: 280px; overflow-y: auto; margin-top: 4px;"></div>
+            <span
+              style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 1.1rem; color: #94a3b8;">🔍</span>
+            <input type="text" id="purchase-product-search" class="sub-search-input"
+              placeholder="Escanear código de barras o escribir nombre del producto a comprar... (Enter para agregar)"
+              style="padding-left: 2.5rem; background: #fff; height: 42px; border-radius: var(--radius-md); font-size: 0.95rem; width: 100%;"
+              autocomplete="off">
+            <div id="purchase-search-results"
+              style="display:none; position:absolute; top: 100%; left: 0; right: 0; background: #fff; border: 1px solid #cbd5e1; border-radius: var(--radius-md); box-shadow: 0 10px 25px -5px rgba(0,0,0,0.15); z-index: 1000; max-height: 280px; overflow-y: auto; margin-top: 4px;">
+            </div>
           </div>
         </div>
 
@@ -749,23 +777,29 @@
         <!-- Barra Inferior de Totales y Registro -->
         <div class="sticky-bottom-bar" style="flex-wrap: wrap; gap: 0.75rem;">
           <div class="bottom-info-left" style="display: flex; gap: 1.25rem; align-items: center; flex-wrap: wrap;">
-            <label style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.82rem; cursor: pointer; color: var(--text-secondary); user-select: none;">
-              <input type="checkbox" id="purchase-chk-cashout" checked style="width: 16px; height: 16px; accent-color: var(--primary-blue);">
+            <label
+              style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.82rem; cursor: pointer; color: var(--text-secondary); user-select: none;">
+              <input type="checkbox" id="purchase-chk-cashout" checked
+                style="width: 16px; height: 16px; accent-color: var(--primary-blue);">
               <span>💵 Registrar egreso de efectivo en el turno de caja actual</span>
             </label>
-            <label style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.82rem; cursor: pointer; color: var(--text-secondary); user-select: none;">
-              <input type="checkbox" id="purchase-chk-updatecosts" checked style="width: 16px; height: 16px; accent-color: var(--primary-blue);">
+            <label
+              style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.82rem; cursor: pointer; color: var(--text-secondary); user-select: none;">
+              <input type="checkbox" id="purchase-chk-updatecosts" checked
+                style="width: 16px; height: 16px; accent-color: var(--primary-blue);">
               <span>📦 Actualizar precio de costo en catálogo de productos</span>
             </label>
           </div>
           <div class="bottom-info-right" style="display: flex; align-items: center; gap: 1rem;">
             <div class="totals-breakdown">
               <div class="subtotal-text">
-                Unidades: <strong id="purchase-total-units" style="color: var(--primary-blue);">0 unidades</strong> • 
-                Total: <strong id="purchase-total-amount" style="font-size: 1.15rem; color: var(--accent-green-dark);">$0.00 MXN</strong>
+                Unidades: <strong id="purchase-total-units" style="color: var(--primary-blue);">0 unidades</strong> •
+                Total: <strong id="purchase-total-amount"
+                  style="font-size: 1.15rem; color: var(--accent-green-dark);">$0.00 MXN</strong>
               </div>
             </div>
-            <button type="button" class="main-action-pill-btn" id="btn-submit-purchase" style="background: var(--primary-blue); font-size: 0.95rem; padding: 0.65rem 1.6rem;">
+            <button type="button" class="main-action-pill-btn" id="btn-submit-purchase"
+              style="background: var(--primary-blue); font-size: 0.95rem; padding: 0.65rem 1.6rem;">
               <span id="purchase-pill-btn-text">💾 Registrar Compra</span>
             </button>
           </div>
@@ -777,7 +811,8 @@
         <div class="sub-toolbar" style="margin-bottom: 1rem;">
           <div class="sub-search-wrapper" style="max-width: 420px;">
             <span class="sub-search-icon">🔍</span>
-            <input type="text" id="purchase-history-search" class="sub-search-input" placeholder="Buscar compra por folio, factura o proveedor...">
+            <input type="text" id="purchase-history-search" class="sub-search-input"
+              placeholder="Buscar compra por folio, factura o proveedor...">
           </div>
           <button type="button" class="meta-btn" onclick="PurchasesModule.loadHistory()">
             <span>🔄</span> <span>Actualizar Historial</span>
@@ -812,34 +847,40 @@
       <div class="sub-toolbar">
         <div class="sub-search-wrapper" style="max-width: 450px;">
           <span class="sub-search-icon">🔍</span>
-          <input type="text" id="suppliers-search-input" class="sub-search-input" placeholder="Buscar por nombre de empresa, contacto, teléfono o RFC...">
+          <input type="text" id="suppliers-search-input" class="sub-search-input"
+            placeholder="Buscar por nombre de empresa, contacto, teléfono o RFC...">
         </div>
         <div class="sub-meta-group">
           <div class="meta-badge" id="suppliers-count-badge">
             0 Proveedores
           </div>
-          <button type="button" class="main-action-pill-btn" id="btn-new-supplier" style="background: var(--primary-blue);">
+          <button type="button" class="main-action-pill-btn" id="btn-new-supplier"
+            style="background: var(--primary-blue);">
             <span>➕ Registrar Nuevo Proveedor</span>
           </button>
         </div>
       </div>
 
-      <div id="suppliers-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.25rem; padding: 1.25rem;">
+      <div id="suppliers-grid"
+        style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.25rem; padding: 1.25rem;">
         <!-- Tarjetas cargadas dinámicamente con SuppliersModule -->
       </div>
     </section>
 
     <!-- ====================================================================
-         VISTA 4: AJUSTE LIBRE DE INVENTARIO (ESTILO CAPTURA 4)
+         VISTA 4: REALIZAR INVENTARIO (CONTEO FÍSICO, PRECIOS Y FOTOS)
          ==================================================================== -->
     <section id="view-inventory-adjust" class="view-panel">
+      <!-- Input oculto para tomar fotos con la cámara o galería desde el móvil -->
+      <input type="file" id="mobile-inventory-photo-input" accept="image/*" capture="environment" style="display: none;">
+
       <!-- Banner Exclusivo Móvil de Terminal de Inventario -->
       <div class="mobile-inventory-header-banner" id="mobile-inventory-header-banner">
         <div class="mob-inv-brand">
-          <span class="mob-inv-icon">📦</span>
+          <span class="mob-inv-icon">📋</span>
           <div>
-            <strong class="mob-inv-title">Ajuste de Inventario Móvil</strong>
-            <span class="mob-inv-sub">Terminal de conteo físico y escáner</span>
+            <strong class="mob-inv-title">Realizar Inventario</strong>
+            <span class="mob-inv-sub">Terminal móvil: Conteo, cambio de precio y foto</span>
           </div>
         </div>
       </div>
@@ -847,20 +888,16 @@
       <div class="sub-toolbar">
         <div class="sub-search-wrapper">
           <span class="sub-search-icon">🔍</span>
-          <input 
-            type="text" 
-            id="adjust-search-input" 
-            class="sub-search-input" 
-            placeholder="Escanear código o buscar producto..." 
-            autocomplete="off"
-          >
+          <input type="text" id="adjust-search-input" class="sub-search-input"
+            placeholder="Escanear código o buscar producto..." autocomplete="off">
         </div>
         <div class="sub-meta-group">
           <button class="meta-btn" id="btn-adjust-scan-trigger" onclick="InventoryModule.triggerBarcodePrompt()">
             <span>📷</span>
             <span>Escanear</span>
           </button>
-          <button class="meta-btn" onclick="InventoryModule.resetAllAdjustments()" title="Restablecer conteos a las existencias del sistema">
+          <button class="meta-btn" onclick="InventoryModule.resetAllAdjustments()"
+            title="Restablecer conteos a las existencias del sistema">
             <span>🔄</span>
             <span>Restablecer</span>
           </button>
@@ -898,7 +935,8 @@
       <div class="adjustment-bottom-bar" id="adjustment-bottom-bar">
         <div class="adjustment-stats-row">
           <span class="stat-tag" id="adj-stat-sindiff">Sin diferencia (0)</span>
-          <span class="stat-tag" style="color: var(--accent-green-dark);" id="adj-stat-pos">D. positiva (0) +$0.00</span>
+          <span class="stat-tag" style="color: var(--accent-green-dark);" id="adj-stat-pos">D. positiva (0)
+            +$0.00</span>
           <span class="stat-tag" style="color: var(--accent-red);" id="adj-stat-neg">D. negativa (0) -$0.00</span>
           <span class="stat-tag" style="font-weight: 800;" id="adj-stat-total">Total diferencia: $0.00</span>
         </div>
@@ -914,7 +952,7 @@
          ==================================================================== -->
     <section id="view-multiservices" class="view-panel">
       <div class="multiservices-container">
-        
+
         <!-- Pestañas de Servicios -->
         <div class="service-tabs-bar">
           <button class="service-tab-btn active" data-tab="recargas">
@@ -932,11 +970,15 @@
         </div>
 
         <!-- Banner informativo -->
-        <div style="background: var(--primary-blue-light); border: 1px solid rgba(0,96,223,0.2); padding: 1rem 1.5rem; border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: space-between;">
+        <div
+          style="background: var(--primary-blue-light); border: 1px solid rgba(0,96,223,0.2); padding: 1rem 1.5rem; border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: space-between;">
           <div>
-            <span style="background: var(--primary-blue); color:#fff; font-size: 0.72rem; font-weight:800; padding: 0.2rem 0.5rem; border-radius: 4px;">NUEVO</span>
-            <strong style="margin-left: 0.5rem; color: var(--primary-blue-dark);">Recargas electrónicas y cobro de servicios</strong>
-            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.2rem;">Atiende a tus clientes con recargas al instante sin salir del punto de venta.</p>
+            <span
+              style="background: var(--primary-blue); color:#fff; font-size: 0.72rem; font-weight:800; padding: 0.2rem 0.5rem; border-radius: 4px;">NUEVO</span>
+            <strong style="margin-left: 0.5rem; color: var(--primary-blue-dark);">Recargas electrónicas y cobro de
+              servicios</strong>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.2rem;">Atiende a tus clientes con
+              recargas al instante sin salir del punto de venta.</p>
           </div>
         </div>
 
@@ -985,7 +1027,8 @@
       <div class="sub-toolbar">
         <div class="sub-search-wrapper">
           <span class="sub-search-icon">🔍</span>
-          <input type="text" id="customers-search-input" class="sub-search-input" placeholder="Buscar cliente por nombre o teléfono...">
+          <input type="text" id="customers-search-input" class="sub-search-input"
+            placeholder="Buscar cliente por nombre o teléfono...">
         </div>
         <div class="sub-meta-group">
           <button class="meta-btn" id="btn-new-customer" onclick="CustomersModule.openNewCustomerModal()">
@@ -1028,20 +1071,24 @@
               <span>Turno abierto:</span>
               <strong id="cash-opened-at">-</strong>
             </div>
-            <div class="meta-badge" id="cash-shift-cashier-badge" style="background: var(--primary-blue-light); color: var(--primary-blue-dark); font-weight: 700;">
+            <div class="meta-badge" id="cash-shift-cashier-badge"
+              style="background: var(--primary-blue-light); color: var(--primary-blue-dark); font-weight: 700;">
               👤 Cajero: Admin
             </div>
           </div>
           <div class="sub-meta-group">
-            <button class="meta-btn" onclick="CashModule.openCashInModal()" style="background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0;">
+            <button class="meta-btn" onclick="CashModule.openCashInModal()"
+              style="background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0;">
               <span>📥</span>
               <span>Entrada (F8)</span>
             </button>
-            <button class="meta-btn" onclick="CashModule.openCashOutModal()" style="background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca;">
+            <button class="meta-btn" onclick="CashModule.openCashOutModal()"
+              style="background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca;">
               <span>📤</span>
               <span>Salida (F9)</span>
             </button>
-            <button class="meta-btn" id="btn-view-corte-ticket" onclick="CashModule.openCorteTicketModal()" style="background: #10b981; color: #fff;">
+            <button class="meta-btn" id="btn-view-corte-ticket" onclick="CashModule.openCorteTicketModal()"
+              style="background: #10b981; color: #fff;">
               <span>🖨️</span>
               <span>Ver / Imprimir Corte</span>
             </button>
@@ -1054,34 +1101,49 @@
 
         <div class="table-view-container">
           <!-- Tarjetas Desglose de Caja -->
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+          <div
+            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
             <div class="sicar-table-card" style="padding: 1.2rem;">
               <div style="font-size: 0.8rem; color: var(--text-secondary);">FONDO INICIAL</div>
-              <div style="font-size: 1.4rem; font-weight: 900; font-family: var(--font-mono); margin-top: 0.2rem;" id="cash-initial-val">$0.00</div>
+              <div style="font-size: 1.4rem; font-weight: 900; font-family: var(--font-mono); margin-top: 0.2rem;"
+                id="cash-initial-val">$0.00</div>
             </div>
             <div class="sicar-table-card" style="padding: 1.2rem;">
               <div style="font-size: 0.8rem; color: var(--text-secondary);">VENTAS EN EFECTIVO</div>
-              <div style="font-size: 1.4rem; font-weight: 900; font-family: var(--font-mono); color: var(--accent-green-dark); margin-top: 0.2rem;" id="cash-sales-val">$0.00</div>
+              <div
+                style="font-size: 1.4rem; font-weight: 900; font-family: var(--font-mono); color: var(--accent-green-dark); margin-top: 0.2rem;"
+                id="cash-sales-val">$0.00</div>
             </div>
             <div class="sicar-table-card" style="padding: 1.2rem; background: #f0fdf4; border-color: #86efac;">
               <div style="font-size: 0.8rem; font-weight: 700; color: #15803d;">📥 ENTRADAS (F8)</div>
-              <div style="font-size: 1.4rem; font-weight: 900; font-family: var(--font-mono); color: #15803d; margin-top: 0.2rem;" id="cash-ingresos-val">+$0.00</div>
+              <div
+                style="font-size: 1.4rem; font-weight: 900; font-family: var(--font-mono); color: #15803d; margin-top: 0.2rem;"
+                id="cash-ingresos-val">+$0.00</div>
             </div>
             <div class="sicar-table-card" style="padding: 1.2rem; background: #fef2f2; border-color: #fca5a5;">
               <div style="font-size: 0.8rem; font-weight: 700; color: #b91c1c;">📤 SALIDAS (F9)</div>
-              <div style="font-size: 1.4rem; font-weight: 900; font-family: var(--font-mono); color: #b91c1c; margin-top: 0.2rem;" id="cash-egresos-val">-$0.00</div>
+              <div
+                style="font-size: 1.4rem; font-weight: 900; font-family: var(--font-mono); color: #b91c1c; margin-top: 0.2rem;"
+                id="cash-egresos-val">-$0.00</div>
             </div>
             <div class="sicar-table-card" style="padding: 1.2rem;">
               <div style="font-size: 0.8rem; color: var(--text-secondary);">TARJETAS / TRANSFERENCIAS</div>
-              <div style="font-size: 1.4rem; font-weight: 900; font-family: var(--font-mono); color: var(--primary-blue); margin-top: 0.2rem;" id="cash-card-val">$0.00</div>
+              <div
+                style="font-size: 1.4rem; font-weight: 900; font-family: var(--font-mono); color: var(--primary-blue); margin-top: 0.2rem;"
+                id="cash-card-val">$0.00</div>
             </div>
-            <div class="sicar-table-card" style="padding: 1.2rem; background: var(--primary-blue-light); border-color: rgba(0,96,223,0.3);">
-              <div style="font-size: 0.8rem; font-weight: 700; color: var(--primary-blue-dark);">EFECTIVO ESPERADO EN CAJA</div>
-              <div style="font-size: 1.6rem; font-weight: 900; font-family: var(--font-mono); color: var(--primary-blue-dark); margin-top: 0.2rem;" id="cash-expected-val">$0.00</div>
+            <div class="sicar-table-card"
+              style="padding: 1.2rem; background: var(--primary-blue-light); border-color: rgba(0,96,223,0.3);">
+              <div style="font-size: 0.8rem; font-weight: 700; color: var(--primary-blue-dark);">EFECTIVO ESPERADO EN
+                CAJA</div>
+              <div
+                style="font-size: 1.6rem; font-weight: 900; font-family: var(--font-mono); color: var(--primary-blue-dark); margin-top: 0.2rem;"
+                id="cash-expected-val">$0.00</div>
             </div>
           </div>
 
-          <h3 style="font-size: 1.05rem; font-weight: 800; margin-bottom: 0.75rem;">Movimientos Extraordinarios de Efectivo</h3>
+          <h3 style="font-size: 1.05rem; font-weight: 800; margin-bottom: 0.75rem;">Movimientos Extraordinarios de
+            Efectivo</h3>
           <div class="sicar-table-card">
             <table class="sicar-table">
               <thead>
@@ -1105,9 +1167,12 @@
         <div style="font-size: 3.5rem; margin-bottom: 1rem;">🔒</div>
         <h2 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 0.5rem;">Caja Cerrada • Sin Turno Activo</h2>
         <p style="color: var(--text-secondary); max-width: 480px; margin: 0 auto 1.5rem; font-size: 0.92rem;">
-          No hay ningún turno de caja abierto en este momento. Abre un nuevo turno para poder comenzar a cobrar y emitir tickets en el mostrador.
+          No hay ningún turno de caja abierto en este momento. Abre un nuevo turno para poder comenzar a cobrar y emitir
+          tickets en el mostrador.
         </p>
-        <button class="main-action-pill-btn" onclick="document.getElementById('modal-open-shift').classList.add('active')" style="font-size: 1rem; padding: 0.85rem 2.2rem;">
+        <button class="main-action-pill-btn"
+          onclick="document.getElementById('modal-open-shift').classList.add('active')"
+          style="font-size: 1rem; padding: 0.85rem 2.2rem;">
           🔑 Abrir Nuevo Turno de Caja
         </button>
       </div>
@@ -1151,17 +1216,24 @@
           <div class="sicar-table-card" style="padding: 1.25rem; margin-top: 1rem;">
             <input type="hidden" id="user-edit-id">
             <h4 style="font-size: 0.95rem; font-weight: 800; margin-bottom: 0.85rem;">Datos del Cajero / Usuario</h4>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.85rem; font-size: 0.88rem;">
+            <div
+              style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.85rem; font-size: 0.88rem;">
               <div>
-                <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.3rem;">Nombre Completo:</label>
+                <label
+                  style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.3rem;">Nombre
+                  Completo:</label>
                 <input type="text" id="user-edit-name" class="sub-search-input" style="background:#fff;">
               </div>
               <div>
-                <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.3rem;">Usuario (Login):</label>
+                <label
+                  style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.3rem;">Usuario
+                  (Login):</label>
                 <input type="text" id="user-edit-username" class="sub-search-input" style="background:#fff;">
               </div>
               <div>
-                <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.3rem;">Rol Asignado:</label>
+                <label
+                  style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.3rem;">Rol
+                  Asignado:</label>
                 <select id="user-edit-role" class="sub-search-input" style="background:#fff; height: 38px;">
                   <option value="ADMIN">Administrador (Control Total)</option>
                   <option value="Encargado">Encargado de Tienda</option>
@@ -1169,11 +1241,16 @@
                 </select>
               </div>
               <div>
-                <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.3rem;">PIN de Acceso:</label>
-                <input type="password" id="user-edit-pin" class="sub-search-input" style="background:#fff;" placeholder="Ej: 1234">
+                <label
+                  style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.3rem;">PIN de
+                  Acceso:</label>
+                <input type="password" id="user-edit-pin" class="sub-search-input" style="background:#fff;"
+                  placeholder="Ej: 1234">
               </div>
               <div>
-                <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.3rem;">Avatar / Icono:</label>
+                <label
+                  style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.3rem;">Avatar
+                  / Icono:</label>
                 <select id="user-edit-avatar" class="sub-search-input" style="background:#fff; height: 38px;">
                   <option value="👑">👑 Corona (Admin)</option>
                   <option value="👨‍💼" selected>👨‍💼 Hombre con Corbata</option>
@@ -1185,16 +1262,24 @@
                 </select>
               </div>
               <div>
-                <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.3rem;">Teléfono / WhatsApp:</label>
-                <input type="text" id="user-edit-phone" class="sub-search-input" style="background:#fff;" placeholder="Opcional">
+                <label
+                  style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.3rem;">Teléfono
+                  / WhatsApp:</label>
+                <input type="text" id="user-edit-phone" class="sub-search-input" style="background:#fff;"
+                  placeholder="Opcional">
               </div>
               <div>
-                <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.3rem;">Correo Electrónico:</label>
-                <input type="email" id="user-edit-email" class="sub-search-input" style="background:#fff;" placeholder="Opcional">
+                <label
+                  style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.3rem;">Correo
+                  Electrónico:</label>
+                <input type="email" id="user-edit-email" class="sub-search-input" style="background:#fff;"
+                  placeholder="Opcional">
               </div>
               <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 1.2rem;">
-                <input type="checkbox" id="user-edit-active" checked style="width: 18px; height: 18px; accent-color: var(--primary-blue);">
-                <label for="user-edit-active" style="font-weight: 700; cursor: pointer;">Cajero Activo en Sistema</label>
+                <input type="checkbox" id="user-edit-active" checked
+                  style="width: 18px; height: 18px; accent-color: var(--primary-blue);">
+                <label for="user-edit-active" style="font-weight: 700; cursor: pointer;">Cajero Activo en
+                  Sistema</label>
               </div>
             </div>
 
@@ -1205,7 +1290,8 @@
                   <span>🔐</span>
                   <span>Permisos Asignados al Cajero</span>
                 </h4>
-                <span style="font-size: 0.78rem; color: var(--text-secondary);">Marca las acciones permitidas para este cajero</span>
+                <span style="font-size: 0.78rem; color: var(--text-secondary);">Marca las acciones permitidas para este
+                  cajero</span>
               </div>
               <div id="user-permissions-container">
                 <!-- Renderizado dinámico desde users.js -->
@@ -1213,8 +1299,10 @@
             </div>
 
             <!-- Botones de Acción -->
-            <div style="margin-top: 1.5rem; display: flex; gap: 0.75rem; justify-content: flex-end; border-top: 1px solid var(--border-light); padding-top: 1rem;">
-              <button class="meta-btn" id="btn-delete-user" style="background: var(--bg-card); color: var(--accent-red); border-color: var(--accent-red);">
+            <div
+              style="margin-top: 1.5rem; display: flex; gap: 0.75rem; justify-content: flex-end; border-top: 1px solid var(--border-light); padding-top: 1rem;">
+              <button class="meta-btn" id="btn-delete-user"
+                style="background: var(--bg-card); color: var(--accent-red); border-color: var(--accent-red);">
                 <span>🗑️</span>
                 <span>Eliminar Cajero</span>
               </button>
@@ -1233,12 +1321,14 @@
          ==================================================================== -->
     <section id="view-reports" class="view-panel">
       <div class="table-view-container">
-        
+
         <!-- Encabezado de Reportes y Filtros de Período -->
         <div class="sicar-table-card" style="padding: 1.25rem; margin-bottom: 1.25rem;">
-          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;">
+          <div
+            style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;">
             <div>
-              <h2 style="font-size: 1.3rem; font-weight: 800; display:flex; align-items:center; gap:0.5rem; margin-bottom: 0.2rem;">
+              <h2
+                style="font-size: 1.3rem; font-weight: 800; display:flex; align-items:center; gap:0.5rem; margin-bottom: 0.2rem;">
                 <span>📊</span>
                 <span>Reportes y Estadísticas de Eleventa</span>
               </h2>
@@ -1261,54 +1351,79 @@
           </div>
 
           <!-- Filtro de Fechas Personalizadas (oculto por defecto) -->
-          <div id="custom-date-container" style="display: none; align-items: center; gap: 0.8rem; background: var(--bg-subtle); padding: 0.75rem 1rem; border-radius: 8px; margin-top: 0.5rem; flex-wrap: wrap;">
+          <div id="custom-date-container"
+            style="display: none; align-items: center; gap: 0.8rem; background: var(--bg-subtle); padding: 0.75rem 1rem; border-radius: 8px; margin-top: 0.5rem; flex-wrap: wrap;">
             <span style="font-size: 0.85rem; font-weight: 700;">Rango de Fechas:</span>
             <div style="display: flex; align-items: center; gap: 0.4rem;">
               <span style="font-size: 0.8rem; color: var(--text-secondary);">Desde:</span>
-              <input type="date" id="rep-start-date" class="sub-search-input" style="background:#fff; width: 150px; height: 32px; font-size: 0.85rem;">
+              <input type="date" id="rep-start-date" class="sub-search-input"
+                style="background:#fff; width: 150px; height: 32px; font-size: 0.85rem;">
             </div>
             <div style="display: flex; align-items: center; gap: 0.4rem;">
               <span style="font-size: 0.8rem; color: var(--text-secondary);">Hasta:</span>
-              <input type="date" id="rep-end-date" class="sub-search-input" style="background:#fff; width: 150px; height: 32px; font-size: 0.85rem;">
+              <input type="date" id="rep-end-date" class="sub-search-input"
+                style="background:#fff; width: 150px; height: 32px; font-size: 0.85rem;">
             </div>
-            <button class="main-action-pill-btn" id="btn-apply-custom-dates" style="padding: 0.4rem 1.2rem; font-size: 0.85rem;">
+            <button class="main-action-pill-btn" id="btn-apply-custom-dates"
+              style="padding: 0.4rem 1.2rem; font-size: 0.85rem;">
               Filtrar
             </button>
           </div>
         </div>
 
         <!-- Tarjetas KPI Financieras Dinámicas -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+        <div
+          style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
           <div class="kpi-report-card">
-            <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">VENTAS TOTALES</div>
-            <div style="font-size: 1.7rem; font-weight: 900; font-family: var(--font-mono); color: var(--primary-blue); margin-top: 0.25rem;" id="kpi-sales-total">$0.00</div>
-            <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.2rem;">Ventas cobradas en el período</div>
+            <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">
+              VENTAS TOTALES</div>
+            <div
+              style="font-size: 1.7rem; font-weight: 900; font-family: var(--font-mono); color: var(--primary-blue); margin-top: 0.25rem;"
+              id="kpi-sales-total">$0.00</div>
+            <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.2rem;">Ventas cobradas en el
+              período</div>
           </div>
           <div class="kpi-report-card">
-            <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">GANANCIA / UTILIDAD</div>
-            <div style="font-size: 1.7rem; font-weight: 900; font-family: var(--font-mono); color: var(--accent-green-dark); margin-top: 0.25rem;" id="kpi-profit-total">$0.00</div>
-            <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.2rem;">Venta menos precio de costo</div>
+            <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">
+              GANANCIA / UTILIDAD</div>
+            <div
+              style="font-size: 1.7rem; font-weight: 900; font-family: var(--font-mono); color: var(--accent-green-dark); margin-top: 0.25rem;"
+              id="kpi-profit-total">$0.00</div>
+            <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.2rem;">Venta menos precio de
+              costo</div>
           </div>
           <div class="kpi-report-card">
-            <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">MARGEN PROMEDIO</div>
-            <div style="font-size: 1.7rem; font-weight: 900; font-family: var(--font-mono); color: var(--accent-green-dark); margin-top: 0.25rem;" id="kpi-margin-pct">0.0%</div>
-            <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.2rem;">Margen sobre ventas brutas</div>
+            <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">
+              MARGEN PROMEDIO</div>
+            <div
+              style="font-size: 1.7rem; font-weight: 900; font-family: var(--font-mono); color: var(--accent-green-dark); margin-top: 0.25rem;"
+              id="kpi-margin-pct">0.0%</div>
+            <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.2rem;">Margen sobre ventas
+              brutas</div>
           </div>
           <div class="kpi-report-card">
-            <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">TICKETS COBRADOS</div>
-            <div style="font-size: 1.7rem; font-weight: 900; font-family: var(--font-mono); margin-top: 0.25rem;" id="kpi-tickets-count">0</div>
-            <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.2rem;">Transacciones finalizadas</div>
+            <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">
+              TICKETS COBRADOS</div>
+            <div style="font-size: 1.7rem; font-weight: 900; font-family: var(--font-mono); margin-top: 0.25rem;"
+              id="kpi-tickets-count">0</div>
+            <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.2rem;">Transacciones finalizadas
+            </div>
           </div>
           <div class="kpi-report-card">
-            <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">TICKET PROMEDIO</div>
-            <div style="font-size: 1.7rem; font-weight: 900; font-family: var(--font-mono); color: var(--primary-blue-dark); margin-top: 0.25rem;" id="kpi-avg-ticket">$0.00</div>
-            <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.2rem;">Promedio de compra por ticket</div>
+            <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">
+              TICKET PROMEDIO</div>
+            <div
+              style="font-size: 1.7rem; font-weight: 900; font-family: var(--font-mono); color: var(--primary-blue-dark); margin-top: 0.25rem;"
+              id="kpi-avg-ticket">$0.00</div>
+            <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.2rem;">Promedio de compra por
+              ticket</div>
           </div>
         </div>
 
         <!-- Pestañas de Sub-Reportes -->
         <div class="sicar-table-card" style="padding: 0; overflow: hidden; margin-bottom: 1.5rem;">
-          <div style="display: flex; border-bottom: 1px solid var(--border-light); background: var(--bg-subtle); overflow-x: auto;">
+          <div
+            style="display: flex; border-bottom: 1px solid var(--border-light); background: var(--bg-subtle); overflow-x: auto;">
             <button class="report-tab-btn active" data-tab="sales">
               <span>💵</span>
               <span>Ventas y Métodos de Pago</span>
@@ -1342,7 +1457,8 @@
           <div style="padding: 1.25rem;">
             <!-- Pestaña 1: Ventas y Métodos de Pago -->
             <div id="tab-content-sales" class="report-tab-content" style="display: block;">
-              <h4 style="font-size: 0.95rem; font-weight: 800; margin-bottom: 0.85rem;">Distribución de Ventas por Forma de Pago</h4>
+              <h4 style="font-size: 0.95rem; font-weight: 800; margin-bottom: 0.85rem;">Distribución de Ventas por Forma
+                de Pago</h4>
               <table class="sicar-table">
                 <thead>
                   <tr>
@@ -1359,26 +1475,41 @@
 
               <!-- Resumen de Flujo de Efectivo del Día / Período -->
               <div style="margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid var(--border-light);">
-                <h4 style="font-size: 0.95rem; font-weight: 800; margin-bottom: 0.85rem; display: flex; align-items: center; gap: 0.5rem;">
+                <h4
+                  style="font-size: 0.95rem; font-weight: 800; margin-bottom: 0.85rem; display: flex; align-items: center; gap: 0.5rem;">
                   <span>💵</span>
                   <span>Flujo y Cuadre de Efectivo en Caja (Corte del Período)</span>
                 </h4>
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.85rem;">
-                  <div style="background: var(--bg-subtle); padding: 0.85rem 1rem; border-radius: 8px; border: 1px solid var(--border-light);">
-                    <div style="font-size: 0.76rem; color: var(--text-secondary); font-weight: 700;">VENTAS EN EFECTIVO</div>
-                    <div id="rep-cash-sales" style="font-family: var(--font-mono); font-weight: 900; font-size: 1.3rem; color: var(--primary-blue); margin-top: 0.2rem;">$0.00</div>
+                  <div
+                    style="background: var(--bg-subtle); padding: 0.85rem 1rem; border-radius: 8px; border: 1px solid var(--border-light);">
+                    <div style="font-size: 0.76rem; color: var(--text-secondary); font-weight: 700;">VENTAS EN EFECTIVO
+                    </div>
+                    <div id="rep-cash-sales"
+                      style="font-family: var(--font-mono); font-weight: 900; font-size: 1.3rem; color: var(--primary-blue); margin-top: 0.2rem;">
+                      $0.00</div>
                   </div>
-                  <div style="background: #f0fdf4; padding: 0.85rem 1rem; border-radius: 8px; border: 1px solid #86efac;">
+                  <div
+                    style="background: #f0fdf4; padding: 0.85rem 1rem; border-radius: 8px; border: 1px solid #86efac;">
                     <div style="font-size: 0.76rem; color: #15803d; font-weight: 700;">(+) ENTRADAS EFECTIVO (F8)</div>
-                    <div id="rep-cash-inflows" style="font-family: var(--font-mono); font-weight: 900; font-size: 1.3rem; color: #15803d; margin-top: 0.2rem;">+$0.00 (0)</div>
+                    <div id="rep-cash-inflows"
+                      style="font-family: var(--font-mono); font-weight: 900; font-size: 1.3rem; color: #15803d; margin-top: 0.2rem;">
+                      +$0.00 (0)</div>
                   </div>
-                  <div style="background: #fef2f2; padding: 0.85rem 1rem; border-radius: 8px; border: 1px solid #fca5a5;">
+                  <div
+                    style="background: #fef2f2; padding: 0.85rem 1rem; border-radius: 8px; border: 1px solid #fca5a5;">
                     <div style="font-size: 0.76rem; color: #b91c1c; font-weight: 700;">(-) SALIDAS EFECTIVO (F9)</div>
-                    <div id="rep-cash-outflows" style="font-family: var(--font-mono); font-weight: 900; font-size: 1.3rem; color: #b91c1c; margin-top: 0.2rem;">-$0.00 (0)</div>
+                    <div id="rep-cash-outflows"
+                      style="font-family: var(--font-mono); font-weight: 900; font-size: 1.3rem; color: #b91c1c; margin-top: 0.2rem;">
+                      -$0.00 (0)</div>
                   </div>
-                  <div style="background: #eff6ff; padding: 0.85rem 1rem; border-radius: 8px; border: 1px solid #93c5fd;">
-                    <div style="font-size: 0.76rem; color: #1e40af; font-weight: 700;">(=) EFECTIVO NETO RESULTANTE</div>
-                    <div id="rep-cash-net" style="font-family: var(--font-mono); font-weight: 900; font-size: 1.35rem; color: #1e40af; margin-top: 0.2rem;">$0.00</div>
+                  <div
+                    style="background: #eff6ff; padding: 0.85rem 1rem; border-radius: 8px; border: 1px solid #93c5fd;">
+                    <div style="font-size: 0.76rem; color: #1e40af; font-weight: 700;">(=) EFECTIVO NETO RESULTANTE
+                    </div>
+                    <div id="rep-cash-net"
+                      style="font-family: var(--font-mono); font-weight: 900; font-size: 1.35rem; color: #1e40af; margin-top: 0.2rem;">
+                      $0.00</div>
                   </div>
                 </div>
               </div>
@@ -1386,7 +1517,8 @@
 
             <!-- Pestaña 2: Ventas por Departamento -->
             <div id="tab-content-departments" class="report-tab-content" style="display: none;">
-              <h4 style="font-size: 0.95rem; font-weight: 800; margin-bottom: 0.85rem;">Ventas y Ganancias por Departamento / Categoría</h4>
+              <h4 style="font-size: 0.95rem; font-weight: 800; margin-bottom: 0.85rem;">Ventas y Ganancias por
+                Departamento / Categoría</h4>
               <table class="sicar-table">
                 <thead>
                   <tr>
@@ -1406,11 +1538,13 @@
 
             <!-- Pestaña 3: Productos Más Vendidos -->
             <div id="tab-content-products" class="report-tab-content" style="display: none;">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem; flex-wrap: wrap; gap: 0.5rem;">
+              <div
+                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem; flex-wrap: wrap; gap: 0.5rem;">
                 <h4 style="font-size: 0.95rem; font-weight: 800;">Ranking de Artículos Más Vendidos</h4>
                 <div style="display: flex; align-items: center; gap: 0.5rem;">
                   <span style="font-size: 0.82rem; color: var(--text-secondary);">Ordenar por:</span>
-                  <select id="top-products-order-by" class="sub-search-input" style="background:#fff; height: 32px; font-size: 0.84rem;">
+                  <select id="top-products-order-by" class="sub-search-input"
+                    style="background:#fff; height: 32px; font-size: 0.84rem;">
                     <option value="revenue" selected>Mayor Ingreso ($)</option>
                     <option value="qty">Mayor Cantidad Vendida (piezas/kg)</option>
                     <option value="profit">Mayor Ganancia ($)</option>
@@ -1437,7 +1571,8 @@
 
             <!-- Pestaña 4: Ventas por Cajero -->
             <div id="tab-content-cashiers" class="report-tab-content" style="display: none;">
-              <h4 style="font-size: 0.95rem; font-weight: 800; margin-bottom: 0.85rem;">Rendimiento de Ventas por Cajero</h4>
+              <h4 style="font-size: 0.95rem; font-weight: 800; margin-bottom: 0.85rem;">Rendimiento de Ventas por Cajero
+              </h4>
               <table class="sicar-table">
                 <thead>
                   <tr>
@@ -1482,14 +1617,21 @@
 
             <!-- Pestaña 6: Libreta de Fiados y Deudas -->
             <div id="tab-content-credits" class="report-tab-content" style="display: none;">
-              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.25rem;">
-                <div class="sicar-table-card" style="padding: 1rem; border-color: rgba(239, 68, 68, 0.3); background: rgba(239, 68, 68, 0.04);">
-                  <div style="font-size: 0.78rem; font-weight: 700; color: var(--accent-red);">TOTAL EN FIADOS PENDIENTES</div>
-                  <div style="font-size: 1.6rem; font-weight: 900; font-family: var(--font-mono); color: var(--accent-red); margin-top: 0.2rem;" id="credits-total-debt">$0.00</div>
-                  <div style="font-size: 0.75rem; color: var(--text-secondary);" id="credits-debtors-count">0 clientes con deuda</div>
+              <div
+                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.25rem;">
+                <div class="sicar-table-card"
+                  style="padding: 1rem; border-color: rgba(239, 68, 68, 0.3); background: rgba(239, 68, 68, 0.04);">
+                  <div style="font-size: 0.78rem; font-weight: 700; color: var(--accent-red);">TOTAL EN FIADOS
+                    PENDIENTES</div>
+                  <div
+                    style="font-size: 1.6rem; font-weight: 900; font-family: var(--font-mono); color: var(--accent-red); margin-top: 0.2rem;"
+                    id="credits-total-debt">$0.00</div>
+                  <div style="font-size: 0.75rem; color: var(--text-secondary);" id="credits-debtors-count">0 clientes
+                    con deuda</div>
                 </div>
               </div>
-              <h4 style="font-size: 0.95rem; font-weight: 800; margin-bottom: 0.85rem;">Clientes con Mayor Saldo Pendiente</h4>
+              <h4 style="font-size: 0.95rem; font-weight: 800; margin-bottom: 0.85rem;">Clientes con Mayor Saldo
+                Pendiente</h4>
               <table class="sicar-table">
                 <thead>
                   <tr>
@@ -1508,30 +1650,42 @@
 
             <!-- Pestaña 7: Valuación de Inventario -->
             <div id="tab-content-inventory" class="report-tab-content" style="display: none;">
-              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.25rem;">
+              <div
+                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.25rem;">
                 <div class="kpi-report-card">
-                  <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary);">VALOR A PRECIO DE COSTO</div>
-                  <div style="font-size: 1.6rem; font-weight: 900; font-family: var(--font-mono); margin-top: 0.2rem;" id="inv-cost-val">$0.00</div>
+                  <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary);">VALOR A PRECIO DE
+                    COSTO</div>
+                  <div style="font-size: 1.6rem; font-weight: 900; font-family: var(--font-mono); margin-top: 0.2rem;"
+                    id="inv-cost-val">$0.00</div>
                   <div style="font-size: 0.75rem; color: var(--text-secondary);">Inversión física en anaqueles</div>
                 </div>
                 <div class="kpi-report-card">
-                  <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary);">VALOR A PRECIO DE VENTA</div>
-                  <div style="font-size: 1.6rem; font-weight: 900; font-family: var(--font-mono); color: var(--primary-blue); margin-top: 0.2rem;" id="inv-retail-val">$0.00</div>
+                  <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary);">VALOR A PRECIO DE
+                    VENTA</div>
+                  <div
+                    style="font-size: 1.6rem; font-weight: 900; font-family: var(--font-mono); color: var(--primary-blue); margin-top: 0.2rem;"
+                    id="inv-retail-val">$0.00</div>
                   <div style="font-size: 0.75rem; color: var(--text-secondary);">Valor comercial total estimado</div>
                 </div>
                 <div class="kpi-report-card">
-                  <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary);">GANANCIA PROYECTADA</div>
-                  <div style="font-size: 1.6rem; font-weight: 900; font-family: var(--font-mono); color: var(--accent-green-dark); margin-top: 0.2rem;" id="inv-profit-val">$0.00</div>
+                  <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary);">GANANCIA PROYECTADA
+                  </div>
+                  <div
+                    style="font-size: 1.6rem; font-weight: 900; font-family: var(--font-mono); color: var(--accent-green-dark); margin-top: 0.2rem;"
+                    id="inv-profit-val">$0.00</div>
                   <div style="font-size: 0.75rem; color: var(--text-secondary);">Utilidad potencial al vender todo</div>
                 </div>
                 <div class="kpi-report-card">
-                  <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary);">UNIDADES EN STOCK</div>
-                  <div style="font-size: 1.2rem; font-weight: 800; font-family: var(--font-mono); margin-top: 0.4rem;" id="inv-units-val">0 unidades</div>
+                  <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary);">UNIDADES EN STOCK
+                  </div>
+                  <div style="font-size: 1.2rem; font-weight: 800; font-family: var(--font-mono); margin-top: 0.4rem;"
+                    id="inv-units-val">0 unidades</div>
                   <div style="font-size: 0.75rem; color: var(--text-secondary);">Productos activos en catálogo</div>
                 </div>
               </div>
 
-              <h4 style="font-size: 0.95rem; font-weight: 800; margin-bottom: 0.85rem; color: var(--accent-red);">⚠️ Productos Agotados o por Debajo del Stock Mínimo</h4>
+              <h4 style="font-size: 0.95rem; font-weight: 800; margin-bottom: 0.85rem; color: var(--accent-red);">⚠️
+                Productos Agotados o por Debajo del Stock Mínimo</h4>
               <table class="sicar-table">
                 <thead>
                   <tr>
@@ -1552,12 +1706,16 @@
         </div>
 
         <!-- Acceso directo a Configuración -->
-        <div class="sicar-table-card" style="padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-top: 1.5rem;">
+        <div class="sicar-table-card"
+          style="padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-top: 1.5rem;">
           <div>
-            <h3 style="font-size: 1.1rem; font-weight: 800; margin-bottom: 0.3rem;">⚙️ Configuración del Negocio y Tickets</h3>
-            <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0;">Personaliza los datos comerciales, datos de contacto, encabezados de ticket y opciones del punto de venta.</p>
+            <h3 style="font-size: 1.1rem; font-weight: 800; margin-bottom: 0.3rem;">⚙️ Configuración del Negocio y
+              Tickets</h3>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0;">Personaliza los datos comerciales,
+              datos de contacto, encabezados de ticket y opciones del punto de venta.</p>
           </div>
-          <button type="button" class="main-action-pill-btn" onclick="App.switchView('settings')" style="background: var(--primary-blue); font-size: 0.9rem; padding: 0.6rem 1.4rem;">
+          <button type="button" class="main-action-pill-btn" onclick="App.switchView('settings')"
+            style="background: var(--primary-blue); font-size: 0.9rem; padding: 0.6rem 1.4rem;">
             ⚙️ Abrir Módulo de Configuración
           </button>
         </div>
@@ -1570,37 +1728,44 @@
          ==================================================================== -->
     <section id="view-settings" class="view-panel">
       <!-- Barra Superior de Pestañas de Configuración -->
-      <div class="settings-tabs-bar" style="background: #fff; border-bottom: 1px solid var(--border-light); padding: 0.5rem 1.5rem 0; display: flex; gap: 0.5rem; overflow-x: auto; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
-        <button type="button" class="report-tab-btn active" id="tab-btn-cfg-store" onclick="SettingsModule.switchTab('store')">
+      <div class="settings-tabs-bar"
+        style="background: #fff; border-bottom: 1px solid var(--border-light); padding: 0.5rem 1.5rem 0; display: flex; gap: 0.5rem; overflow-x: auto; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
+        <button type="button" class="report-tab-btn active" id="tab-btn-cfg-store"
+          onclick="SettingsModule.switchTab('store')">
           <span>🏪</span> <span>Datos del Negocio</span>
         </button>
-        <button type="button" class="report-tab-btn" id="tab-btn-cfg-tickets" onclick="SettingsModule.switchTab('tickets')">
+        <button type="button" class="report-tab-btn" id="tab-btn-cfg-tickets"
+          onclick="SettingsModule.switchTab('tickets')">
           <span>🧾</span> <span>Tickets e Impresión</span>
         </button>
         <button type="button" class="report-tab-btn" id="tab-btn-cfg-pos" onclick="SettingsModule.switchTab('pos')">
           <span>⚖️</span> <span>Ventas y Granel</span>
         </button>
-        <button type="button" class="report-tab-btn" id="tab-btn-cfg-backups" onclick="SettingsModule.switchTab('backups')">
+        <button type="button" class="report-tab-btn" id="tab-btn-cfg-backups"
+          onclick="SettingsModule.switchTab('backups')">
           <span>💾</span> <span>Respaldos de Seguridad</span>
         </button>
       </div>
 
       <div style="padding: 1.5rem; max-width: 950px; margin: 0 auto;">
-        
+
         <!-- PESTAÑA 1: DATOS DEL NEGOCIO -->
         <div id="panel-cfg-store" class="cfg-tab-panel">
           <div class="sicar-table-card" style="padding: 1.5rem;">
-            <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.5rem;">
+            <h3
+              style="font-size: 1.15rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.5rem;">
               <span>🏪</span> Datos del Negocio / Establecimiento
             </h3>
             <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
               Información fiscal y comercial que aparecerá en el encabezado de tus tickets de venta y reportes.
             </p>
 
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+            <div
+              style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
               <div class="form-group">
                 <label class="form-label" style="font-weight: 700;">Nombre Comercial de la Tienda:</label>
-                <input type="text" id="cfg-store-name" class="form-input" placeholder="Ej. Abarrotes & Mini Súper La Tiendita">
+                <input type="text" id="cfg-store-name" class="form-input"
+                  placeholder="Ej. Abarrotes & Mini Súper La Tiendita">
               </div>
               <div class="form-group">
                 <label class="form-label" style="font-weight: 700;">Teléfono / WhatsApp:</label>
@@ -1612,11 +1777,13 @@
               </div>
               <div class="form-group">
                 <label class="form-label" style="font-weight: 700;">Dirección / Domicilio:</label>
-                <input type="text" id="cfg-store-address" class="form-input" placeholder="Ej. Av. Principal #123, Col. Centro">
+                <input type="text" id="cfg-store-address" class="form-input"
+                  placeholder="Ej. Av. Principal #123, Col. Centro">
               </div>
             </div>
 
-            <button type="button" class="main-action-pill-btn" id="btn-save-business-config" style="background: var(--primary-blue); font-size: 0.95rem; padding: 0.65rem 1.8rem;">
+            <button type="button" class="main-action-pill-btn" id="btn-save-business-config"
+              style="background: var(--primary-blue); font-size: 0.95rem; padding: 0.65rem 1.8rem;">
               💾 Guardar Datos del Negocio
             </button>
           </div>
@@ -1625,21 +1792,25 @@
         <!-- PESTAÑA 2: TICKETS E IMPRESIÓN -->
         <div id="panel-cfg-tickets" class="cfg-tab-panel" style="display: none;">
           <div class="sicar-table-card" style="padding: 1.5rem;">
-            <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.5rem;">
+            <h3
+              style="font-size: 1.15rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.5rem;">
               <span>🧾</span> Personalización de Impresión y Tickets
             </h3>
             <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
               Ajusta los textos impresos y el comportamiento de la impresora de tickets térmicos.
             </p>
 
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+            <div
+              style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
               <div class="form-group">
                 <label class="form-label" style="font-weight: 700;">Encabezado / Lema del Ticket:</label>
-                <input type="text" id="cfg-ticket-header" class="form-input" placeholder="Ej. ¡LOS MEJORES PRECIOS DE LA COLONIA!">
+                <input type="text" id="cfg-ticket-header" class="form-input"
+                  placeholder="Ej. ¡LOS MEJORES PRECIOS DE LA COLONIA!">
               </div>
               <div class="form-group">
                 <label class="form-label" style="font-weight: 700;">Mensaje al Pie del Ticket:</label>
-                <input type="text" id="cfg-ticket-footer" class="form-input" placeholder="Ej. ¡Muchas gracias por su compra! Vuelva pronto.">
+                <input type="text" id="cfg-ticket-footer" class="form-input"
+                  placeholder="Ej. ¡Muchas gracias por su compra! Vuelva pronto.">
               </div>
               <div class="form-group">
                 <label class="form-label" style="font-weight: 700;">Ancho de Impresión del Ticket:</label>
@@ -1650,14 +1821,18 @@
               </div>
             </div>
 
-            <div style="display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap; margin-bottom: 1.5rem; padding: 0.75rem; background: #f8fafc; border-radius: var(--radius-md);">
-              <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.88rem; cursor: pointer; font-weight: 600;">
-                <input type="checkbox" id="cfg-auto-print-ticket" style="width: 17px; height: 17px; accent-color: var(--primary-blue);">
+            <div
+              style="display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap; margin-bottom: 1.5rem; padding: 0.75rem; background: #f8fafc; border-radius: var(--radius-md);">
+              <label
+                style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.88rem; cursor: pointer; font-weight: 600;">
+                <input type="checkbox" id="cfg-auto-print-ticket"
+                  style="width: 17px; height: 17px; accent-color: var(--primary-blue);">
                 <span>Abrir diálogo de impresión de ticket automáticamente al cobrar cada venta</span>
               </label>
             </div>
 
-            <button type="button" class="main-action-pill-btn" onclick="SettingsModule.saveBusinessConfig()" style="background: var(--primary-blue); font-size: 0.95rem; padding: 0.65rem 1.8rem;">
+            <button type="button" class="main-action-pill-btn" onclick="SettingsModule.saveBusinessConfig()"
+              style="background: var(--primary-blue); font-size: 0.95rem; padding: 0.65rem 1.8rem;">
               💾 Guardar Opciones de Tickets
             </button>
           </div>
@@ -1665,25 +1840,31 @@
 
         <!-- PESTAÑA 3: VENTAS Y GRANEL -->
         <div id="panel-cfg-pos" class="cfg-tab-panel" style="display: none;">
-          
+
           <!-- Tarjeta Especial: Funcionalidad de Granel y Redondeo -->
           <div class="sicar-table-card" style="padding: 1.5rem; margin-bottom: 1.5rem; border-left: 4px solid #16a34a;">
-            <h3 style="font-size: 1.15rem; font-weight: 800; color: #15803d; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.5rem;">
+            <h3
+              style="font-size: 1.15rem; font-weight: 800; color: #15803d; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.5rem;">
               <span>⚖️</span> Venta a Granel, Báscula y Redondeo Entero
             </h3>
             <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 1rem;">
               Configuración para productos que se venden por fracción o kilogramo (frutas, verduras, carnes, semillas).
             </p>
 
-            <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: var(--radius-md); padding: 1rem; margin-bottom: 0.5rem;">
+            <div
+              style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: var(--radius-md); padding: 1rem; margin-bottom: 0.5rem;">
               <label style="display: flex; align-items: flex-start; gap: 0.75rem; cursor: pointer; user-select: none;">
-                <input type="checkbox" id="cfg-bulk-round-up" checked style="width: 20px; height: 20px; margin-top: 2px; accent-color: #16a34a;">
+                <input type="checkbox" id="cfg-bulk-round-up" checked
+                  style="width: 20px; height: 20px; margin-top: 2px; accent-color: #16a34a;">
                 <div>
                   <strong style="font-size: 0.95rem; color: #166534; display: block; margin-bottom: 0.2rem;">
                     🔺 Redondear importe de granel al entero superior automáticamente
                   </strong>
                   <span style="font-size: 0.82rem; color: #15803d; line-height: 1.4; display: block;">
-                    Al ingresar el peso de un producto a granel (ej. aguacate, jitomate, jamón), el importe total a cobrar se redondeará automáticamente hacia el siguiente peso entero superior (ej. <strong>$15.20 ➔ $16.00</strong>, <strong>$8.05 ➔ $9.00</strong>). Evita faltantes de monedas fraccionarias y agiliza el cambio en caja.
+                    Al ingresar el peso de un producto a granel (ej. aguacate, jitomate, jamón), el importe total a
+                    cobrar se redondeará automáticamente hacia el siguiente peso entero superior (ej. <strong>$15.20 ➔
+                      $16.00</strong>, <strong>$8.05 ➔ $9.00</strong>). Evita faltantes de monedas fraccionarias y
+                    agiliza el cambio en caja.
                   </span>
                 </div>
               </label>
@@ -1692,14 +1873,16 @@
 
           <!-- Preferencias Generales de Venta e Inventario -->
           <div class="sicar-table-card" style="padding: 1.5rem; margin-bottom: 1.5rem;">
-            <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.5rem;">
+            <h3
+              style="font-size: 1.15rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.5rem;">
               <span>⚙️</span> Preferencias Generales de Venta e Inventario
             </h3>
             <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
               Control de existencias negativas, moneda y escáner de códigos de barras.
             </p>
 
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+            <div
+              style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
               <div class="form-group">
                 <label class="form-label" style="font-weight: 700;">Símbolo de Moneda:</label>
                 <input type="text" id="cfg-currency-symbol" class="form-input" style="max-width: 120px;" value="$">
@@ -1710,19 +1893,26 @@
               </div>
               <div class="form-group">
                 <label class="form-label" style="font-weight: 700;">Prefijo de Escáner a Ignorar:</label>
-                <input type="text" id="cfg-scanner-prefix" class="form-input" style="max-width: 180px;" placeholder="Auto-limpieza activa">
-                <small style="color: var(--text-secondary); font-size: 0.72rem; display: block; margin-top: 0.2rem;">Opcional: Si tu hardware antepone caracteres fijos.</small>
+                <input type="text" id="cfg-scanner-prefix" class="form-input" style="max-width: 180px;"
+                  placeholder="Auto-limpieza activa">
+                <small
+                  style="color: var(--text-secondary); font-size: 0.72rem; display: block; margin-top: 0.2rem;">Opcional:
+                  Si tu hardware antepone caracteres fijos.</small>
               </div>
             </div>
 
-            <div style="display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap; margin-bottom: 1.5rem; padding: 0.75rem; background: #f8fafc; border-radius: var(--radius-md);">
-              <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.88rem; cursor: pointer; font-weight: 600;">
-                <input type="checkbox" id="cfg-allow-negative-stock" checked style="width: 17px; height: 17px; accent-color: var(--accent-green);">
+            <div
+              style="display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap; margin-bottom: 1.5rem; padding: 0.75rem; background: #f8fafc; border-radius: var(--radius-md);">
+              <label
+                style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.88rem; cursor: pointer; font-weight: 600;">
+                <input type="checkbox" id="cfg-allow-negative-stock" checked
+                  style="width: 17px; height: 17px; accent-color: var(--accent-green);">
                 <span>Permitir ventas cuando el producto no tenga stock registrado (evita detener el cobro)</span>
               </label>
             </div>
 
-            <button type="button" class="main-action-pill-btn" id="btn-save-pos-preferences" style="background: var(--accent-green); font-size: 0.95rem; padding: 0.65rem 1.8rem;">
+            <button type="button" class="main-action-pill-btn" id="btn-save-pos-preferences"
+              style="background: var(--accent-green); font-size: 0.95rem; padding: 0.65rem 1.8rem;">
               💾 Guardar Preferencias de Venta y Granel
             </button>
           </div>
@@ -1732,31 +1922,38 @@
         <!-- PESTAÑA 4: RESPALDOS DE SEGURIDAD -->
         <div id="panel-cfg-backups" class="cfg-tab-panel" style="display: none;">
           <div class="sicar-table-card" style="padding: 1.5rem; margin-bottom: 1.5rem;">
-            <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.5rem;">
+            <h3
+              style="font-size: 1.15rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.5rem;">
               <span>📁</span> Carpeta de Respaldos de Base de Datos
             </h3>
             <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
-              Las copias de seguridad de la base de datos se generan automáticamente al <strong>cerrar sesión</strong> o cuando pulses "Crear Respaldo Ahora".
+              Las copias de seguridad de la base de datos se generan automáticamente al <strong>cerrar sesión</strong> o
+              cuando pulses "Crear Respaldo Ahora".
             </p>
 
             <div class="form-group" style="margin-bottom: 1rem;">
               <label class="form-label" style="font-weight: 700;">Ruta de la Carpeta de Respaldos:</label>
               <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
-                <input type="text" class="form-input setting-backup-folder-input" id="setting-backup-folder-input" style="flex: 1; min-width: 260px;" placeholder="C:\PuntoDeVenta\respaldos">
-                <button type="button" class="meta-btn btn-save-backup-folder" id="btn-save-backup-folder" style="white-space: nowrap;">
+                <input type="text" class="form-input setting-backup-folder-input" id="setting-backup-folder-input"
+                  style="flex: 1; min-width: 260px;" placeholder="C:\PuntoDeVenta\respaldos">
+                <button type="button" class="meta-btn btn-save-backup-folder" id="btn-save-backup-folder"
+                  style="white-space: nowrap;">
                   💾 Guardar Carpeta
                 </button>
               </div>
             </div>
 
             <div style="display: flex; gap: 0.75rem; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap;">
-              <button type="button" class="btn-modal-accept btn-create-manual-backup" id="btn-create-manual-backup" style="background: var(--accent-green); font-size: 0.88rem; padding: 0.6rem 1.4rem;">
+              <button type="button" class="btn-modal-accept btn-create-manual-backup" id="btn-create-manual-backup"
+                style="background: var(--accent-green); font-size: 0.88rem; padding: 0.6rem 1.4rem;">
                 📦 Crear Respaldo Ahora
               </button>
-              <button type="button" class="main-action-pill-btn btn-optimize-database" id="btn-optimize-database" style="font-size: 0.88rem; padding: 0.6rem 1.2rem; background: var(--primary-blue);">
+              <button type="button" class="main-action-pill-btn btn-optimize-database" id="btn-optimize-database"
+                style="font-size: 0.88rem; padding: 0.6rem 1.2rem; background: var(--primary-blue);">
                 🧹 Optimizar Base de Datos
               </button>
-              <button type="button" class="meta-btn btn-upload-backup-file" id="btn-upload-backup-file" style="font-size: 0.88rem; padding: 0.6rem 1.2rem; display: inline-flex; align-items: center; gap: 0.35rem; cursor: pointer;">
+              <button type="button" class="meta-btn btn-upload-backup-file" id="btn-upload-backup-file"
+                style="font-size: 0.88rem; padding: 0.6rem 1.2rem; display: inline-flex; align-items: center; gap: 0.35rem; cursor: pointer;">
                 📂 Subir y Cargar Respaldo (.db)
               </button>
             </div>
@@ -1765,10 +1962,12 @@
               <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin: 0;">
                 Respaldos Disponibles en Carpeta:
               </h4>
-              <span style="font-size: 0.78rem; color: var(--text-secondary);">Haga clic en <strong>🔄 Cargar</strong> para restaurar un respaldo</span>
+              <span style="font-size: 0.78rem; color: var(--text-secondary);">Haga clic en <strong>🔄 Cargar</strong>
+                para restaurar un respaldo</span>
             </div>
             <div id="recent-backups-list" class="recent-backups-list">
-              <div style="color: var(--text-secondary); font-size: 0.85rem; padding: 0.5rem 0;">Cargando lista de respaldos...</div>
+              <div style="color: var(--text-secondary); font-size: 0.85rem; padding: 0.5rem 0;">Cargando lista de
+                respaldos...</div>
             </div>
           </div>
         </div>
@@ -1793,8 +1992,10 @@
           <div>
             <div style="font-size: 0.75rem; color: var(--text-muted);" id="modal-qty-code">PZA • 52528488</div>
             <strong style="font-size: 1.05rem;" id="modal-qty-name">Coca Cola 600 ml</strong>
-            <div style="font-size: 0.85rem; color: var(--primary-blue); font-weight: 700;" id="modal-qty-price">$18.00 MXN</div>
-            <div style="font-size: 0.75rem; color: var(--text-secondary);" id="modal-qty-exist">Existencia: 10 pzas</div>
+            <div style="font-size: 0.85rem; color: var(--primary-blue); font-weight: 700;" id="modal-qty-price">$18.00
+              MXN</div>
+            <div style="font-size: 0.75rem; color: var(--text-secondary);" id="modal-qty-exist">Existencia: 10 pzas
+            </div>
           </div>
         </div>
 
@@ -1811,55 +2012,70 @@
     </div>
   </div>
 
-  <!-- Modal 2: Conectar Móvil con Código QR -->
+  <!-- Modal 2: Realizar Inventario con Celular (Código QR) -->
   <div class="modal-overlay" id="connect-modal">
-    <div class="modal-sicar-dialog" style="max-width: 460px;">
+    <div class="modal-sicar-dialog" style="max-width: 480px;">
       <div class="modal-sicar-header">
-        <h3>📱 Terminal Móvil de Inventario</h3>
+        <h3>📋 Realizar Inventario en Celular o Tablet</h3>
         <button class="menu-toggle-btn" onclick="App.closeModal('connect-modal')">✕</button>
       </div>
       <div class="modal-sicar-body" style="text-align: center;">
         <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 0.5rem;">
-          Escanea este código QR con la cámara de tu teléfono para abrir la <strong>Terminal Móvil de Conteo y Ajuste de Inventario</strong>:
+          Escanea este código QR con la cámara de tu teléfono para abrir la terminal de <strong>Realizar Inventario</strong> (conteo de existencias, cambio de precios y fotos con la cámara):
         </p>
 
         <!-- Selector de Adaptador de Red (en caso de múltiples IPs) -->
         <div style="margin-bottom: 0.6rem; text-align: left;" id="qr-ip-container">
-          <label style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">
+          <label
+            style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">
             Red Wi-Fi / Adaptador de red:
           </label>
-          <select id="qr-ip-select" class="form-control" style="font-size: 0.82rem; padding: 0.4rem 0.6rem; background: #fff; border: 1px solid var(--border-color); border-radius: var(--radius-md); width: 100%;">
+          <select id="qr-ip-select" class="form-control"
+            style="font-size: 0.82rem; padding: 0.4rem 0.6rem; background: #fff; border: 1px solid var(--border-color); border-radius: var(--radius-md); width: 100%;">
           </select>
         </div>
 
         <div style="display: flex; justify-content: center; margin: 0.5rem 0;">
-          <div style="background:#fff; padding: 0.75rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); border: 1px solid var(--border-color); display: inline-block;">
-            <img id="qr-image" alt="Código QR Móvil" style="width: 220px; height: 220px; display: block; margin: 0 auto; object-fit: contain;" />
+          <div
+            style="background:#fff; padding: 0.75rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); border: 1px solid var(--border-color); display: inline-block;">
+            <img id="qr-image" alt="Código QR Móvil"
+              style="width: 220px; height: 220px; display: block; margin: 0 auto; object-fit: contain;" />
             <canvas id="qr-canvas" style="display: none;"></canvas>
           </div>
         </div>
 
         <div style="margin: 0.6rem 0;">
-          <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.3rem;">O ingresa esta URL en el navegador de tu celular:</div>
-          <div style="background: var(--bg-subtle); border: 1px solid var(--border-color); padding: 0.55rem 1rem; border-radius: var(--radius-pill); font-family: var(--font-mono); font-weight: 700; color: var(--primary-blue); word-break: break-all;" id="qr-network-url">
+          <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.3rem;">O ingresa esta URL en el
+            navegador de tu celular:</div>
+          <div
+            style="background: var(--bg-subtle); border: 1px solid var(--border-color); padding: 0.55rem 1rem; border-radius: var(--radius-pill); font-family: var(--font-mono); font-weight: 700; color: var(--primary-blue); word-break: break-all;"
+            id="qr-network-url">
             http://...
           </div>
         </div>
 
-        <div style="display: flex; gap: 0.5rem; justify-content: center; margin-top: 0.5rem;">
+        <div style="display: flex; gap: 0.5rem; justify-content: center; margin-top: 0.5rem; flex-wrap: wrap;">
           <button class="meta-btn" style="justify-content: center; padding: 0.6rem 1.2rem;" id="btn-copy-url">
             📋 Copiar Enlace
+          </button>
+          <button type="button" class="btn-modal-accept" style="justify-content: center; padding: 0.6rem 1.2rem;" onclick="App.closeModal('connect-modal'); App.switchView('inventory-adjust');">
+            🖥️ Abrir en esta PC
           </button>
         </div>
 
         <!-- Caja de Ayuda y Diagnóstico de Red / Firewall -->
-        <div style="margin-top: 1rem; text-align: left; background: #fffbeb; border: 1px solid #fef3c7; border-radius: var(--radius-md); padding: 0.75rem; font-size: 0.78rem; color: #92400e; line-height: 1.45;">
+        <div
+          style="margin-top: 1rem; text-align: left; background: #fffbeb; border: 1px solid #fef3c7; border-radius: var(--radius-md); padding: 0.75rem; font-size: 0.78rem; color: #92400e; line-height: 1.45;">
           <strong style="display: flex; align-items: center; gap: 0.35rem; margin-bottom: 0.3rem;">
             <span>💡</span> ¿Tu celular no carga la página?
           </strong>
           <ul style="margin: 0; padding-left: 1.2rem;">
-            <li><strong>Mismo Wi-Fi:</strong> El teléfono debe estar en la misma red Wi-Fi de esta PC (desactiva datos celulares mientras te conectas).</li>
-            <li><strong>Bloqueo por Firewall de Windows:</strong> Si el celular marca <em>"No se puede acceder al sitio"</em>, ejecuta el archivo <code style="background: #fde68a; padding: 1px 4px; border-radius: 3px; font-weight: 700;">habilitar_acceso_celular.bat</code> en la carpeta del sistema dando <em>Clic derecho &gt; Ejecutar como administrador</em>.</li>
+            <li><strong>Mismo Wi-Fi:</strong> El teléfono debe estar en la misma red Wi-Fi de esta PC (desactiva datos
+              celulares mientras te conectas).</li>
+            <li><strong>Bloqueo por Firewall de Windows:</strong> Si el celular marca <em>"No se puede acceder al
+                sitio"</em>, ejecuta el archivo <code
+                style="background: #fde68a; padding: 1px 4px; border-radius: 3px; font-weight: 700;">habilitar_acceso_celular.bat</code>
+              en la carpeta del sistema dando <em>Clic derecho &gt; Ejecutar como administrador</em>.</li>
           </ul>
         </div>
       </div>
@@ -1874,22 +2090,30 @@
         <button class="menu-toggle-btn" onclick="App.closeModal('checkout-modal')">✕</button>
       </div>
       <div class="modal-sicar-body">
-        
-        <div style="text-align: center; background: var(--primary-blue-light); padding: 1.25rem; border-radius: var(--radius-lg);">
-          <span style="font-size: 0.8rem; text-transform: uppercase; color: var(--primary-blue); font-weight: 700;">Total a Cobrar</span>
-          <div style="font-size: 2.5rem; font-weight: 900; font-family: var(--font-mono); color: var(--primary-blue);" id="checkout-total-val">$0.00</div>
+
+        <div
+          style="text-align: center; background: var(--primary-blue-light); padding: 1.25rem; border-radius: var(--radius-lg);">
+          <span
+            style="font-size: 0.8rem; text-transform: uppercase; color: var(--primary-blue); font-weight: 700;">Total a
+            Cobrar</span>
+          <div style="font-size: 2.5rem; font-weight: 900; font-family: var(--font-mono); color: var(--primary-blue);"
+            id="checkout-total-val">$0.00</div>
         </div>
 
         <!-- Cliente asignado a esta venta -->
-        <div id="checkout-customer-bar" style="display: flex; align-items: center; justify-content: space-between; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.55rem 0.85rem; margin-top: -0.25rem;">
+        <div id="checkout-customer-bar"
+          style="display: flex; align-items: center; justify-content: space-between; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.55rem 0.85rem; margin-top: -0.25rem;">
           <div style="display: flex; align-items: center; gap: 0.5rem;">
             <span style="font-size: 1.15rem;">👤</span>
             <div>
-              <span style="font-size: 0.72rem; color: #64748b; display: block; line-height: 1;">Cliente en esta venta:</span>
-              <strong id="checkout-customer-name-display" style="font-size: 0.88rem; color: #1e293b;">Público General</strong>
+              <span style="font-size: 0.72rem; color: #64748b; display: block; line-height: 1;">Cliente en esta
+                venta:</span>
+              <strong id="checkout-customer-name-display" style="font-size: 0.88rem; color: #1e293b;">Público
+                General</strong>
             </div>
           </div>
-          <button type="button" class="btn-secondary" onclick="PosModule.openCustomerSelectModal()" style="padding: 0.25rem 0.65rem; font-size: 0.78rem; font-weight: 700; border-radius: 6px; cursor: pointer;">
+          <button type="button" class="btn-secondary" onclick="PosModule.openCustomerSelectModal()"
+            style="padding: 0.25rem 0.65rem; font-size: 0.78rem; font-weight: 700; border-radius: 6px; cursor: pointer;">
             Cambiar
           </button>
         </div>
@@ -1906,7 +2130,8 @@
             <span style="font-size: 1.3rem;">💳</span>
             <span style="font-size: 0.75rem; font-weight: 700;">Tarjeta</span>
           </button>
-          <button type="button" class="meta-btn payment-method-card" data-method="TRANSFERENCIA" id="btn-pm-transferencia">
+          <button type="button" class="meta-btn payment-method-card" data-method="TRANSFERENCIA"
+            id="btn-pm-transferencia">
             <span class="pos-kbd-badge">F4</span>
             <span style="font-size: 1.3rem;">📲</span>
             <span style="font-size: 0.75rem; font-weight: 700;">Transf.</span>
@@ -1920,30 +2145,44 @@
 
         <!-- Efectivo & Billetes rápidos -->
         <div id="cash-payment-fields">
-          <label style="font-size: 0.82rem; color: var(--text-secondary); display: block; margin-bottom: 0.3rem;">¿Con cuánto paga el cliente?</label>
-          <input type="number" id="checkout-paid-input" class="sub-search-input" style="background:#fff; font-size: 1.4rem; font-weight: 800; text-align: center;" placeholder="0.00" step="0.5">
+          <label style="font-size: 0.82rem; color: var(--text-secondary); display: block; margin-bottom: 0.3rem;">¿Con
+            cuánto paga el cliente?</label>
+          <input type="number" id="checkout-paid-input" class="sub-search-input"
+            style="background:#fff; font-size: 1.4rem; font-weight: 800; text-align: center;" placeholder="0.00"
+            step="0.5">
 
           <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.4rem; margin-top: 0.5rem;">
-            <button class="meta-btn bill-btn" data-amount="exact" style="padding: 0.5rem 0.2rem; justify-content: center; font-size: 0.75rem;">Exacto</button>
-            <button class="meta-btn bill-btn" data-amount="50" style="padding: 0.5rem 0.2rem; justify-content: center;">$50</button>
-            <button class="meta-btn bill-btn" data-amount="100" style="padding: 0.5rem 0.2rem; justify-content: center;">$100</button>
-            <button class="meta-btn bill-btn" data-amount="200" style="padding: 0.5rem 0.2rem; justify-content: center;">$200</button>
-            <button class="meta-btn bill-btn" data-amount="500" style="padding: 0.5rem 0.2rem; justify-content: center;">$500</button>
+            <button class="meta-btn bill-btn" data-amount="exact"
+              style="padding: 0.5rem 0.2rem; justify-content: center; font-size: 0.75rem;">Exacto</button>
+            <button class="meta-btn bill-btn" data-amount="50"
+              style="padding: 0.5rem 0.2rem; justify-content: center;">$50</button>
+            <button class="meta-btn bill-btn" data-amount="100"
+              style="padding: 0.5rem 0.2rem; justify-content: center;">$100</button>
+            <button class="meta-btn bill-btn" data-amount="200"
+              style="padding: 0.5rem 0.2rem; justify-content: center;">$200</button>
+            <button class="meta-btn bill-btn" data-amount="500"
+              style="padding: 0.5rem 0.2rem; justify-content: center;">$500</button>
           </div>
 
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.85rem; padding: 0.75rem 1rem; background: var(--bg-subtle); border-radius: var(--radius-md);">
+          <div
+            style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.85rem; padding: 0.75rem 1rem; background: var(--bg-subtle); border-radius: var(--radius-md);">
             <strong style="font-size: 1rem;">Cambio:</strong>
-            <span style="font-size: 1.6rem; font-weight: 900; font-family: var(--font-mono); color: var(--accent-green-dark);" id="checkout-change-val">$0.00</span>
+            <span
+              style="font-size: 1.6rem; font-weight: 900; font-family: var(--font-mono); color: var(--accent-green-dark);"
+              id="checkout-change-val">$0.00</span>
           </div>
         </div>
 
         <!-- Fiado Fields -->
         <div id="fiado-payment-fields" style="display: none;">
-          <label style="font-size: 0.82rem; color: var(--text-secondary); display: block; margin-bottom: 0.3rem;">Seleccionar Cliente para Fiado:</label>
+          <label
+            style="font-size: 0.82rem; color: var(--text-secondary); display: block; margin-bottom: 0.3rem;">Seleccionar
+            Cliente para Fiado:</label>
           <select id="checkout-customer-select" class="sub-search-input" style="background:#fff;"></select>
         </div>
 
-        <button type="button" class="btn-modal-accept" id="confirm-checkout-btn" style="display: flex; align-items: center; justify-content: center; gap: 0.6rem; width: 100%; font-size: 1.05rem; font-weight: 800; cursor: pointer;">
+        <button type="button" class="btn-modal-accept" id="confirm-checkout-btn"
+          style="display: flex; align-items: center; justify-content: center; gap: 0.6rem; width: 100%; font-size: 1.05rem; font-weight: 800; cursor: pointer;">
           <span>COMPLETAR VENTA</span>
           <span class="pos-enter-badge">Enter ↵</span>
         </button>
@@ -1960,17 +2199,22 @@
       </div>
       <div class="modal-sicar-body">
         <div>
-          <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.3rem;">Número de Teléfono (10 dígitos):</label>
-          <input type="tel" id="recharge-phone-input" class="sub-search-input" style="background:#fff; font-size: 1.2rem; font-weight: 700; text-align: center;" placeholder="55 1234 5678" maxlength="10">
+          <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.3rem;">Número
+            de Teléfono (10 dígitos):</label>
+          <input type="tel" id="recharge-phone-input" class="sub-search-input"
+            style="background:#fff; font-size: 1.2rem; font-weight: 700; text-align: center;" placeholder="55 1234 5678"
+            maxlength="10">
         </div>
 
         <div>
-          <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.4rem;">Monto de la Recarga:</label>
+          <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.4rem;">Monto
+            de la Recarga:</label>
           <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem;">
             <button class="meta-btn" onclick="MultiservicesModule.selectAmount(20)">$20</button>
             <button class="meta-btn" onclick="MultiservicesModule.selectAmount(30)">$30</button>
             <button class="meta-btn" onclick="MultiservicesModule.selectAmount(50)">$50</button>
-            <button class="meta-btn" onclick="MultiservicesModule.selectAmount(100)" style="border-color: var(--primary-blue); font-weight: 800;">$100</button>
+            <button class="meta-btn" onclick="MultiservicesModule.selectAmount(100)"
+              style="border-color: var(--primary-blue); font-weight: 800;">$100</button>
             <button class="meta-btn" onclick="MultiservicesModule.selectAmount(200)">$200</button>
             <button class="meta-btn" onclick="MultiservicesModule.selectAmount(500)">$500</button>
           </div>
@@ -1994,51 +2238,76 @@
       <div class="modal-sicar-body">
         <div style="text-align: center;">
           <h4 id="bulk-product-title" style="font-size: 1.15rem; font-weight: 800;">Producto</h4>
-          <span id="bulk-price-ref" style="font-size: 0.9rem; color: var(--primary-blue); font-weight: 700;">$0.00 / kg</span>
+          <span id="bulk-price-ref" style="font-size: 0.9rem; color: var(--primary-blue); font-weight: 700;">$0.00 /
+            kg</span>
         </div>
 
         <div>
-          <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Peso en Kilogramos (kg):</label>
-          <input type="number" id="bulk-weight-input" class="sub-search-input" style="background:#fff; font-size: 1.3rem; font-weight: 800; text-align: center;" step="0.005" value="1.000">
+          <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Peso
+            en Kilogramos (kg):</label>
+          <input type="number" id="bulk-weight-input" class="sub-search-input"
+            style="background:#fff; font-size: 1.3rem; font-weight: 800; text-align: center;" step="0.005"
+            value="1.000">
         </div>
 
         <!-- Botones rápidos de peso -->
         <div style="display: flex; gap: 0.35rem; margin-top: 0.35rem; justify-content: center; flex-wrap: wrap;">
-          <button type="button" class="btn-secondary" onclick="PosModule.setBulkWeight(0.250)" style="padding: 0.2rem 0.55rem; font-size: 0.78rem; font-weight: 700;">¼ kg</button>
-          <button type="button" class="btn-secondary" onclick="PosModule.setBulkWeight(0.500)" style="padding: 0.2rem 0.55rem; font-size: 0.78rem; font-weight: 700;">½ kg</button>
-          <button type="button" class="btn-secondary" onclick="PosModule.setBulkWeight(0.750)" style="padding: 0.2rem 0.55rem; font-size: 0.78rem; font-weight: 700;">¾ kg</button>
-          <button type="button" class="btn-secondary" onclick="PosModule.setBulkWeight(1.000)" style="padding: 0.2rem 0.55rem; font-size: 0.78rem; font-weight: 700;">1.0 kg</button>
-          <button type="button" class="btn-secondary" onclick="PosModule.setBulkWeight(2.000)" style="padding: 0.2rem 0.55rem; font-size: 0.78rem; font-weight: 700;">2.0 kg</button>
+          <button type="button" class="btn-secondary" onclick="PosModule.setBulkWeight(0.250)"
+            style="padding: 0.2rem 0.55rem; font-size: 0.78rem; font-weight: 700;">¼ kg</button>
+          <button type="button" class="btn-secondary" onclick="PosModule.setBulkWeight(0.500)"
+            style="padding: 0.2rem 0.55rem; font-size: 0.78rem; font-weight: 700;">½ kg</button>
+          <button type="button" class="btn-secondary" onclick="PosModule.setBulkWeight(0.750)"
+            style="padding: 0.2rem 0.55rem; font-size: 0.78rem; font-weight: 700;">¾ kg</button>
+          <button type="button" class="btn-secondary" onclick="PosModule.setBulkWeight(1.000)"
+            style="padding: 0.2rem 0.55rem; font-size: 0.78rem; font-weight: 700;">1.0 kg</button>
+          <button type="button" class="btn-secondary" onclick="PosModule.setBulkWeight(2.000)"
+            style="padding: 0.2rem 0.55rem; font-size: 0.78rem; font-weight: 700;">2.0 kg</button>
         </div>
 
-        <div style="text-align: center; color: var(--text-muted); font-size: 0.8rem; margin: 0.4rem 0;">— O bien importe deseado —</div>
+        <div style="text-align: center; color: var(--text-muted); font-size: 0.8rem; margin: 0.4rem 0;">— O bien importe
+          deseado —</div>
 
         <div>
-          <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Importe en Dinero ($ Pesos):</label>
-          <input type="number" id="bulk-money-input" class="sub-search-input" style="background:#fff; font-size: 1.3rem; font-weight: 800; text-align: center; color: var(--accent-green-dark);" step="1.0">
+          <label
+            style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Importe en
+            Dinero ($ Pesos):</label>
+          <input type="number" id="bulk-money-input" class="sub-search-input"
+            style="background:#fff; font-size: 1.3rem; font-weight: 800; text-align: center; color: var(--accent-green-dark);"
+            step="1.0">
         </div>
 
         <!-- Botones rápidos de dinero -->
         <div style="display: flex; gap: 0.35rem; margin-top: 0.35rem; justify-content: center; flex-wrap: wrap;">
-          <button type="button" class="btn-secondary" onclick="PosModule.setBulkMoney(10)" style="padding: 0.2rem 0.55rem; font-size: 0.78rem; font-weight: 700;">$10</button>
-          <button type="button" class="btn-secondary" onclick="PosModule.setBulkMoney(20)" style="padding: 0.2rem 0.55rem; font-size: 0.78rem; font-weight: 700;">$20</button>
-          <button type="button" class="btn-secondary" onclick="PosModule.setBulkMoney(30)" style="padding: 0.2rem 0.55rem; font-size: 0.78rem; font-weight: 700;">$30</button>
-          <button type="button" class="btn-secondary" onclick="PosModule.setBulkMoney(50)" style="padding: 0.2rem 0.55rem; font-size: 0.78rem; font-weight: 700;">$50</button>
-          <button type="button" class="btn-secondary" onclick="PosModule.setBulkMoney(100)" style="padding: 0.2rem 0.55rem; font-size: 0.78rem; font-weight: 700;">$100</button>
+          <button type="button" class="btn-secondary" onclick="PosModule.setBulkMoney(10)"
+            style="padding: 0.2rem 0.55rem; font-size: 0.78rem; font-weight: 700;">$10</button>
+          <button type="button" class="btn-secondary" onclick="PosModule.setBulkMoney(20)"
+            style="padding: 0.2rem 0.55rem; font-size: 0.78rem; font-weight: 700;">$20</button>
+          <button type="button" class="btn-secondary" onclick="PosModule.setBulkMoney(30)"
+            style="padding: 0.2rem 0.55rem; font-size: 0.78rem; font-weight: 700;">$30</button>
+          <button type="button" class="btn-secondary" onclick="PosModule.setBulkMoney(50)"
+            style="padding: 0.2rem 0.55rem; font-size: 0.78rem; font-weight: 700;">$50</button>
+          <button type="button" class="btn-secondary" onclick="PosModule.setBulkMoney(100)"
+            style="padding: 0.2rem 0.55rem; font-size: 0.78rem; font-weight: 700;">$100</button>
         </div>
 
         <!-- Módulo de Redondeo al Entero Superior -->
-        <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: var(--radius-md); padding: 0.65rem 0.85rem; margin: 0.8rem 0 0.5rem;">
+        <div
+          style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: var(--radius-md); padding: 0.65rem 0.85rem; margin: 0.8rem 0 0.5rem;">
           <div style="display: flex; align-items: center; justify-content: space-between;">
-            <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; font-weight: 700; color: #166534; cursor: pointer; user-select: none;">
-              <input type="checkbox" id="bulk-round-up-checkbox" checked style="width: 17px; height: 17px; accent-color: #16a34a;">
+            <label
+              style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; font-weight: 700; color: #166534; cursor: pointer; user-select: none;">
+              <input type="checkbox" id="bulk-round-up-checkbox" checked
+                style="width: 17px; height: 17px; accent-color: #16a34a;">
               <span>🔺 Redondear al superior entero</span>
             </label>
-            <span id="bulk-rounding-badge" style="font-size: 0.72rem; font-weight: 800; background: #dcfce7; color: #15803d; padding: 0.15rem 0.45rem; border-radius: 4px;">ACTIVO</span>
+            <span id="bulk-rounding-badge"
+              style="font-size: 0.72rem; font-weight: 800; background: #dcfce7; color: #15803d; padding: 0.15rem 0.45rem; border-radius: 4px;">ACTIVO</span>
           </div>
-          <div id="bulk-calc-comparison" style="font-size: 0.8rem; color: #166534; margin-top: 0.35rem; display: flex; justify-content: space-between; align-items: center;">
+          <div id="bulk-calc-comparison"
+            style="font-size: 0.8rem; color: #166534; margin-top: 0.35rem; display: flex; justify-content: space-between; align-items: center;">
             <span>Exacto: <strong id="bulk-exact-money">$0.00</strong></span>
-            <span>➔ Cobrar: <strong id="bulk-rounded-money" style="font-size: 1rem; color: #15803d;">$0.00</strong></span>
+            <span>➔ Cobrar: <strong id="bulk-rounded-money"
+                style="font-size: 1rem; color: #15803d;">$0.00</strong></span>
           </div>
         </div>
 
@@ -2058,54 +2327,76 @@
       </div>
       <div class="modal-sicar-body">
         <!-- Sección para Tomar Foto al Producto -->
-        <div style="display: flex; flex-direction: column; align-items: center; gap: 0.6rem; padding: 0.8rem; background: var(--bg-subtle); border-radius: var(--radius-md); border: 1px dashed var(--border-color);">
-          <div style="position: relative; width: 110px; height: 110px; border-radius: var(--radius-md); background: #ffffff; border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; overflow: hidden;" id="product-photo-preview-box">
+        <div
+          style="display: flex; flex-direction: column; align-items: center; gap: 0.6rem; padding: 0.8rem; background: var(--bg-subtle); border-radius: var(--radius-md); border: 1px dashed var(--border-color);">
+          <div
+            style="position: relative; width: 110px; height: 110px; border-radius: var(--radius-md); background: #ffffff; border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; overflow: hidden;"
+            id="product-photo-preview-box">
             <span id="product-photo-placeholder" style="font-size: 3rem; color: var(--text-muted);">📷</span>
-            <img id="product-photo-img" src="" style="display: none; width: 100%; height: 100%; object-fit: cover;" alt="Foto del producto">
-            <button type="button" id="btn-remove-photo" onclick="InventoryModule.removeSelectedPhoto()" style="display: none; position: absolute; top: 4px; right: 4px; background: rgba(239, 68, 68, 0.9); color: #fff; border: none; border-radius: 50%; width: 22px; height: 22px; font-size: 0.75rem; cursor: pointer;" title="Eliminar foto">✕</button>
+            <img id="product-photo-img" src="" style="display: none; width: 100%; height: 100%; object-fit: cover;"
+              alt="Foto del producto">
+            <button type="button" id="btn-remove-photo" onclick="InventoryModule.removeSelectedPhoto()"
+              style="display: none; position: absolute; top: 4px; right: 4px; background: rgba(239, 68, 68, 0.9); color: #fff; border: none; border-radius: 50%; width: 22px; height: 22px; font-size: 0.75rem; cursor: pointer;"
+              title="Eliminar foto">✕</button>
           </div>
           <input type="hidden" id="prod-form-image-url" value="">
-          
+
           <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center;">
-            <button type="button" class="meta-btn" id="btn-open-camera" onclick="InventoryModule.startCamera()" style="border-color: var(--primary-blue); font-weight: 700;">
+            <button type="button" class="meta-btn" id="btn-open-camera" onclick="InventoryModule.startCamera()"
+              style="border-color: var(--primary-blue); font-weight: 700;">
               📸 Tomar Foto
             </button>
             <label class="meta-btn" style="cursor: pointer;">
               📁 Galería
-              <input type="file" id="prod-photo-file-input" accept="image/*" capture="environment" onchange="InventoryModule.handleFilePhotoSelect(event)" style="display: none;">
+              <input type="file" id="prod-photo-file-input" accept="image/*" capture="environment"
+                onchange="InventoryModule.handleFilePhotoSelect(event)" style="display: none;">
             </label>
           </div>
         </div>
 
         <div>
-          <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Código de Barras:</label>
-          <input type="text" id="prod-form-barcode" class="sub-search-input" style="background:#fff;" placeholder="75010553...">
+          <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Código
+            de Barras:</label>
+          <input type="text" id="prod-form-barcode" class="sub-search-input" style="background:#fff;"
+            placeholder="75010553...">
         </div>
         <div>
-          <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Nombre del Producto:</label>
-          <input type="text" id="prod-form-name" class="sub-search-input" style="background:#fff;" placeholder="ej. Papas Sabritas 45g">
+          <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Nombre
+            del Producto:</label>
+          <input type="text" id="prod-form-name" class="sub-search-input" style="background:#fff;"
+            placeholder="ej. Papas Sabritas 45g">
         </div>
         <div>
-          <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Categoría:</label>
+          <label
+            style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Categoría:</label>
           <select id="prod-form-category" class="sub-search-input" style="background:#fff;"></select>
         </div>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem;">
           <div>
-            <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Precio Costo ($):</label>
-            <input type="number" id="prod-form-cost" class="sub-search-input" style="background:#fff;" step="0.5" placeholder="0.00">
+            <label
+              style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Precio
+              Costo ($):</label>
+            <input type="number" id="prod-form-cost" class="sub-search-input" style="background:#fff;" step="0.5"
+              placeholder="0.00">
           </div>
           <div>
-            <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Precio Venta ($):</label>
-            <input type="number" id="prod-form-price" class="sub-search-input" style="background:#fff;" step="0.5" placeholder="0.00">
+            <label
+              style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Precio
+              Venta ($):</label>
+            <input type="number" id="prod-form-price" class="sub-search-input" style="background:#fff;" step="0.5"
+              placeholder="0.00">
           </div>
         </div>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem;">
           <div>
-            <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Stock Inicial:</label>
+            <label
+              style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Stock
+              Inicial:</label>
             <input type="number" id="prod-form-stock" class="sub-search-input" style="background:#fff;" value="10">
           </div>
           <div>
-            <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Unidad:</label>
+            <label
+              style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Unidad:</label>
             <select id="prod-form-unit" class="sub-search-input" style="background:#fff;">
               <option value="pz">Pieza (pz)</option>
               <option value="kg">Kilo (kg)</option>
@@ -2133,17 +2424,23 @@
         <button class="menu-toggle-btn" onclick="App.closeModal('ticket-modal')">✕</button>
       </div>
       <div class="modal-sicar-body" style="padding: 1rem;">
-        <div id="receipt-content" style="background: #fff; font-family: monospace; font-size: 0.85rem; padding: 1rem; border: 1px dashed #cbd5e1; border-radius: 4px;">
+        <div id="receipt-content"
+          style="background: #fff; font-family: monospace; font-size: 0.85rem; padding: 1rem; border: 1px dashed #cbd5e1; border-radius: 4px;">
           <!-- Ticket dinámico -->
         </div>
 
-        <div class="ticket-modal-actions no-print" style="margin-top: 1rem; display: flex; flex-direction: column; gap: 0.55rem;">
-          <button type="button" class="btn-whatsapp-ticket" id="btn-ticket-whatsapp" onclick="PosModule.sendTicketViaWhatsApp()" style="display: flex; align-items: center; justify-content: center; gap: 0.55rem; width: 100%; padding: 0.75rem 1rem; font-size: 0.95rem; font-weight: 800; border-radius: 8px; box-shadow: 0 3px 10px rgba(22, 163, 74, 0.35);">
+        <div class="ticket-modal-actions no-print"
+          style="margin-top: 1rem; display: flex; flex-direction: column; gap: 0.55rem;">
+          <button type="button" class="btn-whatsapp-ticket" id="btn-ticket-whatsapp"
+            onclick="PosModule.sendTicketViaWhatsApp()"
+            style="display: flex; align-items: center; justify-content: center; gap: 0.55rem; width: 100%; padding: 0.75rem 1rem; font-size: 0.95rem; font-weight: 800; border-radius: 8px; box-shadow: 0 3px 10px rgba(22, 163, 74, 0.35);">
             <span style="font-size: 1.3rem; line-height: 1;">💬</span>
             <span id="ticket-whatsapp-text">Enviar Ticket por WhatsApp</span>
           </button>
 
-          <button type="button" class="meta-btn" onclick="PosModule.sendTicketAsImageToWhatsApp()" style="width: 100%; font-size: 0.8rem; padding: 0.45rem; display: flex; align-items: center; justify-content: center; gap: 0.4rem; background: #f8fafc; border: 1px dashed #cbd5e1; color: #475569;" title="Generar y enviar ticket como imagen PNG">
+          <button type="button" class="meta-btn" onclick="PosModule.sendTicketAsImageToWhatsApp()"
+            style="width: 100%; font-size: 0.8rem; padding: 0.45rem; display: flex; align-items: center; justify-content: center; gap: 0.4rem; background: #f8fafc; border: 1px dashed #cbd5e1; color: #475569;"
+            title="Generar y enviar ticket como imagen PNG">
             <span>🖼️</span> Enviar o Descargar como Imagen
           </button>
 
@@ -2168,27 +2465,35 @@
         <button class="menu-toggle-btn" onclick="App.closeModal('modal-ticket-image')">✕</button>
       </div>
       <div class="modal-sicar-body" style="padding: 1rem; text-align: center;">
-        
-        <div id="ticket-image-alert" style="background: #f0fdf4; border: 1px solid #bbf7d0; color: #15803d; padding: 0.65rem 0.85rem; border-radius: 8px; font-size: 0.82rem; font-weight: 600; margin-bottom: 0.85rem; text-align: left; display: flex; align-items: center; gap: 0.5rem;">
+
+        <div id="ticket-image-alert"
+          style="background: #f0fdf4; border: 1px solid #bbf7d0; color: #15803d; padding: 0.65rem 0.85rem; border-radius: 8px; font-size: 0.82rem; font-weight: 600; margin-bottom: 0.85rem; text-align: left; display: flex; align-items: center; gap: 0.5rem;">
           <span style="font-size: 1.25rem;">📋</span>
-          <span id="ticket-image-alert-text">¡Imagen copiada al portapapeles! En WhatsApp presiona <strong>Ctrl + V</strong> para pegar y enviar.</span>
+          <span id="ticket-image-alert-text">¡Imagen copiada al portapapeles! En WhatsApp presiona <strong>Ctrl +
+              V</strong> para pegar y enviar.</span>
         </div>
 
-        <div style="max-height: 380px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.5rem; background: #f8fafc; margin-bottom: 1rem; box-shadow: inset 0 2px 4px rgba(0,0,0,0.04);">
-          <img id="ticket-preview-img" src="" alt="Ticket PNG" style="width: 100%; height: auto; display: block; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        <div
+          style="max-height: 380px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.5rem; background: #f8fafc; margin-bottom: 1rem; box-shadow: inset 0 2px 4px rgba(0,0,0,0.04);">
+          <img id="ticket-preview-img" src="" alt="Ticket PNG"
+            style="width: 100%; height: auto; display: block; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
         </div>
 
         <div style="display: flex; flex-direction: column; gap: 0.55rem;">
-          <button type="button" class="btn-whatsapp-ticket" id="btn-open-wa-chat" onclick="PosModule.openWhatsAppChatWithImage()" style="width: 100%; padding: 0.7rem 1rem; font-size: 0.95rem; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+          <button type="button" class="btn-whatsapp-ticket" id="btn-open-wa-chat"
+            onclick="PosModule.openWhatsAppChatWithImage()"
+            style="width: 100%; padding: 0.7rem 1rem; font-size: 0.95rem; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
             <span style="font-size: 1.2rem;">💬</span>
             <span id="btn-open-wa-label">Abrir Chat de WhatsApp</span>
           </button>
 
           <div style="display: flex; gap: 0.5rem;">
-            <button type="button" class="btn-secondary" onclick="PosModule.copyTicketImageToClipboard()" style="flex: 1; padding: 0.55rem; font-size: 0.82rem; font-weight: 700; border-radius: 6px; display: flex; align-items: center; justify-content: center; gap: 0.35rem; background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe;">
+            <button type="button" class="btn-secondary" onclick="PosModule.copyTicketImageToClipboard()"
+              style="flex: 1; padding: 0.55rem; font-size: 0.82rem; font-weight: 700; border-radius: 6px; display: flex; align-items: center; justify-content: center; gap: 0.35rem; background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe;">
               <span>📋</span> <span>Copiar Imagen</span>
             </button>
-            <button type="button" class="btn-secondary" onclick="PosModule.downloadTicketImage()" style="flex: 1; padding: 0.55rem; font-size: 0.82rem; font-weight: 700; border-radius: 6px; display: flex; align-items: center; justify-content: center; gap: 0.35rem;">
+            <button type="button" class="btn-secondary" onclick="PosModule.downloadTicketImage()"
+              style="flex: 1; padding: 0.55rem; font-size: 0.82rem; font-weight: 700; border-radius: 6px; display: flex; align-items: center; justify-content: center; gap: 0.35rem;">
               <span>⬇️</span> <span>Descargar PNG</span>
             </button>
           </div>
@@ -2208,24 +2513,35 @@
       <div class="modal-sicar-body">
         <input type="hidden" id="cust-form-id" value="">
         <div>
-          <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Nombre Completo *:</label>
-          <input type="text" id="cust-form-name" class="sub-search-input" style="background:#fff;" placeholder="ej. Don Pedro">
+          <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Nombre
+            Completo *:</label>
+          <input type="text" id="cust-form-name" class="sub-search-input" style="background:#fff;"
+            placeholder="ej. Don Pedro">
         </div>
         <div>
-          <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Teléfono / WhatsApp (10 dígitos):</label>
-          <input type="tel" id="cust-form-phone" class="sub-search-input" style="background:#fff;" placeholder="ej. 5512345678">
+          <label
+            style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Teléfono /
+            WhatsApp (10 dígitos):</label>
+          <input type="tel" id="cust-form-phone" class="sub-search-input" style="background:#fff;"
+            placeholder="ej. 5512345678">
         </div>
         <div>
-          <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Dirección:</label>
-          <input type="text" id="cust-form-address" class="sub-search-input" style="background:#fff;" placeholder="ej. Calle Reforma #10">
+          <label
+            style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Dirección:</label>
+          <input type="text" id="cust-form-address" class="sub-search-input" style="background:#fff;"
+            placeholder="ej. Calle Reforma #10">
         </div>
         <div>
-          <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Límite de Crédito ($) — 0 = Sin límite:</label>
-          <input type="number" id="cust-form-limit" class="sub-search-input" style="background:#fff;" value="1500.00" step="0.01">
+          <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Límite
+            de Crédito ($) — 0 = Sin límite:</label>
+          <input type="number" id="cust-form-limit" class="sub-search-input" style="background:#fff;" value="1500.00"
+            step="0.01">
         </div>
         <div>
-          <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Notas:</label>
-          <input type="text" id="cust-form-notes" class="sub-search-input" style="background:#fff;" placeholder="ej. Paga quincenal">
+          <label
+            style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Notas:</label>
+          <input type="text" id="cust-form-notes" class="sub-search-input" style="background:#fff;"
+            placeholder="ej. Paga quincenal">
         </div>
         <button class="btn-modal-accept" id="btn-save-customer">
           💾 GUARDAR CLIENTE
@@ -2245,17 +2561,24 @@
         <div style="text-align: center;">
           <h4 id="payment-customer-name" style="font-size: 1.1rem; font-weight: 800;">Cliente</h4>
           <div style="font-size: 0.8rem; color: var(--text-secondary);">Deuda Actual:</div>
-          <div id="payment-current-debt" style="font-size: 1.8rem; font-weight: 900; font-family: var(--font-mono); color: var(--accent-red);">$0.00</div>
+          <div id="payment-current-debt"
+            style="font-size: 1.8rem; font-weight: 900; font-family: var(--font-mono); color: var(--accent-red);">$0.00
+          </div>
         </div>
 
         <div>
-          <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Monto a pagar hoy ($):</label>
-          <input type="number" id="payment-amount-input" class="sub-search-input" style="background:#fff; font-size: 1.4rem; font-weight: 800; text-align: center;">
+          <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Monto
+            a pagar hoy ($):</label>
+          <input type="number" id="payment-amount-input" class="sub-search-input"
+            style="background:#fff; font-size: 1.4rem; font-weight: 800; text-align: center;">
         </div>
 
         <div>
-          <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Concepto / Nota:</label>
-          <input type="text" id="payment-notes-input" class="sub-search-input" style="background:#fff;" value="Abono en efectivo">
+          <label
+            style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">Concepto /
+            Nota:</label>
+          <input type="text" id="payment-notes-input" class="sub-search-input" style="background:#fff;"
+            value="Abono en efectivo">
         </div>
 
         <button class="btn-modal-accept" id="btn-save-payment">
@@ -2273,14 +2596,17 @@
         <button class="menu-toggle-btn" onclick="App.closeModal('customer-history-modal')">✕</button>
       </div>
       <div class="modal-sicar-body" style="padding: 0;">
-        <div style="padding: 1rem 1.25rem; background: var(--bg-subtle); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+        <div
+          style="padding: 1rem 1.25rem; background: var(--bg-subtle); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
           <div>
             <div style="font-size: 0.75rem; color: var(--text-secondary);">Cliente</div>
             <div id="history-cust-name" style="font-size: 1.05rem; font-weight: 800;">—</div>
           </div>
           <div style="text-align: right;">
             <div style="font-size: 0.75rem; color: var(--text-secondary);">Saldo Actual</div>
-            <div id="history-cust-debt" style="font-size: 1.4rem; font-weight: 900; font-family: var(--font-mono); color: var(--accent-red);">$0.00</div>
+            <div id="history-cust-debt"
+              style="font-size: 1.4rem; font-weight: 900; font-family: var(--font-mono); color: var(--accent-red);">
+              $0.00</div>
           </div>
         </div>
         <div id="history-transactions-list" style="max-height: 380px; overflow-y: auto; padding: 0.5rem 0;">
@@ -2305,8 +2631,9 @@
       </div>
       <div class="modal-sicar-body" style="padding: 1.25rem;">
         <input type="hidden" id="wa-customer-id" value="">
-        
-        <div style="display: flex; gap: 1rem; align-items: center; background: #f0fdf4; border: 1px solid #bbf7d0; padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 0.75rem;">
+
+        <div
+          style="display: flex; gap: 1rem; align-items: center; background: #f0fdf4; border: 1px solid #bbf7d0; padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 0.75rem;">
           <div style="font-size: 1.8rem;">👤</div>
           <div style="flex: 1;">
             <div id="wa-customer-name" style="font-weight: 800; font-size: 1.05rem; color: #166534;">Cliente</div>
@@ -2315,39 +2642,52 @@
         </div>
 
         <div>
-          <label style="font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">
+          <label
+            style="font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">
             Número de WhatsApp (10 dígitos):
           </label>
           <div style="display: flex; gap: 0.5rem;">
-            <span style="background: #e2e8f0; padding: 0.55rem 0.75rem; border-radius: 6px; font-weight: 700; font-size: 0.9rem; display: flex; align-items: center;">🇲🇽 +52</span>
-            <input type="tel" id="wa-phone-input" class="sub-search-input" style="flex: 1; background: #fff;" placeholder="ej. 5512345678" maxlength="15">
+            <span
+              style="background: #e2e8f0; padding: 0.55rem 0.75rem; border-radius: 6px; font-weight: 700; font-size: 0.9rem; display: flex; align-items: center;">🇲🇽
+              +52</span>
+            <input type="tel" id="wa-phone-input" class="sub-search-input" style="flex: 1; background: #fff;"
+              placeholder="ej. 5512345678" maxlength="15">
           </div>
           <span style="font-size: 0.72rem; color: #64748b;">Se actualizará en la ficha del cliente si es nuevo.</span>
         </div>
 
         <div style="margin-top: 0.5rem;">
-          <label style="font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">
+          <label
+            style="font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">
             Plantilla rápida:
           </label>
           <div style="display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 0.5rem;">
-            <button type="button" class="btn-secondary" style="font-size: 0.75rem; padding: 0.3rem 0.6rem;" onclick="CustomersModule.applyWhatsAppTemplate('debt')">🧾 Recordatorio Deuda</button>
-            <button type="button" class="btn-secondary" style="font-size: 0.75rem; padding: 0.3rem 0.6rem;" onclick="CustomersModule.applyWhatsAppTemplate('current')">🟢 Al Corriente</button>
-            <button type="button" class="btn-secondary" style="font-size: 0.75rem; padding: 0.3rem 0.6rem;" onclick="CustomersModule.applyWhatsAppTemplate('greeting')">👋 Saludo Cordial</button>
+            <button type="button" class="btn-secondary" style="font-size: 0.75rem; padding: 0.3rem 0.6rem;"
+              onclick="CustomersModule.applyWhatsAppTemplate('debt')">🧾 Recordatorio Deuda</button>
+            <button type="button" class="btn-secondary" style="font-size: 0.75rem; padding: 0.3rem 0.6rem;"
+              onclick="CustomersModule.applyWhatsAppTemplate('current')">🟢 Al Corriente</button>
+            <button type="button" class="btn-secondary" style="font-size: 0.75rem; padding: 0.3rem 0.6rem;"
+              onclick="CustomersModule.applyWhatsAppTemplate('greeting')">👋 Saludo Cordial</button>
           </div>
         </div>
 
         <div>
-          <label style="font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">
+          <label
+            style="font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">
             Mensaje a Enviar (Puedes editarlo):
           </label>
-          <textarea id="wa-message-input" rows="5" class="sub-search-input" style="width: 100%; background: #fff; font-family: inherit; font-size: 0.88rem; line-height: 1.4; resize: vertical;"></textarea>
+          <textarea id="wa-message-input" rows="5" class="sub-search-input"
+            style="width: 100%; background: #fff; font-family: inherit; font-size: 0.88rem; line-height: 1.4; resize: vertical;"></textarea>
         </div>
 
         <div style="display: flex; gap: 0.5rem; margin-top: 0.75rem;">
-          <button type="button" class="btn-secondary" style="padding: 0.75rem 1rem;" onclick="CustomersModule.copyWhatsAppMessage()" title="Copiar texto al portapapeles">
+          <button type="button" class="btn-secondary" style="padding: 0.75rem 1rem;"
+            onclick="CustomersModule.copyWhatsAppMessage()" title="Copiar texto al portapapeles">
             📋 Copiar
           </button>
-          <button type="button" class="btn-modal-accept" style="flex: 1; background: #22c55e; border-color: #16a34a; font-size: 0.95rem;" onclick="CustomersModule.sendWhatsAppNow()">
+          <button type="button" class="btn-modal-accept"
+            style="flex: 1; background: #22c55e; border-color: #16a34a; font-size: 0.95rem;"
+            onclick="CustomersModule.sendWhatsAppNow()">
             📱 Abrir WhatsApp
           </button>
         </div>
@@ -2363,10 +2703,14 @@
         <button class="menu-toggle-btn" onclick="InventoryModule.stopCamera()">✕</button>
       </div>
       <div class="modal-sicar-body" style="padding: 1rem; align-items: center; text-align: center;">
-        <div style="position: relative; width: 100%; max-width: 400px; aspect-ratio: 4/3; background: #0f172a; border-radius: var(--radius-md); overflow: hidden; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-md);">
-          <video id="camera-video-feed" autoplay playsinline style="width: 100%; height: 100%; object-fit: cover;"></video>
+        <div
+          style="position: relative; width: 100%; max-width: 400px; aspect-ratio: 4/3; background: #0f172a; border-radius: var(--radius-md); overflow: hidden; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-md);">
+          <video id="camera-video-feed" autoplay playsinline
+            style="width: 100%; height: 100%; object-fit: cover;"></video>
           <canvas id="camera-capture-canvas" style="display: none;"></canvas>
-          <button type="button" onclick="InventoryModule.switchCameraFacing()" style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.6); color: #fff; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 1.3rem; cursor: pointer; display: flex; align-items: center; justify-content: center;" title="Cambiar cámara (frontal/trasera)">🔄</button>
+          <button type="button" onclick="InventoryModule.switchCameraFacing()"
+            style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.6); color: #fff; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 1.3rem; cursor: pointer; display: flex; align-items: center; justify-content: center;"
+            title="Cambiar cámara (frontal/trasera)">🔄</button>
         </div>
 
         <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.4rem;">
@@ -2374,7 +2718,8 @@
         </p>
 
         <div style="display: flex; justify-content: center; gap: 0.85rem; width: 100%; margin-top: 0.5rem;">
-          <button type="button" class="main-action-pill-btn" onclick="InventoryModule.capturePhoto()" style="background: var(--primary-blue); padding: 0.85rem 2rem; display: flex; align-items: center; gap: 0.5rem;">
+          <button type="button" class="main-action-pill-btn" onclick="InventoryModule.capturePhoto()"
+            style="background: var(--primary-blue); padding: 0.85rem 2rem; display: flex; align-items: center; gap: 0.5rem;">
             ⚪ Capturar Foto
           </button>
           <button type="button" class="meta-btn" onclick="InventoryModule.stopCamera()">
@@ -2394,19 +2739,23 @@
       </div>
       <div class="modal-sicar-body" style="padding: 1.25rem;">
         <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 0.85rem;">
-          Migre automáticamente todo el catálogo de productos, existencias, clientes, cuentas de crédito (fiados) y el historial completo de ventas desde su instalación local de <strong>Eleventa</strong> (Abarrotes Punto de Venta).
+          Migre automáticamente todo el catálogo de productos, existencias, clientes, cuentas de crédito (fiados) y el
+          historial completo de ventas desde su instalación local de <strong>Eleventa</strong> (Abarrotes Punto de
+          Venta).
         </p>
 
         <div class="form-group" style="margin-bottom: 0.85rem;">
           <label class="form-label">Ruta de instalación de Eleventa:</label>
-          <input type="text" class="form-input" id="eleventa-path-input" value="C:\Program Files (x86)\AbarrotesPDV" placeholder="C:\Program Files (x86)\AbarrotesPDV">
+          <input type="text" class="form-input" id="eleventa-path-input" value="C:\Program Files (x86)\AbarrotesPDV"
+            placeholder="C:\Program Files (x86)\AbarrotesPDV">
         </div>
 
         <div id="eleventa-detection-info" style="margin-bottom: 1rem;">
           <!-- Se llena dinámicamente -->
         </div>
 
-        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: var(--radius-md); padding: 0.85rem; margin-bottom: 1rem;">
+        <div
+          style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: var(--radius-md); padding: 0.85rem; margin-bottom: 1rem;">
           <div style="font-weight: 600; font-size: 0.88rem; margin-bottom: 0.5rem; color: var(--text-primary);">
             Módulos a transferir:
           </div>
@@ -2436,11 +2785,13 @@
 
         <!-- Caja de Progreso Dinámico -->
         <div id="eleventa-progress-box" style="display: none; margin-bottom: 1rem;">
-          <div style="font-size: 0.85rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--primary-blue);" id="eleventa-progress-text">
+          <div style="font-size: 0.85rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--primary-blue);"
+            id="eleventa-progress-text">
             Procesando datos...
           </div>
           <div style="width: 100%; height: 10px; background: #e2e8f0; border-radius: 5px; overflow: hidden;">
-            <div id="eleventa-progress-bar" style="width: 0%; height: 100%; background: var(--primary-blue); transition: width 0.3s ease;"></div>
+            <div id="eleventa-progress-bar"
+              style="width: 0%; height: 100%; background: var(--primary-blue); transition: width 0.3s ease;"></div>
           </div>
           <div id="eleventa-stats-list"></div>
         </div>
@@ -2449,7 +2800,8 @@
           <button type="button" class="meta-btn" onclick="App.closeModal('eleventa-modal')">
             Cerrar
           </button>
-          <button type="button" class="btn-modal-accept" id="btn-start-eleventa-import" style="padding: 0.75rem 1.5rem;">
+          <button type="button" class="btn-modal-accept" id="btn-start-eleventa-import"
+            style="padding: 0.75rem 1.5rem;">
             🚀 Iniciar Importación
           </button>
         </div>
@@ -2465,12 +2817,13 @@
         <button class="menu-toggle-btn" onclick="App.closeModal('settings-modal')">✕</button>
       </div>
       <div class="modal-sicar-body" style="padding: 1.25rem; max-height: 80vh; overflow-y: auto;">
-        
+
         <!-- Sección 1: Datos de la Tienda -->
-        <h4 style="color: var(--primary-blue); font-size: 0.95rem; margin-bottom: 0.75rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.35rem; display: flex; align-items: center; gap: 0.4rem;">
+        <h4
+          style="color: var(--primary-blue); font-size: 0.95rem; margin-bottom: 0.75rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.35rem; display: flex; align-items: center; gap: 0.4rem;">
           <span>🏪</span> Datos del Negocio
         </h4>
-        
+
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
           <div class="form-group">
             <label class="form-label">Nombre del Negocio:</label>
@@ -2484,53 +2837,65 @@
 
         <div class="form-group" style="margin-bottom: 0.75rem;">
           <label class="form-label">Dirección del Establecimiento:</label>
-          <input type="text" class="form-input" id="modal-cfg-store-address" placeholder="Av. Principal #123, Col. Centro">
+          <input type="text" class="form-input" id="modal-cfg-store-address"
+            placeholder="Av. Principal #123, Col. Centro">
         </div>
 
         <div class="form-group" style="margin-bottom: 1rem;">
           <label class="form-label">Pie de Ticket:</label>
-          <input type="text" class="form-input" id="modal-cfg-ticket-footer" placeholder="¡Gracias por su compra! Vuelva pronto.">
+          <input type="text" class="form-input" id="modal-cfg-ticket-footer"
+            placeholder="¡Gracias por su compra! Vuelva pronto.">
         </div>
 
-        <button type="button" class="meta-btn" id="btn-save-store-settings" style="margin-bottom: 1.5rem; font-size: 0.85rem; padding: 0.45rem 1rem;">
+        <button type="button" class="meta-btn" id="btn-save-store-settings"
+          style="margin-bottom: 1.5rem; font-size: 0.85rem; padding: 0.45rem 1rem;">
           💾 Guardar Datos del Negocio
         </button>
 
         <!-- Sección 2: Carpeta de Respaldos -->
-        <h4 style="color: var(--primary-blue); font-size: 0.95rem; margin-bottom: 0.75rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.35rem; display: flex; align-items: center; gap: 0.4rem;">
+        <h4
+          style="color: var(--primary-blue); font-size: 0.95rem; margin-bottom: 0.75rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.35rem; display: flex; align-items: center; gap: 0.4rem;">
           <span>📁</span> Carpeta de Respaldos de Base de Datos
         </h4>
 
         <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
-          Escriba o seleccione la carpeta donde se guardarán automáticamente las copias de seguridad de la base de datos al <strong>cerrar sesión</strong> o al pulsar "Crear Respaldo Ahora".
+          Escriba o seleccione la carpeta donde se guardarán automáticamente las copias de seguridad de la base de datos
+          al <strong>cerrar sesión</strong> o al pulsar "Crear Respaldo Ahora".
         </p>
 
         <div class="form-group" style="margin-bottom: 0.75rem;">
           <label class="form-label">Ruta de la Carpeta de Respaldo:</label>
           <div style="display: flex; gap: 0.5rem;">
-            <input type="text" class="form-input setting-backup-folder-input" id="modal-backup-folder-input" placeholder="D:\Git\PuntoDeVenta\respaldos" style="font-family: monospace; font-size: 0.85rem; flex: 1;">
-            <button type="button" class="btn-modal-accept btn-save-backup-folder" style="white-space: nowrap; padding: 0.6rem 1.2rem; font-size: 0.85rem;">
+            <input type="text" class="form-input setting-backup-folder-input" id="modal-backup-folder-input"
+              placeholder="D:\Git\PuntoDeVenta\respaldos" style="font-family: monospace; font-size: 0.85rem; flex: 1;">
+            <button type="button" class="btn-modal-accept btn-save-backup-folder"
+              style="white-space: nowrap; padding: 0.6rem 1.2rem; font-size: 0.85rem;">
               💾 Guardar
             </button>
           </div>
         </div>
 
-        <div style="display: flex; justify-content: space-between; align-items: center; margin: 1rem 0 0.5rem; flex-wrap: wrap; gap: 0.5rem;">
+        <div
+          style="display: flex; justify-content: space-between; align-items: center; margin: 1rem 0 0.5rem; flex-wrap: wrap; gap: 0.5rem;">
           <span style="font-weight: 700; font-size: 0.85rem; color: var(--text-primary);">Copias de Seguridad:</span>
           <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-            <button type="button" class="main-action-pill-btn btn-create-manual-backup" style="font-size: 0.82rem; padding: 0.45rem 1rem; background: var(--accent-green);">
+            <button type="button" class="main-action-pill-btn btn-create-manual-backup"
+              style="font-size: 0.82rem; padding: 0.45rem 1rem; background: var(--accent-green);">
               📦 Crear Respaldo Ahora
             </button>
-            <button type="button" class="main-action-pill-btn btn-optimize-database" style="font-size: 0.82rem; padding: 0.45rem 1rem; background: var(--primary-blue);">
+            <button type="button" class="main-action-pill-btn btn-optimize-database"
+              style="font-size: 0.82rem; padding: 0.45rem 1rem; background: var(--primary-blue);">
               🧹 Optimizar Base de Datos
             </button>
-            <button type="button" class="meta-btn btn-upload-backup-file" style="font-size: 0.82rem; padding: 0.45rem 0.85rem; display: inline-flex; align-items: center; gap: 0.25rem; cursor: pointer;">
+            <button type="button" class="meta-btn btn-upload-backup-file"
+              style="font-size: 0.82rem; padding: 0.45rem 0.85rem; display: inline-flex; align-items: center; gap: 0.25rem; cursor: pointer;">
               📂 Subir Respaldo (.db)
             </button>
           </div>
         </div>
 
-        <div class="recent-backups-list" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: var(--radius-md); padding: 0.5rem; margin-bottom: 1rem;">
+        <div class="recent-backups-list"
+          style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: var(--radius-md); padding: 0.5rem; margin-bottom: 1rem;">
           <!-- Se llena dinámicamente -->
         </div>
 
@@ -2556,10 +2921,12 @@
           ¿Desea cerrar la sesión actual?
         </h4>
         <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 1rem;">
-          Al cerrar sesión, el sistema generará automáticamente una copia de seguridad íntegra de la base de datos para proteger todas sus ventas y productos.
+          Al cerrar sesión, el sistema generará automáticamente una copia de seguridad íntegra de la base de datos para
+          proteger todas sus ventas y productos.
         </p>
 
-        <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: var(--radius-md); padding: 0.75rem; text-align: left; margin-bottom: 1.25rem;">
+        <div
+          style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: var(--radius-md); padding: 0.75rem; text-align: left; margin-bottom: 1.25rem;">
           <div style="font-size: 0.78rem; font-weight: 700; color: #1e40af; margin-bottom: 0.2rem;">
             📁 Destino del Respaldo:
           </div>
@@ -2572,7 +2939,8 @@
           <button type="button" class="meta-btn" onclick="App.closeModal('logout-modal')">
             Cancelar
           </button>
-          <button type="button" class="btn-modal-accept" id="btn-confirm-logout" style="background: #dc2626; padding: 0.75rem 1.75rem;">
+          <button type="button" class="btn-modal-accept" id="btn-confirm-logout"
+            style="background: #dc2626; padding: 0.75rem 1.75rem;">
             💾 Respaldar y Cerrar Sesión
           </button>
         </div>
@@ -2598,18 +2966,22 @@
         </div>
 
         <!-- Campo de PIN si el usuario seleccionado lo requiere -->
-        <div id="switch-user-pin-wrap" style="display: none; margin-top: 1rem; padding: 0.85rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;">
+        <div id="switch-user-pin-wrap"
+          style="display: none; margin-top: 1rem; padding: 0.85rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;">
           <label style="display: block; font-size: 0.82rem; font-weight: 700; color: #334155; margin-bottom: 0.4rem;">
             Ingrese el PIN del usuario seleccionado:
           </label>
-          <input type="password" id="switch-user-pin-input" class="sub-search-input" style="width: 100%; height: 40px; font-size: 1.2rem; letter-spacing: 4px; text-align: center;" maxlength="10" placeholder="••••">
+          <input type="password" id="switch-user-pin-input" class="sub-search-input"
+            style="width: 100%; height: 40px; font-size: 1.2rem; letter-spacing: 4px; text-align: center;"
+            maxlength="10" placeholder="••••">
         </div>
 
         <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
           <button type="button" class="meta-btn" onclick="App.closeModal('modal-switch-user')">
             Cancelar
           </button>
-          <button type="button" class="main-action-pill-btn" id="btn-confirm-switch-user" onclick="SessionModule.confirmSwitchUser()" style="padding: 0.65rem 1.6rem;">
+          <button type="button" class="main-action-pill-btn" id="btn-confirm-switch-user"
+            onclick="SessionModule.confirmSwitchUser()" style="padding: 0.65rem 1.6rem;">
             Cambiar a este Usuario
           </button>
         </div>
@@ -2629,7 +3001,8 @@
           <label class="form-label" style="font-size: 0.82rem; font-weight:700; margin-bottom: 0.3rem; display:block;">
             Seleccione el Cajero / Usuario en Turno:
           </label>
-          <select id="open-shift-cashier-input" class="sub-search-input" style="background:#fff; height: 42px; font-weight: 700;">
+          <select id="open-shift-cashier-input" class="sub-search-input"
+            style="background:#fff; height: 42px; font-weight: 700;">
             <option value="Admin" selected>Administrador (ADMIN)</option>
           </select>
         </div>
@@ -2639,8 +3012,11 @@
             Dinero Inicial en Caja (Fondo de Cambio):
           </label>
           <div style="position: relative;">
-            <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-weight: 800; color: var(--text-secondary); font-size: 1.1rem;">$</span>
-            <input type="number" id="open-shift-initial-input" class="sub-search-input" style="background:#fff; height: 42px; padding-left: 2rem; font-family: var(--font-mono); font-size: 1.2rem; font-weight: 800;" value="500.00" step="10">
+            <span
+              style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-weight: 800; color: var(--text-secondary); font-size: 1.1rem;">$</span>
+            <input type="number" id="open-shift-initial-input" class="sub-search-input"
+              style="background:#fff; height: 42px; padding-left: 2rem; font-family: var(--font-mono); font-size: 1.2rem; font-weight: 800;"
+              value="500.00" step="10">
           </div>
           <span style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.3rem; display:block;">
             Efectivo disponible en el cajón para cambio.
@@ -2671,7 +3047,8 @@
           <label class="form-label" style="font-size: 0.82rem; font-weight:700; margin-bottom: 0.3rem; display:block;">
             Tipo de Movimiento:
           </label>
-          <select id="movement-type-select" class="sub-search-input" style="background:#fff; height: 40px; font-weight: 700;">
+          <select id="movement-type-select" class="sub-search-input"
+            style="background:#fff; height: 40px; font-weight: 700;">
             <option value="EGRESO" selected>Salida de Efectivo (Gasto / Pago a Proveedor)</option>
             <option value="INGRESO">Entrada de Efectivo (Depósito Extraordinario)</option>
           </select>
@@ -2681,14 +3058,17 @@
           <label class="form-label" style="font-size: 0.82rem; font-weight:700; margin-bottom: 0.3rem; display:block;">
             Monto ($):
           </label>
-          <input type="number" id="movement-amount-input" class="sub-search-input" style="background:#fff; height: 42px; font-family: var(--font-mono); font-size: 1.2rem; font-weight: 800;" placeholder="0.00" step="1">
+          <input type="number" id="movement-amount-input" class="sub-search-input"
+            style="background:#fff; height: 42px; font-family: var(--font-mono); font-size: 1.2rem; font-weight: 800;"
+            placeholder="0.00" step="1">
         </div>
 
         <div style="margin-bottom: 1.5rem;">
           <label class="form-label" style="font-size: 0.82rem; font-weight:700; margin-bottom: 0.3rem; display:block;">
             Concepto o Motivo:
           </label>
-          <input type="text" id="movement-concept-input" class="sub-search-input" style="background:#fff; height: 40px;" placeholder="Ej: Pago a repartidor Bimbo, compra de bolsas">
+          <input type="text" id="movement-concept-input" class="sub-search-input" style="background:#fff; height: 40px;"
+            placeholder="Ej: Pago a repartidor Bimbo, compra de bolsas">
         </div>
 
         <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
@@ -2713,34 +3093,43 @@
       <div class="modal-sicar-body" style="padding: 1.5rem;">
         <div style="background: var(--bg-subtle); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
           <div style="font-size: 0.8rem; color: var(--text-secondary);">EFECTIVO SISTEMA (ESPERADO):</div>
-          <div style="font-size: 1.6rem; font-weight: 900; font-family: var(--font-mono); color: var(--primary-blue);" id="close-shift-expected">$0.00</div>
-          <div style="font-size: 0.75rem; color: var(--text-secondary);">Fondo inicial + ventas en efectivo + entradas - salidas</div>
+          <div style="font-size: 1.6rem; font-weight: 900; font-family: var(--font-mono); color: var(--primary-blue);"
+            id="close-shift-expected">$0.00</div>
+          <div style="font-size: 0.75rem; color: var(--text-secondary);">Fondo inicial + ventas en efectivo + entradas -
+            salidas</div>
         </div>
 
         <div style="margin-bottom: 1rem;">
           <label class="form-label" style="font-size: 0.82rem; font-weight:700; margin-bottom: 0.3rem; display:block;">
             Dinero Físico Contado en Caja ($):
           </label>
-          <input type="number" id="close-shift-real-input" class="sub-search-input" style="background:#fff; height: 42px; font-family: var(--font-mono); font-size: 1.25rem; font-weight: 800;" placeholder="0.00" step="1">
+          <input type="number" id="close-shift-real-input" class="sub-search-input"
+            style="background:#fff; height: 42px; font-family: var(--font-mono); font-size: 1.25rem; font-weight: 800;"
+            placeholder="0.00" step="1">
         </div>
 
-        <div style="margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; background: #fff; border: 1px solid var(--border-light); padding: 0.6rem 0.8rem; border-radius: 8px;">
+        <div
+          style="margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; background: #fff; border: 1px solid var(--border-light); padding: 0.6rem 0.8rem; border-radius: 8px;">
           <span style="font-size: 0.84rem; font-weight: 700;">Diferencia de Caja:</span>
-          <span id="close-shift-diff" style="font-family: var(--font-mono); font-weight: 900; font-size: 1rem; color: var(--primary-blue);">$0.00 (Cuadre exacto)</span>
+          <span id="close-shift-diff"
+            style="font-family: var(--font-mono); font-weight: 900; font-size: 1rem; color: var(--primary-blue);">$0.00
+            (Cuadre exacto)</span>
         </div>
 
         <div style="margin-bottom: 1.5rem;">
           <label class="form-label" style="font-size: 0.82rem; font-weight:700; margin-bottom: 0.3rem; display:block;">
             Notas u Observaciones del Cierre:
           </label>
-          <input type="text" id="close-shift-notes-input" class="sub-search-input" style="background:#fff; height: 38px;" placeholder="Opcional">
+          <input type="text" id="close-shift-notes-input" class="sub-search-input"
+            style="background:#fff; height: 38px;" placeholder="Opcional">
         </div>
 
         <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
           <button type="button" class="meta-btn" onclick="App.closeModal('close-shift-modal')">
             Cancelar
           </button>
-          <button type="button" class="main-action-pill-btn" id="btn-confirm-close-shift" style="background: #dc2626; padding: 0.75rem 1.8rem;">
+          <button type="button" class="main-action-pill-btn" id="btn-confirm-close-shift"
+            style="background: #dc2626; padding: 0.75rem 1.8rem;">
             Confirmar y Cerrar Turno
           </button>
         </div>
@@ -2763,7 +3152,8 @@
           <button type="button" class="meta-btn" onclick="App.closeModal('modal-corte-ticket')">
             Cerrar
           </button>
-          <button type="button" class="main-action-pill-btn" onclick="CashModule.printCorteTicket()" style="background: #10b981; padding: 0.75rem 1.6rem;">
+          <button type="button" class="main-action-pill-btn" onclick="CashModule.printCorteTicket()"
+            style="background: #10b981; padding: 0.75rem 1.6rem;">
             🖨️ Imprimir Ticket
           </button>
         </div>
@@ -2810,10 +3200,13 @@
         <p style="font-size: 0.82rem; color: #64748b; margin-bottom: 0.75rem;">
           Escriba notas adicionales para este ticket (ej. datos de entrega, instrucciones especiales):
         </p>
-        <textarea id="ticket-note-textarea" class="sub-search-input" style="width: 100%; height: 95px; border-radius: 8px; padding: 0.75rem; font-family: inherit; font-size: 0.9rem; resize: vertical;" placeholder="Escriba la nota aquí..."></textarea>
+        <textarea id="ticket-note-textarea" class="sub-search-input"
+          style="width: 100%; height: 95px; border-radius: 8px; padding: 0.75rem; font-family: inherit; font-size: 0.9rem; resize: vertical;"
+          placeholder="Escriba la nota aquí..."></textarea>
         <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.25rem;">
           <button type="button" class="meta-btn" onclick="App.closeModal('modal-ticket-notes')">Cancelar</button>
-          <button type="button" class="main-action-pill-btn" onclick="PosModule.saveTicketNote()" style="padding: 0.65rem 1.5rem;">Guardar Nota</button>
+          <button type="button" class="main-action-pill-btn" onclick="PosModule.saveTicketNote()"
+            style="padding: 0.65rem 1.5rem;">Guardar Nota</button>
         </div>
       </div>
     </div>
@@ -2831,27 +3224,35 @@
           <label class="form-label" style="font-size: 0.82rem; font-weight:700; margin-bottom: 0.3rem; display:block;">
             Concepto / Descripción del Producto:
           </label>
-          <input type="text" id="quick-item-name" class="sub-search-input" style="background:#fff; height: 42px;" placeholder="Ej: Recarga Telefónica, Hielo, Varios..." value="Artículo Común">
+          <input type="text" id="quick-item-name" class="sub-search-input" style="background:#fff; height: 42px;"
+            placeholder="Ej: Recarga Telefónica, Hielo, Varios..." value="Artículo Común">
         </div>
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
           <div>
-            <label class="form-label" style="font-size: 0.82rem; font-weight:700; margin-bottom: 0.3rem; display:block;">
+            <label class="form-label"
+              style="font-size: 0.82rem; font-weight:700; margin-bottom: 0.3rem; display:block;">
               Precio de Venta ($):
             </label>
-            <input type="number" id="quick-item-price" class="sub-search-input" style="background:#fff; height: 42px; font-family: var(--font-mono); font-size: 1.2rem; font-weight: 800;" placeholder="0.00" step="0.5" autofocus>
+            <input type="number" id="quick-item-price" class="sub-search-input"
+              style="background:#fff; height: 42px; font-family: var(--font-mono); font-size: 1.2rem; font-weight: 800;"
+              placeholder="0.00" step="0.5" autofocus>
           </div>
           <div>
-            <label class="form-label" style="font-size: 0.82rem; font-weight:700; margin-bottom: 0.3rem; display:block;">
+            <label class="form-label"
+              style="font-size: 0.82rem; font-weight:700; margin-bottom: 0.3rem; display:block;">
               Cantidad:
             </label>
-            <input type="number" id="quick-item-qty" class="sub-search-input" style="background:#fff; height: 42px; font-family: var(--font-mono); font-size: 1.2rem; font-weight: 800;" value="1" min="1" step="1">
+            <input type="number" id="quick-item-qty" class="sub-search-input"
+              style="background:#fff; height: 42px; font-family: var(--font-mono); font-size: 1.2rem; font-weight: 800;"
+              value="1" min="1" step="1">
           </div>
         </div>
 
         <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
           <button type="button" class="meta-btn" onclick="App.closeModal('modal-quick-item')">Cancelar</button>
-          <button type="button" class="main-action-pill-btn" onclick="PosModule.addQuickItem()" style="padding: 0.65rem 1.5rem;">+ Agregar al Ticket</button>
+          <button type="button" class="main-action-pill-btn" onclick="PosModule.addQuickItem()"
+            style="padding: 0.65rem 1.5rem;">+ Agregar al Ticket</button>
         </div>
       </div>
     </div>
@@ -2864,19 +3265,25 @@
         <h3>👤 Asignar Cliente a la Venta</h3>
         <button class="menu-toggle-btn" onclick="App.closeModal('modal-customer-selector')">✕</button>
       </div>
-      <div class="modal-sicar-body" style="padding: 1.25rem; flex: 1; overflow: hidden; display: flex; flex-direction: column;">
-        
-        <button type="button" class="meta-btn" onclick="PosModule.selectCustomer(null, 'Público General')" style="width: 100%; justify-content: flex-start; padding: 0.75rem 1rem; margin-bottom: 1rem; background: #e0f2fe; color: #0369a1; border-color: #bae6fd; font-weight: 700;">
+      <div class="modal-sicar-body"
+        style="padding: 1.25rem; flex: 1; overflow: hidden; display: flex; flex-direction: column;">
+
+        <button type="button" class="meta-btn" onclick="PosModule.selectCustomer(null, 'Público General')"
+          style="width: 100%; justify-content: flex-start; padding: 0.75rem 1rem; margin-bottom: 1rem; background: #e0f2fe; color: #0369a1; border-color: #bae6fd; font-weight: 700;">
           <span>🏪</span>
           <span>Público General (Venta sin crédito)</span>
         </button>
 
         <div style="position: relative; margin-bottom: 0.75rem;">
           <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8;">🔍</span>
-          <input type="text" id="quick-customer-search-input" class="sub-search-input" placeholder="Buscar cliente por nombre o teléfono..." style="background:#fff; height: 40px; padding-left: 2.2rem;" oninput="PosModule.filterQuickCustomers(this.value)">
+          <input type="text" id="quick-customer-search-input" class="sub-search-input"
+            placeholder="Buscar cliente por nombre o teléfono..."
+            style="background:#fff; height: 40px; padding-left: 2.2rem;"
+            oninput="PosModule.filterQuickCustomers(this.value)">
         </div>
 
-        <div class="quick-customers-list" id="quick-customers-list" style="flex: 1; overflow-y: auto; max-height: 320px; display: flex; flex-direction: column; gap: 0.4rem; padding-right: 0.3rem;">
+        <div class="quick-customers-list" id="quick-customers-list"
+          style="flex: 1; overflow-y: auto; max-height: 320px; display: flex; flex-direction: column; gap: 0.4rem; padding-right: 0.3rem;">
           <!-- Clientes cargados dinámicamente -->
         </div>
 
@@ -2895,7 +3302,8 @@
         <div class="modal-sicar-body" style="padding: 1.25rem;">
           <div class="form-group" style="margin-bottom: 0.85rem;">
             <label class="form-label" style="font-weight: 700;">Nombre de la Empresa o Marca: *</label>
-            <input type="text" id="supplier-name" class="form-input" placeholder="Ej. Bimbo, Sabritas, Lácteos Lala" required>
+            <input type="text" id="supplier-name" class="form-input" placeholder="Ej. Bimbo, Sabritas, Lácteos Lala"
+              required>
           </div>
 
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.85rem;">
@@ -2922,17 +3330,20 @@
 
           <div class="form-group" style="margin-bottom: 0.85rem;">
             <label class="form-label" style="font-weight: 700;">Dirección / Bodega / Reparto:</label>
-            <input type="text" id="supplier-address" class="form-input" placeholder="Ej. Parque Industrial Oriente Bodega 12">
+            <input type="text" id="supplier-address" class="form-input"
+              placeholder="Ej. Parque Industrial Oriente Bodega 12">
           </div>
 
           <div class="form-group" style="margin-bottom: 1.25rem;">
             <label class="form-label" style="font-weight: 700;">Notas y Días de Visita:</label>
-            <input type="text" id="supplier-notes" class="form-input" placeholder="Ej. Visita martes y viernes por la mañana. Crédito a 7 días.">
+            <input type="text" id="supplier-notes" class="form-input"
+              placeholder="Ej. Visita martes y viernes por la mañana. Crédito a 7 días.">
           </div>
 
           <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
             <button type="button" class="meta-btn" onclick="App.closeModal('modal-supplier-form')">Cancelar</button>
-            <button type="submit" class="main-action-pill-btn" style="padding: 0.65rem 1.6rem; background: var(--primary-blue);">
+            <button type="submit" class="main-action-pill-btn"
+              style="padding: 0.65rem 1.6rem; background: var(--primary-blue);">
               💾 Guardar Proveedor
             </button>
           </div>
@@ -2945,18 +3356,24 @@
   <div class="modal-overlay" id="modal-purchase-detail">
     <div class="modal-sicar-dialog" style="max-width: 680px; max-height: 85vh; display: flex; flex-direction: column;">
       <div class="modal-sicar-header">
-        <h3>🧾 Detalle de Compra: <span id="modal-purchase-detail-folio" style="color: var(--primary-blue); font-family: var(--font-mono);">COM-00001</span></h3>
+        <h3>🧾 Detalle de Compra: <span id="modal-purchase-detail-folio"
+            style="color: var(--primary-blue); font-family: var(--font-mono);">COM-00001</span></h3>
         <button class="menu-toggle-btn" onclick="App.closeModal('modal-purchase-detail')">✕</button>
       </div>
       <div class="modal-sicar-body" style="padding: 1.25rem; overflow-y: auto; flex: 1;">
-        <div style="display: flex; justify-content: space-between; margin-bottom: 1rem; background: #f8fafc; padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.85rem;">
+        <div
+          style="display: flex; justify-content: space-between; margin-bottom: 1rem; background: #f8fafc; padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.85rem;">
           <div>
-            <div>Proveedor: <strong id="modal-purchase-detail-supplier" style="color: var(--text-primary);">Bimbo</strong></div>
-            <div style="color: var(--text-secondary); margin-top: 0.2rem;">Fecha: <span id="modal-purchase-detail-date">--</span></div>
+            <div>Proveedor: <strong id="modal-purchase-detail-supplier"
+                style="color: var(--text-primary);">Bimbo</strong></div>
+            <div style="color: var(--text-secondary); margin-top: 0.2rem;">Fecha: <span
+                id="modal-purchase-detail-date">--</span></div>
           </div>
           <div style="text-align: right;">
             <div>Total Compra:</div>
-            <div style="font-size: 1.25rem; font-weight: 900; font-family: var(--font-mono); color: var(--accent-green-dark);" id="modal-purchase-detail-total">$0.00 MXN</div>
+            <div
+              style="font-size: 1.25rem; font-weight: 900; font-family: var(--font-mono); color: var(--accent-green-dark);"
+              id="modal-purchase-detail-total">$0.00 MXN</div>
           </div>
         </div>
 
@@ -2992,12 +3409,14 @@
         <button class="menu-toggle-btn" onclick="App.closeModal('payment-receipt-modal')">✕</button>
       </div>
       <div class="modal-sicar-body" style="padding: 1rem;">
-        <div id="payment-receipt-content" style="background: #fff; font-family: monospace; font-size: 0.85rem; padding: 1rem; border: 1px dashed #cbd5e1; border-radius: 4px;">
+        <div id="payment-receipt-content"
+          style="background: #fff; font-family: monospace; font-size: 0.85rem; padding: 1rem; border: 1px dashed #cbd5e1; border-radius: 4px;">
           <!-- Comprobante dinámico -->
         </div>
 
         <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
-          <button type="button" class="btn-modal-accept" style="flex: 1;" onclick="CustomersModule.printPaymentReceipt()">
+          <button type="button" class="btn-modal-accept" style="flex: 1;"
+            onclick="CustomersModule.printPaymentReceipt()">
             🖨️ Imprimir
           </button>
           <button type="button" class="meta-btn" onclick="App.closeModal('payment-receipt-modal')">
@@ -3017,7 +3436,8 @@
       </div>
       <div class="modal-sicar-body" style="padding: 1.25rem; overflow-y: auto; flex: 1;">
         <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">
-          Cálculo inteligente basado en el ritmo de venta histórica de los tickets y las existencias actuales. Proyectado para cubrir <strong>15 días</strong> de demanda.
+          Cálculo inteligente basado en el ritmo de venta histórica de los tickets y las existencias actuales.
+          Proyectado para cubrir <strong>15 días</strong> de demanda.
         </p>
 
         <div class="table-view-container">
@@ -3059,7 +3479,8 @@
       </div>
       <div class="modal-sicar-body" style="padding: 1.25rem;">
         <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">
-          Seleccione un archivo <code>.csv</code> (exportado previamente o editado en Excel). El sistema actualizará los productos existentes (por código o ID) y creará los nuevos automáticamente.
+          Seleccione un archivo <code>.csv</code> (exportado previamente o editado en Excel). El sistema actualizará los
+          productos existentes (por código o ID) y creará los nuevos automáticamente.
         </p>
 
         <div class="form-group" style="margin-bottom: 1rem;">
@@ -3067,13 +3488,15 @@
           <input type="file" id="csv-file-input" accept=".csv" class="form-input" style="padding: 0.5rem;">
         </div>
 
-        <div id="csv-import-preview" style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 1rem;"></div>
+        <div id="csv-import-preview" style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 1rem;">
+        </div>
 
         <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
           <button type="button" class="meta-btn" onclick="App.closeModal('modal-import-csv')">
             Cancelar
           </button>
-          <button type="button" class="btn-modal-accept" id="btn-confirm-csv-import" onclick="InventoryModule.processCsvImport()">
+          <button type="button" class="btn-modal-accept" id="btn-confirm-csv-import"
+            onclick="InventoryModule.processCsvImport()">
             📥 Iniciar Importación
           </button>
         </div>
@@ -3094,10 +3517,12 @@
           ¿Desea restaurar este respaldo en el sistema?
         </h4>
 
-        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: var(--radius-md); padding: 0.85rem; margin-bottom: 1rem; font-size: 0.84rem;">
+        <div
+          style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: var(--radius-md); padding: 0.85rem; margin-bottom: 1rem; font-size: 0.84rem;">
           <div style="display: flex; justify-content: space-between; margin-bottom: 0.35rem; gap: 0.5rem;">
             <span style="color: var(--text-secondary);">Archivo:</span>
-            <strong id="restore-modal-filename" style="color: var(--text-primary); font-family: monospace; word-break: break-all; text-align: right;"></strong>
+            <strong id="restore-modal-filename"
+              style="color: var(--text-primary); font-family: monospace; word-break: break-all; text-align: right;"></strong>
           </div>
           <div style="display: flex; justify-content: space-between; margin-bottom: 0.35rem;">
             <span style="color: var(--text-secondary);">Fecha de creación:</span>
@@ -3109,25 +3534,30 @@
           </div>
         </div>
 
-        <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: var(--radius-md); padding: 0.85rem; margin-bottom: 0.85rem; font-size: 0.82rem; color: #92400e; line-height: 1.4;">
+        <div
+          style="background: #fffbeb; border: 1px solid #fde68a; border-radius: var(--radius-md); padding: 0.85rem; margin-bottom: 0.85rem; font-size: 0.82rem; color: #92400e; line-height: 1.4;">
           <div style="font-weight: 700; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.4rem;">
             <span>⚠️</span> Advertencia Importante:
           </div>
-          <div>Esta acción reemplazará la base de datos actual con los datos del respaldo seleccionado (catálogo de productos, inventario, clientes y ventas registradas).</div>
+          <div>Esta acción reemplazará la base de datos actual con los datos del respaldo seleccionado (catálogo de
+            productos, inventario, clientes y ventas registradas).</div>
         </div>
 
-        <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: var(--radius-md); padding: 0.75rem; margin-bottom: 1.25rem; font-size: 0.8rem; color: #166534; line-height: 1.35;">
+        <div
+          style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: var(--radius-md); padding: 0.75rem; margin-bottom: 1.25rem; font-size: 0.8rem; color: #166534; line-height: 1.35;">
           <div style="font-weight: 700; margin-bottom: 0.2rem; display: flex; align-items: center; gap: 0.4rem;">
             <span>🛡️</span> Protección Automática:
           </div>
-          <div>Por seguridad, el sistema creará automáticamente un respaldo previo del estado actual antes de proceder, para que nunca pierda su información.</div>
+          <div>Por seguridad, el sistema creará automáticamente un respaldo previo del estado actual antes de proceder,
+            para que nunca pierda su información.</div>
         </div>
 
         <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
           <button type="button" class="meta-btn" onclick="App.closeModal('modal-confirm-restore')">
             Cancelar
           </button>
-          <button type="button" class="btn-modal-accept" id="btn-do-restore" style="background: #d97706; padding: 0.6rem 1.4rem; font-weight: 700;">
+          <button type="button" class="btn-modal-accept" id="btn-do-restore"
+            style="background: #d97706; padding: 0.6rem 1.4rem; font-weight: 700;">
             🔄 Confirmar y Cargar
           </button>
         </div>
@@ -3151,7 +3581,8 @@
           Los datos del respaldo seleccionado han sido aplicados con éxito.
         </p>
 
-        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: var(--radius-md); padding: 0.85rem; margin-bottom: 1rem; text-align: left; font-size: 0.85rem;">
+        <div
+          style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: var(--radius-md); padding: 0.85rem; margin-bottom: 1rem; text-align: left; font-size: 0.85rem;">
           <div style="display: flex; justify-content: space-between; margin-bottom: 0.35rem;">
             <span style="color: var(--text-secondary);">📦 Productos en catálogo:</span>
             <strong id="restore-success-products">0</strong>
@@ -3164,13 +3595,16 @@
             <span style="color: var(--text-secondary);">🧾 Ventas registradas:</span>
             <strong id="restore-success-sales">0</strong>
           </div>
-          <div style="border-top: 1px dashed #cbd5e1; margin-top: 0.5rem; padding-top: 0.5rem; font-size: 0.78rem; color: #475569;">
+          <div
+            style="border-top: 1px dashed #cbd5e1; margin-top: 0.5rem; padding-top: 0.5rem; font-size: 0.78rem; color: #475569;">
             <span>🛡️ Respaldo previo de seguridad:</span>
-            <div id="restore-success-safety" style="font-family: monospace; word-break: break-all; color: #0369a1; font-weight: 600;"></div>
+            <div id="restore-success-safety"
+              style="font-family: monospace; word-break: break-all; color: #0369a1; font-weight: 600;"></div>
           </div>
         </div>
 
-        <button type="button" class="btn-modal-accept" onclick="window.location.reload()" style="width: 100%; padding: 0.75rem; font-size: 0.95rem; background: #16a34a; font-weight: 700;">
+        <button type="button" class="btn-modal-accept" onclick="window.location.reload()"
+          style="width: 100%; padding: 0.75rem; font-size: 0.95rem; background: #16a34a; font-weight: 700;">
           🔄 Actualizar Sistema Ahora
         </button>
       </div>
@@ -3196,18 +3630,23 @@
         <div class="switch-user-grid" id="switch-user-grid"></div>
 
         <!-- Entrada de PIN si el usuario lo requiere -->
-        <div id="switch-user-pin-wrap" style="display: none; margin-top: 1rem; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: var(--radius-md); padding: 0.85rem;">
+        <div id="switch-user-pin-wrap"
+          style="display: none; margin-top: 1rem; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: var(--radius-md); padding: 0.85rem;">
           <label style="font-size: 0.82rem; font-weight: 700; color: #334155; display: block; margin-bottom: 0.35rem;">
             🔒 Ingrese el PIN de seguridad del usuario:
           </label>
-          <input type="password" id="switch-user-pin-input" maxlength="6" placeholder="PIN de 4-6 dígitos" style="width: 100%; font-size: 1.2rem; text-align: center; letter-spacing: 0.3em; padding: 0.5rem; border: 1.5px solid #94a3b8; border-radius: 6px;" onkeydown="if(event.key==='Enter') SessionModule.confirmSwitchUser()">
+          <input type="password" id="switch-user-pin-input" maxlength="6" placeholder="PIN de 4-6 dígitos"
+            style="width: 100%; font-size: 1.2rem; text-align: center; letter-spacing: 0.3em; padding: 0.5rem; border: 1.5px solid #94a3b8; border-radius: 6px;"
+            onkeydown="if(event.key==='Enter') SessionModule.confirmSwitchUser()">
         </div>
 
-        <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.25rem; border-top: 1px solid #e2e8f0; padding-top: 1rem;">
+        <div
+          style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.25rem; border-top: 1px solid #e2e8f0; padding-top: 1rem;">
           <button type="button" class="meta-btn" onclick="App.closeModal('modal-switch-user')">
             Cancelar
           </button>
-          <button type="button" class="btn-modal-accept" onclick="SessionModule.confirmSwitchUser()" style="background: #0284c7; padding: 0.6rem 1.4rem; font-weight: 700;">
+          <button type="button" class="btn-modal-accept" onclick="SessionModule.confirmSwitchUser()"
+            style="background: #0284c7; padding: 0.6rem 1.4rem; font-weight: 700;">
             ✓ Iniciar con este Usuario
           </button>
         </div>
@@ -3225,7 +3664,7 @@
   <script src="/static/js/qr-generator.js?v=4.0"></script>
   <script src="/static/js/barcode.js?v=4.0"></script>
   <script src="/static/js/pos.js?v=4.0"></script>
-  <script src="/static/js/inventory.js?v=4.0"></script>
+  <script src="/static/js/inventory.js?v=4.1"></script>
   <script src="/static/js/customers.js?v=4.0"></script>
   <script src="/static/js/cash.js?v=4.0"></script>
   <script src="/static/js/users.js?v=4.0"></script>
@@ -3238,4 +3677,5 @@
   <script src="/static/js/session.js?v=4.0"></script>
   <script src="/static/js/app.js?v=4.0"></script>
 </body>
+
 </html>

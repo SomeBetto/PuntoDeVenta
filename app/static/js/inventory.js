@@ -11,6 +11,7 @@ const InventoryModule = {
   editingProductId: null,
   adjustmentsMap: {}, // productId -> { counted, difference }
   modalAdjustProductId: null,
+  targetPhotoProductId: null,
   currentCameraFacing: 'environment', // Cámara trasera por defecto
   activeMediaStream: null,
 
@@ -35,6 +36,12 @@ const InventoryModule = {
           this.handleBarcodeScanInAdjustment(adjustSearch.value.trim());
         }
       });
+    }
+
+    // Input oculto para tomar fotos desde celular o tablet en Realizar Inventario
+    const mobilePhotoInput = document.getElementById('mobile-inventory-photo-input');
+    if (mobilePhotoInput) {
+      mobilePhotoInput.addEventListener('change', (e) => this.handleMobilePhotoSelected(e));
     }
 
     const saveProdBtn = document.getElementById('btn-save-product');
@@ -425,26 +432,48 @@ const InventoryModule = {
         : (p.category_icon || '📦');
 
       return `
-        <tr style="cursor: pointer;" onclick="InventoryModule.openAdjustModal(${p.id})">
-          <td style="text-align: center; color: var(--primary-blue);">☑</td>
+        <tr data-product-id="${p.id}">
+          <td style="text-align: center; color: var(--primary-blue);" onclick="InventoryModule.openAdjustModal(${p.id})">☑</td>
           <td>
             <div class="product-cell-group">
-              <div class="product-thumb">${thumbHtml}</div>
-              <div class="product-cell-info">
+              <div class="product-thumb adj-card-thumb" style="width: 40px; height: 40px; cursor: pointer;" onclick="event.stopPropagation(); InventoryModule.triggerMobilePhotoUpload(${p.id})" title="Clic para tomar foto con la cámara o cambiar imagen">
+                ${thumbHtml}
+                <div class="adj-card-thumb-badge" style="font-size: 0.55rem;">📷</div>
+              </div>
+              <div class="product-cell-info" onclick="InventoryModule.openAdjustModal(${p.id})">
                 <span class="product-cell-code">${p.unit} • ${p.barcode || '00' + p.id}</span>
                 <span class="product-cell-name">${p.name}</span>
               </div>
             </div>
           </td>
-          <td><span style="font-family: var(--font-mono); color: var(--text-secondary);">A-${(i % 5) + 1}</span></td>
-          <td style="text-align: right; font-family: var(--font-mono);">$${p.sale_price.toFixed(2)}</td>
-          <td style="text-align: right; font-family: var(--font-mono); font-weight: 600;">${p.stock}</td>
-          <td style="text-align: right; font-family: var(--font-mono); font-weight: 800; color: ${diff > 0 ? 'var(--accent-green-dark)' : (diff < 0 ? 'var(--accent-red)' : 'var(--text-muted)')};">
+          <td onclick="InventoryModule.openAdjustModal(${p.id})"><span style="font-family: var(--font-mono); color: var(--text-secondary);">A-${(i % 5) + 1}</span></td>
+          <td style="text-align: right;">
+            <div style="display: inline-flex; align-items: center; justify-content: flex-end; gap: 3px;" onclick="event.stopPropagation()">
+              <span style="font-family: var(--font-mono); color: var(--text-secondary); font-size: 0.82rem;">$</span>
+              <input 
+                type="number" 
+                class="adj-price-input" 
+                style="width: 74px; height: 28px; padding: 2px 4px; font-size: 0.85rem;"
+                id="adj-desk-price-${p.id}"
+                value="${p.sale_price.toFixed(2)}" 
+                step="any" 
+                min="0"
+                title="Cambiar precio de venta"
+                onchange="InventoryModule.updateProductPriceQuick(${p.id}, this.value)"
+              >
+            </div>
+          </td>
+          <td style="text-align: right; font-family: var(--font-mono); font-weight: 600;" onclick="InventoryModule.openAdjustModal(${p.id})">${p.stock}</td>
+          <td style="text-align: right; font-family: var(--font-mono); font-weight: 800; color: ${diff > 0 ? 'var(--accent-green-dark)' : (diff < 0 ? 'var(--accent-red)' : 'var(--text-muted)')};" onclick="InventoryModule.openAdjustModal(${p.id})">
             ${diff > 0 ? '+' + diff : diff}
             ${diff !== 0 ? `<div style="font-size:0.7rem; font-weight: normal;">$${(diff * p.sale_price).toFixed(2)}</div>` : ''}
           </td>
           <td style="text-align: right; font-family: var(--font-mono); font-weight: 900; font-size: 1rem; color: var(--primary-blue);">
-            ${adj.counted}
+            <div style="display: inline-flex; align-items: center; justify-content: flex-end; gap: 4px;" onclick="event.stopPropagation()">
+              <button type="button" class="adj-step-btn minus" style="width: 28px; height: 28px; font-size: 0.95rem; border-radius: 4px; border: 1px solid #cbd5e1;" onclick="InventoryModule.stepMobileAdjustment(${p.id}, -1)">−</button>
+              <input type="number" class="adj-stepper-input" style="width: 52px; height: 28px; border-radius: 4px; border: 1px solid #cbd5e1; font-size: 0.85rem;" id="adj-desk-input-${p.id}" value="${adj.counted}" step="any" onchange="InventoryModule.setMobileAdjustmentCount(${p.id}, this.value)">
+              <button type="button" class="adj-step-btn plus" style="width: 28px; height: 28px; font-size: 0.95rem; border-radius: 4px; border: 1px solid #cbd5e1;" onclick="InventoryModule.stepMobileAdjustment(${p.id}, 1)">+</button>
+            </div>
           </td>
         </tr>
       `;
@@ -478,18 +507,55 @@ const InventoryModule = {
 
           return `
             <div class="adj-mobile-card ${diff > 0 ? 'card-diff-pos' : (diff < 0 ? 'card-diff-neg' : '')}" id="adj-card-${p.id}">
+              <!-- Cabecera de Tarjeta: Foto + Datos del Producto -->
               <div class="adj-card-top">
-                <div class="adj-card-thumb">${thumbHtml}</div>
+                <div class="adj-card-thumb" onclick="InventoryModule.triggerMobilePhotoUpload(${p.id})" title="Tocar para tomar foto con la cámara o cambiar imagen">
+                  ${thumbHtml}
+                  <div class="adj-card-thumb-badge">📷 Foto</div>
+                </div>
                 <div class="adj-card-info">
                   <span class="adj-card-barcode">🏷️ ${p.barcode || 'SIN CÓDIGO'} • ${p.unit.toUpperCase()}</span>
                   <strong class="adj-card-title">${p.name}</strong>
                   <div class="adj-card-meta-row">
-                    <span class="adj-meta-stock">Sistema: <strong>${p.stock} ${p.unit}</strong></span>
-                    <span class="adj-meta-price">$${p.sale_price.toFixed(2)} MXN</span>
+                    <span class="adj-meta-stock">Stock sistema: <strong>${p.stock} ${p.unit}</strong></span>
+                    <button type="button" class="adj-mini-photo-btn" onclick="InventoryModule.triggerMobilePhotoUpload(${p.id})" title="Tomar foto con la cámara del celular">
+                      📷 Foto
+                    </button>
                   </div>
                 </div>
               </div>
 
+              <!-- Fila para Cambiar Precio de Venta -->
+              <div class="adj-card-price-row">
+                <div class="adj-price-hint">
+                  <span class="adj-price-icon">💵</span>
+                  <span class="adj-price-label">Precio venta:</span>
+                </div>
+                <div class="adj-price-control">
+                  <span class="adj-price-prefix">$</span>
+                  <input 
+                    type="number" 
+                    class="adj-price-input" 
+                    id="adj-price-${p.id}" 
+                    value="${p.sale_price.toFixed(2)}" 
+                    step="any"
+                    min="0"
+                    title="Editar precio de venta"
+                    onchange="InventoryModule.updateProductPriceQuick(${p.id}, this.value)"
+                  >
+                  <span class="adj-price-suffix">MXN</span>
+                  <button 
+                    type="button" 
+                    class="adj-price-save-btn" 
+                    onclick="InventoryModule.updateProductPriceQuick(${p.id}, document.getElementById('adj-price-${p.id}').value)"
+                    title="Guardar nuevo precio"
+                  >
+                    💾
+                  </button>
+                </div>
+              </div>
+
+              <!-- Fila para Modificar Cantidades (Conteo Físico) -->
               <div class="adj-card-stepper-row">
                 <span class="adj-stepper-hint">Conteo físico:</span>
                 <div class="adj-stepper-touch">
@@ -499,6 +565,7 @@ const InventoryModule = {
                 </div>
               </div>
 
+              <!-- Badge Dinámico de Diferencia -->
               <div class="adj-card-diff-badge ${diffClass}" id="adj-badge-${p.id}">
                 ${diffText}
               </div>
@@ -545,6 +612,10 @@ const InventoryModule = {
     const input = document.getElementById(`adj-input-${productId}`);
     if (input && document.activeElement !== input) {
       input.value = counted;
+    }
+    const deskInput = document.getElementById(`adj-desk-input-${productId}`);
+    if (deskInput && document.activeElement !== deskInput) {
+      deskInput.value = counted;
     }
 
     // Actualizar badge de diferencia de la tarjeta
@@ -599,6 +670,183 @@ const InventoryModule = {
     if (elNeg) elNeg.innerText = `D. negativa (${negCount}) -$${negAmount.toFixed(2)}`;
     const totalDiff = posAmount - negAmount;
     if (elTot) elTot.innerText = `Total diferencia: ${totalDiff >= 0 ? '+' : ''}$${totalDiff.toFixed(2)}`;
+  },
+
+  // =========================================================================
+  // REALIZAR INVENTARIO: CAMBIO RÁPIDO DE PRECIO Y FOTOGRAFÍA CON CÁMARA
+  // =========================================================================
+
+  async updateProductPriceQuick(productId, newPriceVal) {
+    const prod = this.products.find(p => p.id === productId);
+    if (!prod) return;
+
+    const parsedPrice = parseFloat(newPriceVal);
+    if (isNaN(parsedPrice) || parsedPrice < 0) {
+      App.showToast('Por favor ingrese un precio válido (mayor o igual a 0)', 'error');
+      const input = document.getElementById(`adj-price-${productId}`);
+      if (input) input.value = prod.sale_price.toFixed(2);
+      const deskInput = document.getElementById(`adj-desk-price-${productId}`);
+      if (deskInput) deskInput.value = prod.sale_price.toFixed(2);
+      return;
+    }
+
+    if (parsedPrice === prod.sale_price) return;
+
+    try {
+      const res = await fetch(`/api/products/${productId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sale_price: parsedPrice })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || 'Error actualizando precio');
+
+      prod.sale_price = parsedPrice;
+      if (window.PosModule && PosModule.products) {
+        const posProd = PosModule.products.find(p => p.id === productId);
+        if (posProd) posProd.sale_price = parsedPrice;
+      }
+
+      // Actualizar inputs si existen
+      const input = document.getElementById(`adj-price-${productId}`);
+      if (input) {
+        input.value = parsedPrice.toFixed(2);
+        input.classList.add('price-saved-flash');
+        setTimeout(() => input.classList.remove('price-saved-flash'), 1200);
+      }
+      const deskInput = document.getElementById(`adj-desk-price-${productId}`);
+      if (deskInput) {
+        deskInput.value = parsedPrice.toFixed(2);
+        deskInput.classList.add('price-saved-flash');
+        setTimeout(() => deskInput.classList.remove('price-saved-flash'), 1200);
+      }
+
+      // Recalcular diferencia en badge y stats
+      const adj = this.adjustmentsMap[productId] || { counted: prod.stock, difference: 0 };
+      this.setMobileAdjustmentCount(productId, adj.counted);
+
+      App.showToast(`💵 Precio de "${prod.name}" actualizado a $${parsedPrice.toFixed(2)} MXN`, 'success');
+    } catch (err) {
+      console.error('Error al actualizar precio:', err);
+      App.showToast(`Error al actualizar precio: ${err.message}`, 'error');
+    }
+  },
+
+  triggerMobilePhotoUpload(productId) {
+    this.targetPhotoProductId = productId;
+    const input = document.getElementById('mobile-inventory-photo-input');
+    if (input) {
+      input.value = '';
+      input.click();
+    }
+  },
+
+  async handleMobilePhotoSelected(event) {
+    const file = event.target.files && event.target.files[0];
+    if (!file || !this.targetPhotoProductId) return;
+
+    const productId = this.targetPhotoProductId;
+    const prod = this.products.find(p => p.id === productId);
+    const prodName = prod ? prod.name : 'producto';
+
+    App.showToast(`📸 Procesando fotografía de "${prodName}"...`, 'info');
+
+    try {
+      // 1. Redimensionar/comprimir imagen en Canvas para optimizar subida en red móvil
+      const base64Data = await this.compressImageFile(file, 800, 800, 0.85);
+
+      // 2. Subir imagen al backend
+      const res = await fetch('/api/products/upload-photo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image_base64: base64Data })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || 'Error al subir fotografía');
+
+      const newImageUrl = data.image_url;
+
+      // 3. Vincular foto al producto en la base de datos
+      const updateRes = await fetch(`/api/products/${productId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image_url: newImageUrl })
+      });
+      if (!updateRes.ok) {
+        const errData = await updateRes.json();
+        throw new Error(errData.detail || 'Error al vincular foto al producto');
+      }
+
+      // 4. Actualizar memoria local
+      if (prod) prod.image_url = newImageUrl;
+      if (window.PosModule && PosModule.products) {
+        const posProd = PosModule.products.find(p => p.id === productId);
+        if (posProd) posProd.image_url = newImageUrl;
+      }
+
+      // 5. Actualizar interfaz visual inmediatamente en la tarjeta móvil
+      const card = document.getElementById(`adj-card-${productId}`);
+      if (card) {
+        const thumb = card.querySelector('.adj-card-thumb');
+        if (thumb) {
+          thumb.innerHTML = `
+            <img src="${newImageUrl}?t=${Date.now()}" style="width:100%; height:100%; object-fit:cover; border-radius:8px;" alt="${prodName}">
+            <div class="adj-card-thumb-badge">📷 Foto</div>
+          `;
+          thumb.classList.add('card-highlight-pulse');
+          setTimeout(() => thumb.classList.remove('card-highlight-pulse'), 1200);
+        }
+      }
+
+      // Actualizar también en la fila de tabla de escritorio si existe
+      const deskRow = document.querySelector(`tr[data-product-id="${productId}"]`);
+      if (deskRow) {
+        const deskThumb = deskRow.querySelector('.adj-card-thumb');
+        if (deskThumb) {
+          deskThumb.innerHTML = `
+            <img src="${newImageUrl}?t=${Date.now()}" style="width:100%; height:100%; object-fit:cover; border-radius:inherit;" alt="${prodName}">
+            <div class="adj-card-thumb-badge" style="font-size: 0.55rem;">📷</div>
+          `;
+        }
+      }
+
+      App.showToast(`✅ Foto guardada para "${prodName}"`, 'success');
+    } catch (err) {
+      console.error('Error al guardar foto móvil:', err);
+      App.showToast(`Error al guardar foto: ${err.message}`, 'error');
+    }
+  },
+
+  compressImageFile(file, maxW, maxH, quality = 0.85) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = reject;
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onerror = reject;
+        img.onload = () => {
+          let w = img.width;
+          let h = img.height;
+          if (w > maxW || h > maxH) {
+            if (w > h) {
+              h = Math.round((h * maxW) / w);
+              w = maxW;
+            } else {
+              w = Math.round((w * maxH) / h);
+              h = maxH;
+            }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          resolve(canvas.toDataURL('image/jpeg', quality));
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
   },
 
   resetAllAdjustments() {

@@ -184,7 +184,7 @@ def test_full_system():
 
     # Comprobar script tags en index.html
     for script_name in ["suppliers.js", "purchases.js", "settings.js"]:
-        assert f'<script src="/static/js/{script_name}"></script>' in html_content, f"Falta script {script_name} en index.html"
+        assert re.search(rf'<script src="/static/js/{script_name}(\?v=[^"]*)?"></script>', html_content), f"Falta script {script_name} en index.html"
         print(f"    - Script '{script_name}' correctamente vinculado en index.html OK")
 
     print("\n==================================================")

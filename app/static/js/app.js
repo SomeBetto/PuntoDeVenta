@@ -407,6 +407,23 @@ const App = {
   closeAllModals() {
     document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
     document.getElementById('drawer-backdrop')?.classList.remove('active');
+    if (window.AppDialog) AppDialog.close();
+  },
+
+  confirm(opts) {
+    if (window.AppDialog) return AppDialog.confirm(opts);
+    return Promise.resolve(window.confirm(typeof opts === 'string' ? opts : (opts.message || '')));
+  },
+
+  prompt(opts, def) {
+    if (window.AppDialog) return AppDialog.prompt(opts, def);
+    return Promise.resolve(window.prompt(typeof opts === 'string' ? opts : (opts.message || ''), def));
+  },
+
+  alert(opts) {
+    if (window.AppDialog) return AppDialog.alert(opts);
+    window.alert(typeof opts === 'string' ? opts : (opts.message || ''));
+    return Promise.resolve();
   },
 
   showToast(message, type = 'info') {

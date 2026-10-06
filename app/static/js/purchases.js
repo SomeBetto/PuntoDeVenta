@@ -344,9 +344,17 @@ const PurchasesModule = {
     this.renderCart();
   },
 
-  clearCart() {
+  async clearCart() {
     if (this.cart.length === 0) return;
-    if (confirm('¿Deseas limpiar todos los productos de esta compra?')) {
+    const ok = await App.confirm({
+      title: 'Limpiar Carrito de Compra',
+      message: '¿Deseas limpiar todos los productos de esta compra?',
+      type: 'danger',
+      icon: '🗑️',
+      confirmText: 'Sí, limpiar productos',
+      cancelText: 'Conservar compra'
+    });
+    if (ok) {
       this.cart = [];
       this.renderCart();
     }
@@ -650,7 +658,15 @@ const PurchasesModule = {
   },
 
   async confirmCancel(purchaseId, folio) {
-    if (!confirm(`⚠️ ¿ATENCIÓN: Deseas cancelar la compra ${folio}?\n\nEsta acción revertirá automáticamente el stock de los productos que ingresaron con esta compra.`)) {
+    const ok = await App.confirm({
+      title: 'Cancelar Compra',
+      message: `¿Deseas cancelar la compra ${folio}?\n\n⚠️ Esta acción revertirá automáticamente el stock de los productos que ingresaron con esta compra.`,
+      type: 'danger',
+      icon: '⚠️',
+      confirmText: 'Sí, cancelar compra',
+      cancelText: 'Conservar compra'
+    });
+    if (!ok) {
       return;
     }
 

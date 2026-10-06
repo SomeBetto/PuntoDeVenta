@@ -231,7 +231,15 @@ const CustomersModule = {
       return;
     }
 
-    if (!confirm(`¿Estás seguro de que deseas eliminar al cliente "${cust.name}"?`)) {
+    const ok = await App.confirm({
+      title: 'Eliminar Cliente',
+      message: `¿Estás seguro de que deseas eliminar al cliente "${cust.name}"?`,
+      type: 'danger',
+      icon: '🗑️',
+      confirmText: 'Sí, eliminar cliente',
+      cancelText: 'Cancelar'
+    });
+    if (!ok) {
       return;
     }
 

@@ -237,7 +237,15 @@ const SuppliersModule = {
   },
 
   async confirmDelete(supplierId, name) {
-    if (!confirm(`¿Estás seguro de que deseas eliminar o dar de baja al proveedor "${name}"?`)) {
+    const ok = await App.confirm({
+      title: 'Eliminar Proveedor',
+      message: `¿Estás seguro de que deseas eliminar o dar de baja al proveedor "${name}"?`,
+      type: 'danger',
+      icon: '🗑️',
+      confirmText: 'Sí, eliminar proveedor',
+      cancelText: 'Cancelar'
+    });
+    if (!ok) {
       return;
     }
 

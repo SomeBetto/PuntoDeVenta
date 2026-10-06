@@ -285,8 +285,15 @@ const BackupModule = {
       return;
     }
 
-    const confirmMsg = `¿Desea subir y restaurar el archivo "${file.name}"?\n\n⚠️ Esta acción reemplazará la base de datos actual.\n🛡️ Se generará automáticamente un respaldo de seguridad previo.`;
-    if (!confirm(confirmMsg)) {
+    const ok = await App.confirm({
+      title: 'Restaurar Base de Datos',
+      message: `¿Desea subir y restaurar el archivo "${file.name}"?\n\n⚠️ Esta acción reemplazará la base de datos actual.\n🛡️ Se generará automáticamente un respaldo de seguridad previo.`,
+      type: 'warning',
+      icon: '🔄',
+      confirmText: 'Sí, restaurar base de datos',
+      cancelText: 'Cancelar'
+    });
+    if (!ok) {
       return;
     }
 

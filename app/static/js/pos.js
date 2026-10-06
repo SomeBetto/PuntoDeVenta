@@ -67,8 +67,15 @@ const PosModule = {
     // Botón de escáner
     const scannerBtn = document.getElementById('btn-pos-scanner');
     if (scannerBtn) {
-      scannerBtn.addEventListener('click', () => {
-        const val = prompt('Ingrese o escanee el código de barras del producto:');
+      scannerBtn.addEventListener('click', async () => {
+        const val = await App.prompt({
+          title: 'Escanear / Ingresar Código',
+          message: 'Ingrese o escanee el código de barras del producto:',
+          placeholder: 'Código de barras...',
+          inputIcon: '📷',
+          confirmText: 'Buscar y Agregar',
+          cancelText: 'Cancelar'
+        });
         if (val) this.handleBarcodeScan(val.trim());
       });
     }
@@ -829,9 +836,17 @@ const PosModule = {
     this.renderCart();
   },
 
-  clearCurrentSale() {
+  async clearCurrentSale() {
     if (this.cart.length === 0) return;
-    if (confirm('¿Desea vaciar todos los artículos de la venta actual?')) {
+    const ok = await App.confirm({
+      title: 'Vaciar Venta Actual',
+      message: '¿Desea vaciar todos los artículos de la venta actual?',
+      type: 'danger',
+      icon: '🗑️',
+      confirmText: 'Sí, vaciar venta',
+      cancelText: 'Conservar venta'
+    });
+    if (ok) {
       this.cart = [];
       this.renderCart();
       App.showToast('Carrito vaciado', 'info');
@@ -1121,7 +1136,15 @@ const PosModule = {
     const total = this.getCartTotal();
     const cust = this.tickets[this.activeTab].customerName;
 
-    if (!confirm(`⚡ ¿Cobro Express por $${total.toFixed(2)} en EFECTIVO EXACTO?`)) {
+    const ok = await App.confirm({
+      title: '⚡ Cobro Express en Efectivo',
+      message: `¿Cobro Express por $${total.toFixed(2)} en EFECTIVO EXACTO${cust && cust !== 'Público General' ? ` para "${cust}"` : ''}?`,
+      type: 'success',
+      icon: '⚡',
+      confirmText: 'Cobrar Ahora',
+      cancelText: 'Cancelar'
+    });
+    if (!ok) {
       return;
     }
 
@@ -1885,7 +1908,14 @@ ${paymentDetails}${divider}${footer}`;
       const promptMsg = isNamed
         ? `El cliente "${sale.customer_name}" no tiene teléfono registrado.\n\nIngrese su número de WhatsApp (10 dígitos):`
         : 'Ingrese el número de WhatsApp para enviar el ticket (10 dígitos):';
-      const input = prompt(promptMsg);
+      const input = await App.prompt({
+        title: 'Enviar Ticket por WhatsApp',
+        message: promptMsg,
+        placeholder: '10 dígitos (ej. 7441234567)',
+        inputIcon: '💬',
+        confirmText: 'Abrir WhatsApp',
+        cancelText: 'Cancelar'
+      });
       if (!input) return;
       phone = input.trim();
     }
@@ -1944,7 +1974,14 @@ ${paymentDetails}${divider}${footer}`;
       const promptMsg = isNamed
         ? `El cliente "${sale.customer_name}" no tiene teléfono registrado.\n\nIngrese su número de WhatsApp (10 dígitos):`
         : 'Ingrese el número de WhatsApp para enviar el ticket (10 dígitos):';
-      const input = prompt(promptMsg);
+      const input = await App.prompt({
+        title: 'Enviar Ticket por WhatsApp',
+        message: promptMsg,
+        placeholder: '10 dígitos (ej. 7441234567)',
+        inputIcon: '💬',
+        confirmText: 'Abrir WhatsApp',
+        cancelText: 'Cancelar'
+      });
       if (!input) return;
       phone = input.trim();
     }

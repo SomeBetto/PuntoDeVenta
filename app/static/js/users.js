@@ -341,7 +341,15 @@ const UsersModule = {
       return;
     }
 
-    if (!confirm(`¿Está seguro de eliminar al cajero "${this.selectedUser.name}"?`)) {
+    const ok = await App.confirm({
+      title: 'Eliminar Cajero',
+      message: `¿Está seguro de eliminar al cajero "${this.selectedUser.name}"?`,
+      type: 'danger',
+      icon: '🗑️',
+      confirmText: 'Sí, eliminar cajero',
+      cancelText: 'Cancelar'
+    });
+    if (!ok) {
       return;
     }
 

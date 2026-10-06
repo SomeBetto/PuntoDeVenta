@@ -102,7 +102,15 @@ const EleventaModule = {
     const chkSales = document.getElementById('chk-import-sales');
     const importSales = chkSales ? chkSales.checked : true;
 
-    if (!confirm('⚠️ ATENCIÓN: Esta acción eliminará los datos actuales de la base de datos (productos, clientes, saldos, ventas y turnos) y los cargará de nuevo desde cero desde Eleventa.\n\n¿Está seguro de continuar?')) {
+    const ok = await App.confirm({
+      title: 'Importación Limpia de Eleventa',
+      message: '⚠️ ATENCIÓN: Esta acción eliminará los datos actuales de la base de datos (productos, clientes, saldos, ventas y turnos) y los cargará de nuevo desde cero desde Eleventa.\n\n¿Está seguro de continuar?',
+      type: 'danger',
+      icon: '⚠️',
+      confirmText: 'Sí, importar desde cero',
+      cancelText: 'Cancelar'
+    });
+    if (!ok) {
       return;
     }
 

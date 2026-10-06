@@ -849,8 +849,16 @@ const InventoryModule = {
     });
   },
 
-  resetAllAdjustments() {
-    if (!confirm('¿Desea restablecer todos los conteos al stock actual del sistema?')) return;
+  async resetAllAdjustments() {
+    const ok = await App.confirm({
+      title: 'Restablecer Conteos',
+      message: '¿Desea restablecer todos los conteos al stock actual del sistema?',
+      type: 'warning',
+      icon: '🔄',
+      confirmText: 'Sí, restablecer',
+      cancelText: 'Cancelar'
+    });
+    if (!ok) return;
     this.products.forEach(p => {
       this.adjustmentsMap[p.id] = {
         counted: p.stock,
@@ -861,8 +869,15 @@ const InventoryModule = {
     App.showToast('Conteos restablecidos a las existencias del sistema', 'info');
   },
 
-  triggerBarcodePrompt() {
-    const code = prompt('Escriba o escanee el código de barras del producto a contar:');
+  async triggerBarcodePrompt() {
+    const code = await App.prompt({
+      title: 'Contar Producto por Código',
+      message: 'Escriba o escanee el código de barras del producto a contar:',
+      placeholder: 'Código de barras...',
+      inputIcon: '📷',
+      confirmText: 'Contar Producto',
+      cancelText: 'Cancelar'
+    });
     if (code && code.trim()) {
       this.handleBarcodeScanInAdjustment(code.trim());
     }

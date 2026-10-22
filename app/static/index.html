@@ -42,6 +42,14 @@
       <button class="bar-connect-mobile-btn" id="btn-connect-mobile" title="Realizar inventario en celular o tablet">
         📋 Realizar Inventario
       </button>
+      <!-- Botón Minimizar a la Barra de Tareas (Escritorio) -->
+      <button class="bar-action-icon" id="btn-minimize-pos" onclick="minimizePOSDesktopWindow(event)"
+        title="Minimizar a la barra de tareas (Alt + M / Win + D)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+      </button>
       <button class="bar-action-icon" id="btn-fullscreen" onclick="togglePOSFullscreen(event)"
         title="Pantalla Completa (F11)">
         <svg class="fs-icon-enter" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -96,12 +104,41 @@
 
             <div class="win-session-divider"></div>
 
+            <button type="button" class="win-session-item" id="win-btn-minimize"
+              onclick="minimizePOSDesktopWindow()">
+              <span class="win-item-icon">🗕</span>
+              <div class="win-item-text">
+                <span class="win-item-title">Minimizar ventana</span>
+                <span class="win-item-desc">Bajar a la barra de tareas (Alt + M)</span>
+              </div>
+            </button>
+
+            <button type="button" class="win-session-item" id="win-btn-toggle-fs"
+              onclick="togglePOSFullscreen()">
+              <span class="win-item-icon">⛶</span>
+              <div class="win-item-text">
+                <span class="win-item-title">Alternar pantalla completa</span>
+                <span class="win-item-desc">Modo pantalla completa o ventana (F11)</span>
+              </div>
+            </button>
+
+            <div class="win-session-divider"></div>
+
             <button type="button" class="win-session-item win-logout-item" id="btn-top-logout"
               onclick="SessionModule.openLogout()">
               <span class="win-item-icon" style="color: #ef4444;">🚪</span>
               <div class="win-item-text">
                 <span class="win-item-title" style="color: #dc2626;">Cerrar sesión</span>
                 <span class="win-item-desc">Respaldar datos y bloquear terminal</span>
+              </div>
+            </button>
+
+            <button type="button" class="win-session-item" id="win-btn-exit-app"
+              onclick="exitPOSApplication()">
+              <span class="win-item-icon" style="color: #b91c1c;">⏻</span>
+              <div class="win-item-text">
+                <span class="win-item-title" style="color: #b91c1c;">Salir del programa</span>
+                <span class="win-item-desc">Cerrar aplicación y apagar servidor</span>
               </div>
             </button>
           </div>
@@ -167,8 +204,33 @@
       } catch (e) { }
     })();
 
+    function minimizePOSDesktopWindow(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      try {
+        if (window.pywebview && window.pywebview.api && typeof window.pywebview.api.minimize === 'function') {
+          window.pywebview.api.minimize();
+          return;
+        }
+      } catch (err) {
+        console.warn('Error en pywebview.api.minimize:', err);
+      }
+      if (window.App && App.showToast) {
+        App.showToast('ℹ️ En navegador web puedes usar Windows + D o Alt + Tab para minimizar', 'info');
+      }
+    }
+
     function togglePOSFullscreen(e) {
       if (e && e.preventDefault) e.preventDefault();
+      try {
+        if (window.pywebview && window.pywebview.api && typeof window.pywebview.api.toggle_fullscreen === 'function') {
+          window.pywebview.api.toggle_fullscreen();
+          setTimeout(syncDesktopFullscreenState, 150);
+          return;
+        }
+      } catch (err) {
+        console.warn('Error en pywebview.api.toggle_fullscreen:', err);
+      }
+
       try {
         var isFs = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
         if (!isFs) {
@@ -196,10 +258,17 @@
       }
     }
 
-    function syncPOSFullscreenIcon() {
+    function syncDesktopFullscreenState() {
+      if (window.pywebview && window.pywebview.api && typeof window.pywebview.api.is_fullscreen === 'function') {
+        window.pywebview.api.is_fullscreen().then(function (isFs) {
+          setFullscreenButtonUI(Boolean(isFs));
+        }).catch(function () {});
+      }
+    }
+
+    function setFullscreenButtonUI(isFs) {
       var btn = document.getElementById('btn-fullscreen');
       if (!btn) return;
-      var isFs = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
       if (isFs) {
         btn.innerHTML = '<svg class="fs-icon fs-icon-exit" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/></svg>';
         btn.title = 'Salir de Pantalla Completa (F11 o Esc)';
@@ -210,6 +279,29 @@
         btn.classList.remove('active-fullscreen');
       }
     }
+
+    function syncPOSFullscreenIcon() {
+      var isFs = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+      setFullscreenButtonUI(isFs);
+    }
+
+    window.addEventListener('pywebviewready', function () {
+      document.body.classList.add('is-desktop-app');
+      syncDesktopFullscreenState();
+    });
+
+    window.addEventListener('keydown', function (e) {
+      // Alt + M para minimizar en modo escritorio
+      if (e.altKey && (e.key === 'm' || e.key === 'M')) {
+        e.preventDefault();
+        minimizePOSDesktopWindow(e);
+      }
+      // F11 interceptado en modo desktop nativo
+      if (e.key === 'F11' && window.pywebview && window.pywebview.api) {
+        e.preventDefault();
+        togglePOSFullscreen(e);
+      }
+    });
 
     document.addEventListener('fullscreenchange', syncPOSFullscreenIcon);
     document.addEventListener('webkitfullscreenchange', syncPOSFullscreenIcon);
@@ -2935,13 +3027,17 @@
           </code>
         </div>
 
-        <div style="display: flex; justify-content: center; gap: 0.85rem;">
+        <div style="display: flex; justify-content: center; gap: 0.75rem; flex-wrap: wrap;">
           <button type="button" class="meta-btn" onclick="App.closeModal('logout-modal')">
             Cancelar
           </button>
           <button type="button" class="btn-modal-accept" id="btn-confirm-logout"
-            style="background: #dc2626; padding: 0.75rem 1.75rem;">
-            💾 Respaldar y Cerrar Sesión
+            style="background: #2563eb; padding: 0.75rem 1.4rem;">
+            💾 Respaldar e Ir al Login
+          </button>
+          <button type="button" class="btn-modal-accept" id="btn-confirm-logout-and-exit"
+            style="background: #dc2626; padding: 0.75rem 1.4rem;">
+            🛑 Respaldar y Salir
           </button>
         </div>
       </div>
@@ -3177,15 +3273,33 @@
       </div>
 
       <div class="form-group" style="text-align: left; margin-top: 1rem;">
-        <label class="form-label" style="font-size: 0.82rem;">Seleccione Usuario / Cajero:</label>
-        <select class="form-select" id="lock-user-select" style="font-size: 0.9rem;">
-          <option value="Administrador" selected>Administrador (Control Total)</option>
+        <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: #334155;">Seleccione Usuario / Cajero:</label>
+        <select class="form-select" id="lock-user-select" style="font-size: 0.95rem;">
+          <option value="1" selected>👑 Administrador (Control Total)</option>
         </select>
       </div>
 
-      <button type="button" class="btn-unlock" id="btn-unlock-session">
-        🔓 Iniciar Sesión / Ingresar
-      </button>
+      <!-- Campo de PIN si el usuario seleccionado lo requiere -->
+      <div id="lock-pin-wrap" style="display: none; text-align: left; margin-top: 0.75rem;">
+        <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: #334155;">PIN de Acceso:</label>
+        <input type="password" id="lock-pin-input" class="sub-search-input"
+          style="width: 100%; height: 42px; font-size: 1.2rem; letter-spacing: 4px; text-align: center; border-radius: 8px;"
+          maxlength="10" placeholder="••••">
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1.25rem;">
+        <button type="button" class="btn-unlock" id="btn-unlock-session" style="margin-top: 0;">
+          🔓 Iniciar Sesión / Ingresar
+        </button>
+
+        <button type="button" class="btn-exit-pos" id="btn-lock-exit-app" onclick="exitPOSApplication()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
+            <line x1="12" y1="2" x2="12" y2="12"></line>
+          </svg>
+          Salir del Programa
+        </button>
+      </div>
     </div>
   </div>
 

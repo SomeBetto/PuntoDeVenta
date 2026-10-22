@@ -42,10 +42,33 @@ const BackupModule = {
       });
     }
 
-    // Confirmar Cierre de Sesión en el Modal
+    // Confirmar Cierre de Sesión en el Modal (Respaldar e ir al login)
     const btnConfirmLogout = document.getElementById('btn-confirm-logout');
     if (btnConfirmLogout) {
       btnConfirmLogout.addEventListener('click', () => this.processLogoutWithBackup());
+    }
+
+    // Confirmar Cierre de Sesión y Salir del Sistema
+    const btnConfirmLogoutAndExit = document.getElementById('btn-confirm-logout-and-exit');
+    if (btnConfirmLogoutAndExit) {
+      btnConfirmLogoutAndExit.addEventListener('click', () => this.processLogoutAndExit());
+    }
+
+    // Cambio de usuario en Lock Screen
+    const lockUserSelect = document.getElementById('lock-user-select');
+    if (lockUserSelect) {
+      lockUserSelect.addEventListener('change', () => this.handleLockUserChange());
+    }
+
+    // Enter en PIN de Lock Screen
+    const lockPinInput = document.getElementById('lock-pin-input');
+    if (lockPinInput) {
+      lockPinInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          this.unlockSession();
+        }
+      });
     }
 
     // Guardar Carpeta de Respaldo (manejar todos los botones)
@@ -354,7 +377,7 @@ const BackupModule = {
     const btn = document.getElementById('btn-confirm-logout');
     if (btn) {
       btn.disabled = true;
-      btn.innerHTML = '⏳ Respaldando base de datos...';
+      btn.innerHTML = '⏳ Respaldando...';
     }
 
     try {
@@ -373,7 +396,38 @@ const BackupModule = {
     } finally {
       if (btn) {
         btn.disabled = false;
-        btn.innerHTML = '💾 Respaldar y Cerrar Sesión';
+        btn.innerHTML = '💾 Respaldar e Ir al Login';
+      }
+    }
+  },
+
+  async processLogoutAndExit() {
+    const btn = document.getElementById('btn-confirm-logout-and-exit');
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = '⏳ Respaldando...';
+    }
+
+    try {
+      const res = await fetch('/api/backup/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reason: 'logout_and_exit' })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || 'Error creando respaldo');
+
+      App.closeModal('logout-modal');
+      App.showToast('✅ Respaldo completado. Cerrando el sistema...', 'success');
+
+      setTimeout(() => {
+        exitPOSApplication(true);
+      }, 400);
+    } catch (err) {
+      App.showToast(`Error al respaldar al salir: ${err.message}`, 'error');
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = '🛑 Respaldar y Salir';
       }
     }
   },
@@ -403,7 +457,7 @@ const BackupModule = {
     }
   },
 
-  showLockScreen(backupData) {
+  async showLockScreen(backupData) {
     const lockScreen = document.getElementById('lock-screen');
     const infoBox = document.getElementById('lock-screen-backup-info');
 
@@ -427,10 +481,97 @@ const BackupModule = {
       lockScreen.classList.add('active');
     }
 
+    // Cargar usuarios en el selector de la pantalla de bloqueo
+    await this.loadLockScreenUsers();
+
     App.showToast('Sesión cerrada y base de datos respaldada correctamente', 'success');
   },
 
+  async loadLockScreenUsers() {
+    const select = document.getElementById('lock-user-select');
+    if (!select) return;
+
+    try {
+      const res = await fetch('/api/users');
+      const users = await res.json();
+      if (Array.isArray(users) && users.length > 0) {
+        this.cachedUsers = users;
+        const currentId = window.SessionModule && SessionModule.currentUser ? SessionModule.currentUser.id : users[0].id;
+
+        select.innerHTML = users.map(u => {
+          const isAdmin = u.role === 'ADMIN' || u.username === 'admin';
+          const roleLabel = isAdmin ? 'Administrador' : (u.role || 'Cajero');
+          const isSelected = u.id === currentId ? 'selected' : '';
+          return `<option value="${u.id}" ${isSelected}>${u.avatar || '👤'} ${u.name} (${roleLabel})</option>`;
+        }).join('');
+
+        this.handleLockUserChange();
+      }
+    } catch (e) {
+      console.warn('Error cargando usuarios para pantalla de bloqueo:', e);
+    }
+  },
+
+  handleLockUserChange() {
+    const select = document.getElementById('lock-user-select');
+    const pinWrap = document.getElementById('lock-pin-wrap');
+    const pinInput = document.getElementById('lock-pin-input');
+    if (!select || !this.cachedUsers) return;
+
+    const userId = parseInt(select.value, 10);
+    const user = this.cachedUsers.find(u => u.id === userId);
+
+    if (user && user.pin && user.pin.trim() !== '') {
+      if (pinWrap) pinWrap.style.display = 'block';
+      if (pinInput) {
+        pinInput.value = '';
+        setTimeout(() => pinInput.focus(), 100);
+      }
+    } else {
+      if (pinWrap) pinWrap.style.display = 'none';
+      if (pinInput) pinInput.value = '';
+    }
+  },
+
   unlockSession() {
+    const select = document.getElementById('lock-user-select');
+    const pinInput = document.getElementById('lock-pin-input');
+
+    if (select && this.cachedUsers) {
+      const userId = parseInt(select.value, 10);
+      const user = this.cachedUsers.find(u => u.id === userId);
+
+      if (user && user.pin && user.pin.trim() !== '') {
+        const enteredPin = pinInput ? pinInput.value.trim() : '';
+        if (enteredPin !== user.pin.trim()) {
+          App.showToast('PIN de acceso incorrecto', 'error');
+          if (pinInput) {
+            pinInput.value = '';
+            pinInput.focus();
+          }
+          return;
+        }
+      }
+
+      if (user && window.SessionModule) {
+        SessionModule.currentUser = {
+          id: user.id,
+          name: user.name,
+          username: user.username,
+          role: user.role,
+          avatar: user.avatar || '👨‍💼'
+        };
+        localStorage.setItem('pos_active_user', JSON.stringify(SessionModule.currentUser));
+        SessionModule.updateUserUI();
+
+        if (window.CashModule && CashModule.currentShift) {
+          CashModule.currentShift.cashier_name = user.name;
+        }
+      }
+    }
+
+    if (pinInput) pinInput.value = '';
+
     const lockScreen = document.getElementById('lock-screen');
     if (lockScreen) {
       lockScreen.classList.remove('active');
@@ -438,8 +579,75 @@ const BackupModule = {
 
     if (typeof PosModule !== 'undefined') PosModule.loadProducts();
     if (typeof CashModule !== 'undefined') CashModule.loadCurrentShift();
-    App.showToast('¡Bienvenido de nuevo! Sesión activa.', 'success');
+    App.showToast(`¡Bienvenido de nuevo, ${window.SessionModule?.currentUser?.name || ''}!`, 'success');
   }
+};
+
+/**
+ * Función global para salir del Punto de Venta de forma limpia y segura
+ * Apaga el servidor backend y cierra la ventana nativa (pywebview) o de navegador
+ */
+window.exitPOSApplication = async function(skipConfirm = false) {
+  if (window.SessionModule && typeof SessionModule.closeDropdown === 'function') {
+    SessionModule.closeDropdown();
+  }
+  if (window.App && typeof App.closeDrawer === 'function') {
+    App.closeDrawer();
+  }
+
+  if (!skipConfirm) {
+    if (window.AppDialog && typeof AppDialog.confirm === 'function') {
+      const ok = await AppDialog.confirm({
+        title: 'Salir del Punto de Venta',
+        subtitle: 'PUNTO DE VENTA',
+        message: '¿Está seguro de que desea salir del programa y apagar el sistema?',
+        confirmText: 'Sí, Salir del Sistema',
+        cancelText: 'Cancelar',
+        type: 'danger',
+        icon: '⏻'
+      });
+      if (!ok) return;
+    } else {
+      if (!confirm('¿Desea salir del Punto de Venta y cerrar el programa?')) return;
+    }
+  }
+
+  if (window.App && typeof App.showToast === 'function') {
+    App.showToast('Cerrando el Punto de Venta...', 'info');
+  }
+
+  // Notificar al backend para terminar el proceso de servidor
+  try {
+    fetch('/api/system/exit', { method: 'POST' }).catch(() => {});
+  } catch (e) {}
+
+  // Si está en ventana pywebview de escritorio nativa:
+  try {
+    if (window.pywebview && window.pywebview.api && typeof window.pywebview.api.close === 'function') {
+      window.pywebview.api.close();
+      return;
+    }
+  } catch (err) {
+    console.warn('Error llamando pywebview.api.close:', err);
+  }
+
+  // Si está en navegador web o ventana de aplicación Edge/Chrome:
+  setTimeout(() => {
+    try {
+      window.close();
+    } catch (e) {}
+
+    // Mensaje en pantalla por si las políticas de seguridad del navegador impiden window.close()
+    document.body.innerHTML = `
+      <div style="position:fixed;inset:0;background:radial-gradient(circle at center,#1e293b 0%,#0f172a 100%);color:#f8fafc;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;text-align:center;padding:2rem;z-index:999999;">
+        <div style="width:80px;height:80px;border-radius:50%;background:#ef444420;border:2px solid #ef4444;display:flex;align-items:center;justify-content:center;font-size:2.5rem;margin-bottom:1.25rem;">🛑</div>
+        <h1 style="font-size:1.85rem;font-weight:800;margin-bottom:0.6rem;color:#ffffff;letter-spacing:-0.5px;">Punto de Venta Cerrado</h1>
+        <p style="font-size:1rem;color:#94a3b8;max-width:440px;line-height:1.55;margin-bottom:1.5rem;">
+          La sesión se ha cerrado y el sistema se ha apagado de forma segura.<br>Ya puede cerrar esta pestaña o ventana del navegador.
+        </p>
+      </div>
+    `;
+  }, 250);
 };
 
 document.addEventListener('DOMContentLoaded', () => {

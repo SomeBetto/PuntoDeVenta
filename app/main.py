@@ -1,5 +1,9 @@
 import os
+import sys
+import threading
+import time
 from pathlib import Path
+from typing import Optional
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -19,7 +23,6 @@ from app.routes.users import router as users_router
 from app.routes.suppliers import router as suppliers_router
 from app.routes.purchases import router as purchases_router
 
-import sys
 if sys.platform == "win32":
     try:
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -76,7 +79,7 @@ def network_info():
     return get_server_urls(port=8050)
 
 @app.get("/api/network/qr.svg")
-def network_qr_svg(url: str = None):
+def network_qr_svg(url: Optional[str] = None):
     """Genera y retorna un código QR estándar en formato SVG vectorial"""
     if not url:
         net = get_server_urls(port=8050)
@@ -94,3 +97,13 @@ def serve_index():
     if index_file.exists():
         return FileResponse(index_file, headers={"Cache-Control": "no-cache, no-store, must-revalidate"})
     return {"message": "Punto de Venta Backend Activo"}
+
+@app.post("/api/system/exit")
+def exit_system():
+    """Termina de forma ordenada el proceso del servidor y la aplicación."""
+    def _shutdown():
+        time.sleep(0.4)
+        os._exit(0)
+
+    threading.Thread(target=_shutdown, daemon=True).start()
+    return {"status": "ok", "message": "Punto de Venta cerrando..."}

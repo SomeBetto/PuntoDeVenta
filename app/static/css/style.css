@@ -1741,6 +1741,36 @@ body {
   transform: translateY(-1px);
 }
 
+.btn-exit-pos {
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1.5px solid #fecaca;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.95rem;
+  padding: 0.8rem 1.5rem;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  width: 100%;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-exit-pos:hover {
+  background: #dc2626;
+  color: #ffffff;
+  border-color: #dc2626;
+  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.35);
+  transform: translateY(-1px);
+}
+
+.btn-exit-pos:active {
+  transform: translateY(0);
+}
+
 /* ==========================================================================
    14. ESTILOS MODERNOS PARA REPORTES DE ELEVENTA Y GESTIÓN DE CAJEROS
    ========================================================================== */
@@ -3341,7 +3371,8 @@ body {
   .bar-connect-mobile-btn {
     display: none !important;
   }
-  .bar-action-icon#btn-fullscreen {
+  .bar-action-icon#btn-fullscreen,
+  .bar-action-icon#btn-minimize-pos {
     display: none !important;
   }
   .top-app-bar {
@@ -3764,6 +3795,7 @@ body.mobile-inventory-mode .drawer-nav-item#btn-open-eleventa-modal,
 body.mobile-inventory-mode .drawer-nav-item.logout-item,
 body.mobile-inventory-mode .bar-connect-mobile-btn,
 body.mobile-inventory-mode .bar-action-icon#btn-fullscreen,
+body.mobile-inventory-mode .bar-action-icon#btn-minimize-pos,
 body.mobile-inventory-mode .bar-action-icon#btn-top-settings,
 body.mobile-inventory-mode .pos-mobile-nav-bar,
 body.mobile-inventory-mode .pos-mobile-floating-cart {

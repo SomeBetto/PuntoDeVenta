@@ -120,6 +120,13 @@ const SessionModule = {
     }
   },
 
+  exitApplication() {
+    this.closeDropdown();
+    if (typeof window.exitPOSApplication === 'function') {
+      window.exitPOSApplication();
+    }
+  },
+
   async openSwitchUserModal() {
     this.closeDropdown();
     App.openModal('modal-switch-user');

@@ -7,11 +7,37 @@ const CustomersModule = {
   selectedCustomerId: null,
   searchQuery: '',
   storeSettings: null,
+  filterOnlyDebt: false,
+  lastPaymentReceipt: null,
 
   init() {
     this.bindEvents();
     this.loadCustomers();
     this.ensureStoreSettings();
+  },
+
+  setDebtFilter(onlyDebt) {
+    this.filterOnlyDebt = onlyDebt;
+    const btnAll = document.getElementById('btn-cust-filter-all');
+    const btnDebt = document.getElementById('btn-cust-filter-debt');
+    if (btnAll && btnDebt) {
+      if (onlyDebt) {
+        btnAll.style.background = 'transparent';
+        btnAll.style.boxShadow = 'none';
+        btnAll.style.color = 'inherit';
+        btnDebt.style.background = '#fff';
+        btnDebt.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
+        btnDebt.style.color = '#dc2626';
+      } else {
+        btnAll.style.background = '#fff';
+        btnAll.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
+        btnAll.style.color = 'inherit';
+        btnDebt.style.background = 'transparent';
+        btnDebt.style.boxShadow = 'none';
+        btnDebt.style.color = '#b91c1c';
+      }
+    }
+    this.renderTable();
   },
 
   bindEvents() {
@@ -53,7 +79,26 @@ const CustomersModule = {
     const tbody = document.getElementById('customers-table-body');
     if (!tbody) return;
 
+    // Calcular métricas de clientes y fiados
+    const totalCount = (this.customers || []).length;
+    const debtors = (this.customers || []).filter(c => Number(c.current_balance) > 0);
+    const totalDebt = debtors.reduce((sum, c) => sum + (Number(c.current_balance) || 0), 0);
+
+    const countAllEl = document.getElementById('cust-count-all');
+    const countDebtEl = document.getElementById('cust-count-debt');
+    const totalDebtEl = document.getElementById('cust-total-debt');
+
+    if (countAllEl) countAllEl.innerText = totalCount;
+    if (countDebtEl) countDebtEl.innerText = debtors.length;
+    if (totalDebtEl) totalDebtEl.innerText = `$${totalDebt.toFixed(2)}`;
+
     let list = this.customers || [];
+
+    // Aplicar filtro de sólo con deuda
+    if (this.filterOnlyDebt) {
+      list = list.filter(c => Number(c.current_balance) > 0);
+    }
+
     if (this.searchQuery) {
       list = list.filter(c => 
         (c.name || '').toLowerCase().includes(this.searchQuery) ||
@@ -66,8 +111,9 @@ const CustomersModule = {
     if (list.length === 0) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="6" style="text-align:center; padding: 2rem; color: var(--text-dim);">
-            ${this.searchQuery ? 'No se encontraron clientes que coincidan con la búsqueda.' : 'No hay clientes registrados en la libreta de fiados.'}
+          <td colspan="6" style="text-align:center; padding: 2.5rem; color: var(--text-dim);">
+            <div style="font-size: 2rem; margin-bottom: 0.5rem;">${this.filterOnlyDebt ? '🎉' : '🔍'}</div>
+            <strong>${this.filterOnlyDebt ? '¡No hay clientes con saldo pendiente de pago!' : (this.searchQuery ? 'No se encontraron clientes que coincidan con la búsqueda.' : 'No hay clientes registrados.')}</strong>
           </td>
         </tr>
       `;
@@ -88,37 +134,42 @@ const CustomersModule = {
         : `$${availableCredit.toFixed(2)}`;
 
       return `
-        <tr>
+        <tr style="${hasDebt ? 'background: #fffafa;' : ''}">
           <td>
-            <strong>${c.name}</strong>
-            ${c.notes ? `<div style="font-size: 0.75rem; color: var(--text-dim);">${c.notes}</div>` : ''}
-            ${c.address ? `<div style="font-size: 0.75rem; color: var(--text-secondary);">📍 ${c.address}</div>` : ''}
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span style="font-size: 1.25rem;">${hasDebt ? '🔴' : '👤'}</span>
+              <div>
+                <strong style="color: ${hasDebt ? '#991b1b' : 'inherit'}; font-size: 0.95rem;">${c.name}</strong>
+                ${c.notes ? `<div style="font-size: 0.74rem; color: var(--text-dim);">${c.notes}</div>` : ''}
+                ${c.address ? `<div style="font-size: 0.74rem; color: var(--text-secondary);">📍 ${c.address}</div>` : ''}
+              </div>
+            </div>
           </td>
           <td>
             ${c.phone 
-              ? `<span style="font-family: var(--font-mono); font-size: 0.85rem;">📞 ${c.phone}</span>` 
+              ? `<span style="font-family: var(--font-mono); font-size: 0.85rem; font-weight: 600;">📞 ${c.phone}</span>` 
               : `<button class="btn-secondary" style="padding: 0.2rem 0.45rem; font-size: 0.75rem; border: 1px dashed var(--border-color); color: var(--text-dim);" onclick="CustomersModule.openEditCustomerModal(${c.id})" title="Registrar número de teléfono">+ Teléfono</button>`
             }
           </td>
           <td style="font-family: var(--font-mono);">${limitDisplay}</td>
-          <td style="font-family: var(--font-mono); font-weight: 800; font-size: 1rem; color: ${hasDebt ? 'var(--danger)' : 'var(--primary-light)'};">
+          <td style="font-family: var(--font-mono); font-weight: 900; font-size: 1.05rem; text-align: right; color: ${hasDebt ? '#dc2626' : '#16a34a'};">
             $${balance.toFixed(2)}
           </td>
-          <td style="font-family: var(--font-mono);">${availableDisplay}</td>
+          <td style="font-family: var(--font-mono); text-align: right;">${availableDisplay}</td>
           <td>
-            <div style="display: flex; gap: 0.35rem; flex-wrap: wrap; align-items: center;">
+            <div style="display: flex; gap: 0.35rem; flex-wrap: wrap; align-items: center; justify-content: center;">
               ${hasDebt ? `
-                <button class="btn-primary" style="padding: 0.35rem 0.6rem; font-size: 0.8rem;" onclick="CustomersModule.openPaymentModal(${c.id})" title="Registrar abono de pago">
+                <button class="btn-primary" style="padding: 0.35rem 0.6rem; font-size: 0.8rem; background: #2563eb; font-weight: 700;" onclick="CustomersModule.openPaymentModal(${c.id})" title="Registrar abono de pago">
                   💵 Abonar
                 </button>
               ` : ''}
-              <button class="btn-secondary" style="padding: 0.35rem 0.6rem; font-size: 0.8rem; background: #22c55e; color: white; border: none; font-weight: 600; cursor: pointer;" onclick="CustomersModule.sendWhatsAppReminder(${c.id})" title="${c.phone ? 'Enviar mensaje por WhatsApp' : 'Registrar teléfono para WhatsApp'}">
+              <button class="btn-secondary" style="padding: 0.35rem 0.65rem; font-size: 0.8rem; background: #22c55e; color: white; border: none; font-weight: 700; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.15);" onclick="CustomersModule.sendWhatsAppReminder(${c.id})" title="${c.phone ? 'Enviar recordatorio o estado de cuenta por WhatsApp' : 'Registrar teléfono para WhatsApp'}">
                 💬 WhatsApp
               </button>
-              <button class="btn-secondary" style="padding: 0.35rem 0.6rem; font-size: 0.8rem;" onclick="CustomersModule.openEditCustomerModal(${c.id})" title="Modificar datos del cliente">
+              <button class="btn-secondary" style="padding: 0.35rem 0.55rem; font-size: 0.8rem;" onclick="CustomersModule.openEditCustomerModal(${c.id})" title="Modificar datos del cliente">
                 ✏️ Editar
               </button>
-              <button class="btn-secondary" style="padding: 0.35rem 0.6rem; font-size: 0.8rem;" onclick="CustomersModule.openHistoryModal(${c.id})" title="Ver estado de cuenta e historial">
+              <button class="btn-secondary" style="padding: 0.35rem 0.55rem; font-size: 0.8rem;" onclick="CustomersModule.openHistoryModal(${c.id})" title="Ver estado de cuenta e historial">
                 📜 Historial
               </button>
               ${(!hasDebt && c.id !== 1) ? `
@@ -389,7 +440,7 @@ const CustomersModule = {
     // Asegurar datos actualizados de la tienda antes de renderizar la plantilla
     await this.ensureStoreSettings();
 
-    this.applyWhatsAppTemplate(balance > 0 ? 'debt' : 'current');
+    this.applyWhatsAppTemplate(balance > 0 ? 'statement' : 'current');
 
     const modal = document.getElementById('customer-whatsapp-modal');
     if (modal) modal.classList.add('active');
@@ -403,23 +454,75 @@ const CustomersModule = {
     }, 150);
   },
 
-  applyWhatsAppTemplate(type) {
+  async applyWhatsAppTemplate(type) {
     const custId = parseInt(document.getElementById('wa-customer-id')?.value || this.selectedCustomerId);
     const cust = this.customers.find(c => c.id === custId);
     const name = cust ? cust.name : (document.getElementById('wa-customer-name')?.innerText || 'Cliente');
     const balance = cust ? (Number(cust.current_balance) || 0) : 0;
     const storeName = this.getStoreName();
+    const textarea = document.getElementById('wa-message-input');
+
+    if (type === 'statement') {
+      if (textarea) textarea.value = '⏳ Cargando estado de cuenta con detalle de compras...';
+      try {
+        const res = await fetch(`/api/customers/${custId}/history`);
+        const data = await res.json();
+        const txs = data.transactions || [];
+
+        let lines = [];
+        lines.push(`🧾 *ESTADO DE CUENTA - ${storeName}*`);
+        lines.push(`👤 Cliente: *${name}*`);
+        lines.push(`📅 Fecha: ${new Date().toLocaleDateString('es-MX', { year: 'numeric', month: 'short', day: 'numeric' })}`);
+        lines.push('----------------------------------');
+
+        if (txs.length === 0) {
+          lines.push('Sin compras ni movimientos registrados.');
+        } else {
+          lines.push('📋 *Últimos movimientos:*');
+          txs.slice(0, 8).forEach(t => {
+            const d = new Date(t.created_at);
+            const dateStr = `${d.getDate()}/${d.toLocaleString('es-MX', { month: 'short' })}`;
+            if (t.type === 'CARGO') {
+              const itemsStr = t.items_summary ? `\n   ↳ _${t.items_summary}_` : (t.notes ? `\n   ↳ _${t.notes}_` : '');
+              lines.push(`• ${dateStr} 🛍️ Compra fiada: *$${Number(t.amount).toFixed(2)}*${itemsStr}`);
+            } else {
+              lines.push(`• ${dateStr} 💵 Abono a cuenta: *-$${Number(t.amount).toFixed(2)}*`);
+            }
+          });
+        }
+
+        lines.push('----------------------------------');
+        lines.push(`💰 *SALDO TOTAL PENDIENTE: $${balance.toFixed(2)} MXN*`);
+        lines.push('----------------------------------');
+        lines.push('Le recordamos amablemente pasar a liquidar en su próxima visita.');
+        lines.push('¡Muchas gracias por su preferencia y confianza! 🙏');
+
+        if (textarea) textarea.value = lines.join('\n');
+      } catch (err) {
+        console.error('Error cargando historial para estado de cuenta:', err);
+        if (textarea) {
+          textarea.value = `Hola ${name}, le saludamos de *${storeName}*.\n\nLe recordamos amablemente que su saldo pendiente de fiado es de *$${balance.toFixed(2)} MXN*.\n\n¡Gracias por su preferencia!`;
+        }
+      }
+      return;
+    }
 
     let text = '';
     if (type === 'debt') {
       text = `Hola ${name}, le saludamos cordialmente de *${storeName}*.\n\nLe recordamos amablemente que su saldo pendiente de fiado es de *$${balance.toFixed(2)} MXN*.\n\nAgradecemos su preferencia y quedamos a su disposición para cualquier duda sobre su cuenta. ¡Que tenga un excelente día!`;
+    } else if (type === 'payment') {
+      if (this.lastPaymentReceipt && this.lastPaymentReceipt.customer_id === custId) {
+        const r = this.lastPaymentReceipt;
+        text = `🧾 *COMPROBANTE DE ABONO - ${storeName}*\n👤 Cliente: *${r.customer_name}*\nFolio: #${r.folio} | Fecha: ${r.date}\n----------------------------------\n💵 *ABONO REGISTRADO:* *$${r.payment_amount.toFixed(2)} MXN*\nSaldo Anterior: $${r.previous_balance.toFixed(2)} MXN\n🔴 *NUEVO SALDO RESTANTE:* *$${r.new_balance.toFixed(2)} MXN*\n----------------------------------\n${r.notes ? `Nota: ${r.notes}\n` : ''}${r.ticket_footer || '¡Gracias por su abono puntual! 🙏'}`;
+      } else {
+        text = `Hola ${name}, le saludamos de *${storeName}*.\n\nLe confirmamos la recepción de su abono a cuenta.\nSu saldo pendiente restante es de *$${balance.toFixed(2)} MXN*.\n\n¡Muchas gracias por su pago puntual! 🙏`;
+      }
     } else if (type === 'current') {
       text = `Hola ${name}, le saludamos cordialmente de *${storeName}*.\n\nLe informamos que su cuenta con nosotros se encuentra *al corriente* (saldo $0.00).\n\n¡Muchas gracias por su preferencia y confianza! Que tenga un excelente día.`;
     } else if (type === 'greeting') {
       text = `Hola ${name}, le saludamos cordialmente de *${storeName}*.\n\nEsperamos que tenga un excelente día y le recordamos que estamos a sus órdenes para lo que necesite. ¡Gracias por su preferencia!`;
     }
 
-    const textarea = document.getElementById('wa-message-input');
     if (textarea) textarea.value = text;
   },
 
@@ -478,6 +581,7 @@ const CustomersModule = {
   },
 
   showPaymentReceipt(receipt) {
+    this.lastPaymentReceipt = receipt;
     const container = document.getElementById('payment-receipt-content');
     if (!container) return;
 
@@ -535,6 +639,51 @@ const CustomersModule = {
 
   printPaymentReceipt() {
     window.print();
+  },
+
+  async sendPaymentReceiptViaWhatsApp() {
+    if (!this.lastPaymentReceipt) {
+      App.showToast('No hay datos de comprobante para enviar', 'warning');
+      return;
+    }
+    const r = this.lastPaymentReceipt;
+    let cleanPhone = (r.customer_phone || '').replace(/[^0-9]/g, '');
+
+    if (!cleanPhone || cleanPhone.length < 10) {
+      const input = await App.prompt({
+        title: 'Enviar Comprobante por WhatsApp',
+        message: `El cliente "${r.customer_name}" no tiene teléfono registrado.\n\nIngrese su número de WhatsApp (10 dígitos):`,
+        placeholder: '10 dígitos (ej. 5512345678)',
+        inputIcon: '📱',
+        confirmText: 'Enviar Comprobante',
+        cancelText: 'Cancelar'
+      });
+      if (!input || !input.trim()) return;
+      cleanPhone = input.trim().replace(/[^0-9]/g, '');
+      if (cleanPhone.length < 10) {
+        App.showToast('Número de teléfono inválido', 'error');
+        return;
+      }
+      // Actualizar cliente en DB
+      if (r.customer_id) {
+        fetch(`/api/customers/${r.customer_id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone: cleanPhone })
+        }).catch(() => {});
+      }
+    }
+
+    if (cleanPhone.length === 10) {
+      cleanPhone = '52' + cleanPhone;
+    }
+
+    const storeName = this.getStoreName();
+    const text = `🧾 *COMPROBANTE DE ABONO - ${storeName}*\n👤 Cliente: *${r.customer_name}*\nFolio: #${r.folio} | Fecha: ${r.date}\n----------------------------------\n💵 *ABONO REGISTRADO:* *$${Number(r.payment_amount).toFixed(2)} MXN*\nSaldo Anterior: $${Number(r.previous_balance).toFixed(2)} MXN\n🔴 *SALDO RESTANTE:* *$${Number(r.new_balance).toFixed(2)} MXN*\n----------------------------------\n${r.notes ? `Nota: ${r.notes}\n` : ''}${r.ticket_footer || '¡Muchas gracias por su abono puntual! 🙏'}`;
+
+    const waUrl = `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(text)}`;
+    window.open(waUrl, '_blank');
+    App.showToast('💬 Abriendo WhatsApp con el comprobante de abono...', 'success');
   },
 
   async openHistoryModal(customerId) {

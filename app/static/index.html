@@ -50,13 +50,6 @@
           <line x1="5" y1="12" x2="19" y2="12"></line>
         </svg>
       </button>
-      <button class="bar-action-icon" id="btn-fullscreen" onclick="togglePOSFullscreen(event)"
-        title="Pantalla Completa (F11)">
-        <svg class="fs-icon-enter" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-          stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
-        </svg>
-      </button>
       <button class="bar-action-icon" onclick="InventoryModule.openProductModal()" title="Nuevo Producto">
         ➕
       </button>
@@ -113,14 +106,6 @@
               </div>
             </button>
 
-            <button type="button" class="win-session-item" id="win-btn-toggle-fs"
-              onclick="togglePOSFullscreen()">
-              <span class="win-item-icon">⛶</span>
-              <div class="win-item-text">
-                <span class="win-item-title">Alternar pantalla completa</span>
-                <span class="win-item-desc">Modo pantalla completa o ventana (F11)</span>
-              </div>
-            </button>
 
             <div class="win-session-divider"></div>
 
@@ -690,6 +675,13 @@
             <span>➕</span>
             <span>Nuevo Producto</span>
           </button>
+          <button class="meta-btn" onclick="InventoryModule.openExpirationsModal()"
+            title="Control de productos vencidos y próximos a caducar"
+            style="background: #fef2f2; color: #dc2626; border-color: #fca5a5; font-weight: 700;">
+            <span>⏰</span>
+            <span>Caducidades</span>
+            <span id="badge-expirations-count" style="display:none; background:#dc2626; color:#fff; font-size:0.7rem; padding:1px 6px; border-radius:99px; margin-left:3px;">0</span>
+          </button>
           <button class="meta-btn" onclick="InventoryModule.openReorderSuggestionsModal()"
             title="Sugerencias inteligentes de reabastecimiento"
             style="background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe;">
@@ -1122,10 +1114,29 @@
           <input type="text" id="customers-search-input" class="sub-search-input"
             placeholder="Buscar cliente por nombre o teléfono...">
         </div>
-        <div class="sub-meta-group">
-          <button class="meta-btn" id="btn-new-customer" onclick="CustomersModule.openNewCustomerModal()">
+        <div class="sub-meta-group" style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
+          <!-- Filtro rápido de fiados -->
+          <div style="display: inline-flex; background: #e2e8f0; border-radius: 8px; padding: 2px;">
+            <button type="button" class="meta-btn" id="btn-cust-filter-all" onclick="CustomersModule.setDebtFilter(false)"
+              style="border: none; padding: 0.35rem 0.75rem; font-size: 0.8rem; font-weight: 700; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+              👥 Todos (<span id="cust-count-all">0</span>)
+            </button>
+            <button type="button" class="meta-btn" id="btn-cust-filter-debt" onclick="CustomersModule.setDebtFilter(true)"
+              style="border: none; padding: 0.35rem 0.75rem; font-size: 0.8rem; font-weight: 700; background: transparent; color: #b91c1c;">
+              🔴 Con Deuda (<span id="cust-count-debt">0</span>)
+            </button>
+          </div>
+
+          <!-- Total por cobrar -->
+          <div style="background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; padding: 0.4rem 0.75rem; border-radius: 8px; font-size: 0.82rem; font-weight: 700; display: flex; align-items: center; gap: 0.35rem;">
+            <span>💰 Total Fiado:</span>
+            <span id="cust-total-debt" style="font-family: var(--font-mono); font-size: 0.95rem; font-weight: 800;">$0.00</span>
+          </div>
+
+          <button class="meta-btn" id="btn-new-customer" onclick="CustomersModule.openNewCustomerModal()"
+            style="background: #16a34a; color: #fff; border-color: #15803d; font-weight: 700;">
             <span>➕</span>
-            <span>Registrar Nuevo Cliente</span>
+            <span>Registrar Cliente</span>
           </button>
         </div>
       </div>
@@ -2496,10 +2507,47 @@
             </select>
           </div>
         </div>
-        <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; cursor: pointer;">
-          <input type="checkbox" id="prod-form-bulk">
-          ⚖️ Producto a granel (pesaje fraccionado)
-        </label>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; align-items: center;">
+          <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; cursor: pointer;">
+            <input type="checkbox" id="prod-form-bulk">
+            ⚖️ Venta a granel
+          </label>
+          <div>
+            <label style="font-size: 0.76rem; color: var(--text-secondary); display: block; margin-bottom: 0.2rem;">
+              📅 Caducidad (Opcional):
+            </label>
+            <input type="date" id="prod-form-expiry" class="sub-search-input" style="background:#fff; font-size: 0.85rem; padding: 0.4rem 0.6rem;">
+          </div>
+        </div>
+
+        <!-- Sección de Promociones y Mayoreo -->
+        <div style="background: #f8fafc; border: 1.5px dashed #cbd5e1; border-radius: 8px; padding: 0.75rem; margin: 0.25rem 0;">
+          <div style="font-weight: 800; font-size: 0.82rem; color: #1e293b; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.35rem;">
+            <span>🏷️ Promoción y Precio Mayoreo (Opcional)</span>
+          </div>
+
+          <!-- Combo X por $Y -->
+          <div style="margin-bottom: 0.5rem;">
+            <label style="font-size: 0.74rem; color: #475569; display: block; font-weight: 700; margin-bottom: 0.2rem;">
+              Combo "X piezas por $Y" (ej. 3 por $50):
+            </label>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+              <input type="number" id="prod-form-promo-qty" class="sub-search-input" style="background:#fff; font-size: 0.82rem; padding: 0.4rem 0.6rem;" placeholder="Lleva (pzs)" min="0" step="1">
+              <input type="number" id="prod-form-promo-price" class="sub-search-input" style="background:#fff; font-size: 0.82rem; padding: 0.4rem 0.6rem;" placeholder="Total combo ($)" min="0" step="0.5">
+            </div>
+          </div>
+
+          <!-- Mayoreo Cantidad Mínima y Precio Unitario -->
+          <div>
+            <label style="font-size: 0.74rem; color: #475569; display: block; font-weight: 700; margin-bottom: 0.2rem;">
+              Mayoreo por volumen (a partir de N pzs):
+            </label>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+              <input type="number" id="prod-form-wholesale-qty" class="sub-search-input" style="background:#fff; font-size: 0.82rem; padding: 0.4rem 0.6rem;" placeholder="A partir de (pzs)" min="0" step="1">
+              <input type="number" id="prod-form-wholesale-price" class="sub-search-input" style="background:#fff; font-size: 0.82rem; padding: 0.4rem 0.6rem;" placeholder="Precio c/u ($)" min="0" step="0.5">
+            </div>
+          </div>
+        </div>
 
         <button class="btn-modal-accept" id="btn-save-product">
           GUARDAR PRODUCTO
@@ -2754,8 +2802,12 @@
             Plantilla rápida:
           </label>
           <div style="display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 0.5rem;">
+            <button type="button" class="btn-secondary" style="font-size: 0.75rem; padding: 0.3rem 0.6rem; font-weight: 700; background: #eff6ff; color: #1d4ed8; border-color: #93c5fd;"
+              onclick="CustomersModule.applyWhatsAppTemplate('statement')">📑 Estado de Cuenta Detallado</button>
             <button type="button" class="btn-secondary" style="font-size: 0.75rem; padding: 0.3rem 0.6rem;"
-              onclick="CustomersModule.applyWhatsAppTemplate('debt')">🧾 Recordatorio Deuda</button>
+              onclick="CustomersModule.applyWhatsAppTemplate('debt')">🧾 Recordatorio Rápido</button>
+            <button type="button" class="btn-secondary" style="font-size: 0.75rem; padding: 0.3rem 0.6rem;"
+              onclick="CustomersModule.applyWhatsAppTemplate('payment')">💵 Comprobante Abono</button>
             <button type="button" class="btn-secondary" style="font-size: 0.75rem; padding: 0.3rem 0.6rem;"
               onclick="CustomersModule.applyWhatsAppTemplate('current')">🟢 Al Corriente</button>
             <button type="button" class="btn-secondary" style="font-size: 0.75rem; padding: 0.3rem 0.6rem;"
@@ -3528,14 +3580,23 @@
           <!-- Comprobante dinámico -->
         </div>
 
-        <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
-          <button type="button" class="btn-modal-accept" style="flex: 1;"
-            onclick="CustomersModule.printPaymentReceipt()">
-            🖨️ Imprimir
+        <div style="margin-top: 1rem; display: flex; flex-direction: column; gap: 0.5rem;">
+          <button type="button" class="btn-whatsapp-ticket" id="btn-payment-whatsapp"
+            onclick="CustomersModule.sendPaymentReceiptViaWhatsApp()"
+            style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; width: 100%; padding: 0.7rem 1rem; font-size: 0.95rem; font-weight: 800; border-radius: 8px; background: #22c55e; color: #fff; border: none; cursor: pointer; box-shadow: 0 3px 10px rgba(22, 163, 74, 0.35);">
+            <span style="font-size: 1.25rem; line-height: 1;">💬</span>
+            <span>Enviar Comprobante por WhatsApp</span>
           </button>
-          <button type="button" class="meta-btn" onclick="App.closeModal('payment-receipt-modal')">
-            Cerrar
-          </button>
+
+          <div style="display: flex; gap: 0.5rem;">
+            <button type="button" class="btn-modal-accept" style="flex: 1;"
+              onclick="CustomersModule.printPaymentReceipt()">
+              🖨️ Imprimir
+            </button>
+            <button type="button" class="meta-btn" onclick="App.closeModal('payment-receipt-modal')">
+              Cerrar
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -3577,6 +3638,65 @@
 
         <div style="display: flex; justify-content: flex-end; margin-top: 1.25rem; gap: 0.75rem;">
           <button type="button" class="meta-btn" onclick="App.closeModal('modal-reorder-suggestions')">
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 15B: Control y Alertas de Caducidades -->
+  <div class="modal-overlay" id="modal-expirations">
+    <div class="modal-sicar-dialog" style="max-width: 920px; max-height: 88vh; display: flex; flex-direction: column;">
+      <div class="modal-sicar-header">
+        <h3 style="display: flex; align-items: center; gap: 0.5rem;">
+          <span>⏰</span>
+          <span>Control de Caducidades y Vencimientos</span>
+        </h3>
+        <button class="menu-toggle-btn" onclick="App.closeModal('modal-expirations')">✕</button>
+      </div>
+      <div class="modal-sicar-body" style="padding: 1.25rem; overflow-y: auto; flex: 1;">
+        <!-- Tarjetas resumen de alertas -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.75rem; margin-bottom: 1rem;">
+          <div style="background: #fef2f2; border: 1.5px solid #fecaca; border-radius: 8px; padding: 0.75rem 1rem;">
+            <div style="font-size: 0.78rem; font-weight: 700; color: #991b1b;">🔴 PRODUCTOS VENCIDOS</div>
+            <div id="exp-stat-expired" style="font-size: 1.4rem; font-weight: 900; color: #dc2626;">0</div>
+            <div style="font-size: 0.72rem; color: #7f1d1d;">Retirar de exhibición o devolver a proveedor</div>
+          </div>
+          <div style="background: #fffbeb; border: 1.5px solid #fde68a; border-radius: 8px; padding: 0.75rem 1rem;">
+            <div style="font-size: 0.78rem; font-weight: 700; color: #92400e;">🟡 VENCEN EN ≤ 15 DÍAS</div>
+            <div id="exp-stat-soon" style="font-size: 1.4rem; font-weight: 900; color: #d97706;">0</div>
+            <div style="font-size: 0.72rem; color: #78350f;">Priorizar venta, remate o promoción combo</div>
+          </div>
+          <div style="background: #f0fdf4; border: 1.5px solid #bbf7d0; border-radius: 8px; padding: 0.75rem 1rem;">
+            <div style="font-size: 0.78rem; font-weight: 700; color: #166534;">🟢 VENCEN EN 16 A 30 DÍAS</div>
+            <div id="exp-stat-upcoming" style="font-size: 1.4rem; font-weight: 900; color: #16a34a;">0</div>
+            <div style="font-size: 0.72rem; color: #14532d;">Mercancía con caducidad próxima en seguimiento</div>
+          </div>
+        </div>
+
+        <div class="table-view-container">
+          <div class="sicar-table-card">
+            <table class="sicar-table">
+              <thead>
+                <tr>
+                  <th>Producto</th>
+                  <th style="text-align: center;">Fecha Caducidad</th>
+                  <th style="text-align: center;">Diagnóstico</th>
+                  <th style="text-align: right;">Stock Actual</th>
+                  <th style="text-align: right;">Precio Venta</th>
+                  <th style="text-align: center;">Acción Rápida</th>
+                </tr>
+              </thead>
+              <tbody id="expirations-table-body">
+                <!-- Se llena dinámicamente -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; margin-top: 1.25rem;">
+          <button type="button" class="meta-btn" onclick="App.closeModal('modal-expirations')">
             Cerrar
           </button>
         </div>

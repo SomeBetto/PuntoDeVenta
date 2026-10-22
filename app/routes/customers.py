@@ -65,11 +65,28 @@ def get_customer_history(customer_id: int):
         ORDER BY id DESC
         LIMIT 50
     """, (customer_id,)).fetchall()
+
+    tx_list = []
+    for t in transactions:
+        td = dict(t)
+        if td.get("sale_id"):
+            items = conn.execute("""
+                SELECT product_name, quantity, unit, subtotal
+                FROM sale_items
+                WHERE sale_id = ?
+            """, (td["sale_id"],)).fetchall()
+            td["items"] = [dict(it) for it in items]
+            td["items_summary"] = ", ".join([f"{it['quantity']}{it['unit']} {it['product_name']}" for it in items])
+        else:
+            td["items"] = []
+            td["items_summary"] = ""
+        tx_list.append(td)
+
     conn.close()
 
     return {
         "customer": dict(cust),
-        "transactions": [dict(t) for t in transactions]
+        "transactions": tx_list
     }
 
 @router.post("/{customer_id}/payment")

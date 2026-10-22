@@ -48,7 +48,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="Punto de Venta - Tienda de Abarrotes",
     description="Sistema POS web local para PC, tablets y celulares",
-    version="1.0.0",
+    version="2.0.0",
     lifespan=lifespan
 )
 

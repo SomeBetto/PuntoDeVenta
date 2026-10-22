@@ -134,12 +134,34 @@ const InventoryModule = {
       const isLowStock = p.stock <= (p.min_stock || 5);
       const isOutOfStock = p.stock <= 0;
 
+      let expiryBadge = '';
+      if (p.expiry_date) {
+        try {
+          const expD = new Date(p.expiry_date + 'T00:00:00');
+          const now = new Date();
+          now.setHours(0,0,0,0);
+          const diffDays = Math.ceil((expD - now) / (1000 * 60 * 60 * 24));
+          if (diffDays < 0) {
+            expiryBadge = `<span style="background: #fee2e2; color: #dc2626; font-size: 0.68rem; font-weight: 800; padding: 0.1rem 0.4rem; border-radius: 4px;">🔴 VENCIDO</span>`;
+          } else if (diffDays <= 15) {
+            expiryBadge = `<span style="background: #fef3c7; color: #b45309; font-size: 0.68rem; font-weight: 700; padding: 0.1rem 0.4rem; border-radius: 4px;">⏰ VENCE EN ${diffDays}D</span>`;
+          }
+        } catch(e) {}
+      }
+
+      let promoBadge = '';
+      if (p.promo_qty > 0 && p.promo_price > 0) {
+        promoBadge = `<span style="background: #dcfce7; color: #15803d; font-size: 0.68rem; font-weight: 800; padding: 0.1rem 0.4rem; border-radius: 4px;">🏷️ ${p.promo_qty}x$${p.promo_price}</span>`;
+      } else if (p.wholesale_min_qty > 0 && p.wholesale_price > 0) {
+        promoBadge = `<span style="background: #e0e7ff; color: #4338ca; font-size: 0.68rem; font-weight: 800; padding: 0.1rem 0.4rem; border-radius: 4px;">🏷️ ${p.wholesale_min_qty}+ a $${p.wholesale_price}</span>`;
+      }
+
       return `
         <div class="master-product-item ${isSelected ? 'active' : ''}" onclick="InventoryModule.selectProductDetail(${p.id})">
           <div class="master-item-left">
             <div class="product-thumb">${thumbHtml}</div>
             <div style="min-width: 0;">
-              <div class="master-item-meta">
+              <div class="master-item-meta" style="display: flex; gap: 0.35rem; flex-wrap: wrap; align-items: center;">
                 <span class="unit-chip">${p.unit.toUpperCase()}</span>
                 <span>${p.barcode || 'SIN CODIGO'}</span>
                 ${isOutOfStock ? `
@@ -147,6 +169,8 @@ const InventoryModule = {
                 ` : (isLowStock ? `
                   <span style="background: #ffedd5; color: #c2410c; font-size: 0.68rem; font-weight: 700; padding: 0.1rem 0.4rem; border-radius: 4px;">STOCK BAJO (${p.stock})</span>
                 ` : '')}
+                ${expiryBadge}
+                ${promoBadge}
               </div>
               <div class="master-item-name" title="${p.name}">${p.name}</div>
             </div>
@@ -1016,6 +1040,16 @@ const InventoryModule = {
       document.getElementById('prod-form-stock').value = prod.stock != null ? prod.stock : 0;
       document.getElementById('prod-form-unit').value = prod.unit || 'pz';
       document.getElementById('prod-form-bulk').checked = (prod.allow_fractions === 1);
+      const expInput = document.getElementById('prod-form-expiry');
+      if (expInput) expInput.value = prod.expiry_date || '';
+      const pQty = document.getElementById('prod-form-promo-qty');
+      if (pQty) pQty.value = (prod.promo_qty && prod.promo_qty > 0) ? prod.promo_qty : '';
+      const pPrice = document.getElementById('prod-form-promo-price');
+      if (pPrice) pPrice.value = (prod.promo_price && prod.promo_price > 0) ? prod.promo_price : '';
+      const wQty = document.getElementById('prod-form-wholesale-qty');
+      if (wQty) wQty.value = (prod.wholesale_min_qty && prod.wholesale_min_qty > 0) ? prod.wholesale_min_qty : '';
+      const wPrice = document.getElementById('prod-form-wholesale-price');
+      if (wPrice) wPrice.value = (prod.wholesale_price && prod.wholesale_price > 0) ? prod.wholesale_price : '';
 
       if (prod.image_url) {
         document.getElementById('prod-form-image-url').value = prod.image_url;
@@ -1045,6 +1079,16 @@ const InventoryModule = {
       document.getElementById('prod-form-stock').value = '10';
       document.getElementById('prod-form-unit').value = 'pz';
       document.getElementById('prod-form-bulk').checked = false;
+      const expInput = document.getElementById('prod-form-expiry');
+      if (expInput) expInput.value = '';
+      const pQty = document.getElementById('prod-form-promo-qty');
+      if (pQty) pQty.value = '';
+      const pPrice = document.getElementById('prod-form-promo-price');
+      if (pPrice) pPrice.value = '';
+      const wQty = document.getElementById('prod-form-wholesale-qty');
+      if (wQty) wQty.value = '';
+      const wPrice = document.getElementById('prod-form-wholesale-price');
+      if (wPrice) wPrice.value = '';
     }
 
     document.getElementById('product-form-modal').classList.add('active');
@@ -1070,7 +1114,12 @@ const InventoryModule = {
       min_stock: 5,
       unit: document.getElementById('prod-form-unit').value,
       allow_fractions: document.getElementById('prod-form-bulk').checked ? 1 : 0,
-      image_url: document.getElementById('prod-form-image-url').value || null
+      image_url: document.getElementById('prod-form-image-url').value || null,
+      expiry_date: document.getElementById('prod-form-expiry')?.value.trim() || null,
+      promo_qty: parseFloat(document.getElementById('prod-form-promo-qty')?.value) || 0,
+      promo_price: parseFloat(document.getElementById('prod-form-promo-price')?.value) || 0,
+      wholesale_min_qty: parseFloat(document.getElementById('prod-form-wholesale-qty')?.value) || 0,
+      wholesale_price: parseFloat(document.getElementById('prod-form-wholesale-price')?.value) || 0
     };
 
     const isEdit = !!this.editingProductId;
@@ -1213,6 +1262,97 @@ const InventoryModule = {
             <span style="display:inline-block; padding:0.2rem 0.55rem; border-radius:999px; font-size:0.72rem; font-weight:800; background:${statusBg}; color:${statusColor};">
               ${statusTxt}
             </span>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  },
+
+  async openExpirationsModal() {
+    const modal = document.getElementById('modal-expirations');
+    const tbody = document.getElementById('expirations-table-body');
+    if (modal) modal.classList.add('active');
+    if (tbody) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:2rem; color:#64748b;">⏳ Revisando fechas de caducidad en el inventario...</td></tr>';
+    }
+
+    try {
+      const res = await fetch('/api/products/expirations');
+      const data = await res.json();
+      this.renderExpirationsTable(data);
+    } catch (err) {
+      if (tbody) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#dc2626; padding:1.5rem;">Error cargando caducidades: ${err.message}</td></tr>`;
+      }
+    }
+  },
+
+  renderExpirationsTable(data) {
+    const tbody = document.getElementById('expirations-table-body');
+    const statExpired = document.getElementById('exp-stat-expired');
+    const statSoon = document.getElementById('exp-stat-soon');
+    const statUpcoming = document.getElementById('exp-stat-upcoming');
+    const badgeCount = document.getElementById('badge-expirations-count');
+
+    if (statExpired) statExpired.innerText = data.expired_count || 0;
+    if (statSoon) statSoon.innerText = data.expiring_soon_count || 0;
+    if (statUpcoming) statUpcoming.innerText = data.upcoming_count || 0;
+
+    const criticalCount = (data.expired_count || 0) + (data.expiring_soon_count || 0);
+    if (badgeCount) {
+      badgeCount.innerText = criticalCount;
+      badgeCount.style.display = criticalCount > 0 ? 'inline-block' : 'none';
+    }
+
+    if (!tbody) return;
+
+    const all = data.all_tracked || [];
+    if (all.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="6" style="text-align:center; padding:2.5rem; color:#16a34a; font-weight:700;">
+            <div style="font-size:2rem; margin-bottom:0.5rem;">🎉</div>
+            ¡Excelente! No hay productos con fecha de caducidad vencida ni próxima a vencer.<br>
+            <span style="font-size:0.8rem; font-weight:normal; color:#64748b;">Puedes registrar fechas de caducidad al dar de alta o editar productos (lácteos, embutidos, pan).</span>
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    tbody.innerHTML = all.map(it => {
+      const isExpired = it.status === 'EXPIRED';
+      const isSoon = it.status === 'EXPIRING_SOON';
+      const badgeBg = isExpired ? '#fee2e2' : (isSoon ? '#fef3c7' : '#dcfce7');
+      const badgeColor = isExpired ? '#dc2626' : (isSoon ? '#b45309' : '#15803d');
+      const icon = isExpired ? '🔴' : (isSoon ? '🟡' : '🟢');
+
+      return `
+        <tr style="${isExpired ? 'background:#fff5f5;' : ''}">
+          <td>
+            <strong>${it.name}</strong>
+            <div style="font-size:0.75rem; color:#64748b;">${it.barcode || 'S/C'} • ${it.category_name || 'General'}</div>
+          </td>
+          <td style="text-align:center; font-family:monospace; font-weight:700; font-size:0.95rem;">
+            ${it.expiry_date}
+          </td>
+          <td style="text-align:center;">
+            <span style="display:inline-block; padding:0.25rem 0.65rem; border-radius:999px; font-size:0.75rem; font-weight:800; background:${badgeBg}; color:${badgeColor};">
+              ${icon} ${it.status_label}
+            </span>
+          </td>
+          <td style="text-align:right; font-family:monospace; font-weight:800; font-size:0.95rem; color:${it.stock <= 0 ? '#94a3b8' : '#0f172a'};">
+            ${it.stock} ${it.unit}
+          </td>
+          <td style="text-align:right; font-family:monospace; font-weight:700; font-size:0.95rem;">
+            $${it.sale_price.toFixed(2)}
+          </td>
+          <td style="text-align:center;">
+            <div style="display:flex; gap:0.4rem; justify-content:center;">
+              <button type="button" class="btn-secondary" style="padding:0.3rem 0.6rem; font-size:0.78rem;" onclick="App.closeModal('modal-expirations'); InventoryModule.openProductModal(${it.id})" title="Editar producto o crear promoción">
+                ✏️ Editar / Ofertar
+              </button>
+            </div>
           </td>
         </tr>
       `;

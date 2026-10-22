@@ -49,16 +49,31 @@ def init_db():
             unit TEXT NOT NULL DEFAULT 'pz',
             allow_fractions INTEGER NOT NULL DEFAULT 0,
             image_url TEXT,
+            expiry_date TEXT,
+            wholesale_min_qty REAL NOT NULL DEFAULT 0.0,
+            wholesale_price REAL NOT NULL DEFAULT 0.0,
+            promo_qty REAL NOT NULL DEFAULT 0.0,
+            promo_price REAL NOT NULL DEFAULT 0.0,
             is_active INTEGER NOT NULL DEFAULT 1,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
 
-    # Migración automática si la columna image_url no existe aún
+    # Migración automática de columnas en products si no existen aún
     cursor.execute("PRAGMA table_info(products)")
     columns = [col[1] for col in cursor.fetchall()]
     if "image_url" not in columns:
         cursor.execute("ALTER TABLE products ADD COLUMN image_url TEXT")
+    if "expiry_date" not in columns:
+        cursor.execute("ALTER TABLE products ADD COLUMN expiry_date TEXT")
+    if "wholesale_min_qty" not in columns:
+        cursor.execute("ALTER TABLE products ADD COLUMN wholesale_min_qty REAL NOT NULL DEFAULT 0.0")
+    if "wholesale_price" not in columns:
+        cursor.execute("ALTER TABLE products ADD COLUMN wholesale_price REAL NOT NULL DEFAULT 0.0")
+    if "promo_qty" not in columns:
+        cursor.execute("ALTER TABLE products ADD COLUMN promo_qty REAL NOT NULL DEFAULT 0.0")
+    if "promo_price" not in columns:
+        cursor.execute("ALTER TABLE products ADD COLUMN promo_price REAL NOT NULL DEFAULT 0.0")
 
     # 4. Clientes y Fiados
     cursor.execute("""

@@ -501,8 +501,32 @@ const PosModule = {
       const isWeight = (p.unit === 'kg' || p.allow_fractions === 1);
       const unitLabel = isWeight ? '/ kg' : '';
 
+      let promoBadge = '';
+      if (p.promo_qty > 0 && p.promo_price > 0) {
+        promoBadge = `<span class="pos-badge-promo" style="position: absolute; top: 6px; left: 6px; background: #16a34a; color: #fff; font-size: 0.68rem; font-weight: 800; padding: 2px 6px; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.2); z-index: 2;">🏷️ ${p.promo_qty}x$${p.promo_price}</span>`;
+      } else if (p.wholesale_min_qty > 0 && p.wholesale_price > 0) {
+        promoBadge = `<span class="pos-badge-promo" style="position: absolute; top: 6px; left: 6px; background: #4338ca; color: #fff; font-size: 0.68rem; font-weight: 800; padding: 2px 6px; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.2); z-index: 2;">🏷️ Mayoreo ${p.wholesale_min_qty}+</span>`;
+      }
+
+      let expiryBadge = '';
+      if (p.expiry_date) {
+        try {
+          const expD = new Date(p.expiry_date + 'T00:00:00');
+          const now = new Date();
+          now.setHours(0, 0, 0, 0);
+          const diffDays = Math.ceil((expD - now) / (1000 * 60 * 60 * 24));
+          if (diffDays < 0) {
+            expiryBadge = `<span style="position: absolute; top: 6px; right: 6px; background: #dc2626; color: #fff; font-size: 0.65rem; font-weight: 800; padding: 2px 5px; border-radius: 4px; z-index: 2;">🔴 Vencido</span>`;
+          } else if (diffDays <= 7) {
+            expiryBadge = `<span style="position: absolute; top: 6px; right: 6px; background: #d97706; color: #fff; font-size: 0.65rem; font-weight: 700; padding: 2px 5px; border-radius: 4px; z-index: 2;">⏰ Vence ${diffDays}d</span>`;
+          }
+        } catch(e) {}
+      }
+
       return `
-        <div class="pos-product-card" onclick="PosModule.onProductCardClick(${p.id})">
+        <div class="pos-product-card" onclick="PosModule.onProductCardClick(${p.id})" style="position: relative;">
+          ${promoBadge}
+          ${expiryBadge}
           <div class="product-card-img-wrap">
             ${visualHtml}
           </div>
@@ -595,9 +619,29 @@ const PosModule = {
     }).join('');
   },
 
-  onProductCardClick(productId) {
+  async onProductCardClick(productId) {
     const prod = this.products.find(p => p.id === productId);
     if (!prod) return;
+
+    if (prod.expiry_date) {
+      try {
+        const expD = new Date(prod.expiry_date + 'T00:00:00');
+        const now = new Date();
+        now.setHours(0, 0, 0, 0);
+        const diffDays = Math.ceil((expD - now) / (1000 * 60 * 60 * 24));
+        if (diffDays < 0) {
+          const ok = await App.confirm({
+            title: '⚠️ Producto Caducado',
+            message: `¡Atención! El producto "${prod.name}" venció hace ${Math.abs(diffDays)} días (${prod.expiry_date}).\n\n¿Estás seguro de que deseas agregarlo a la venta?`,
+            type: 'danger',
+            icon: '⚠️',
+            confirmText: 'Sí, vender de todos modos',
+            cancelText: 'Cancelar'
+          });
+          if (!ok) return;
+        }
+      } catch(e) {}
+    }
 
     if (prod.unit === 'kg' || prod.allow_fractions) {
       this.openBulkModal(prod);
@@ -615,7 +659,7 @@ const PosModule = {
   // GESTIÓN DEL CARRITO / TICKET DE VENTA
   // =========================================================================
 
-  handleBarcodeScan(code) {
+  async handleBarcodeScan(code) {
     if (!code) return;
     const cleanCode = window.BarcodeUtils ? BarcodeUtils.clean(code) : code.replace(/^[EBD]/, '');
     const lower = cleanCode.toLowerCase();
@@ -633,6 +677,26 @@ const PosModule = {
     const searchInput = document.getElementById('pos-search-input');
 
     if (match) {
+      if (match.expiry_date) {
+        try {
+          const expD = new Date(match.expiry_date + 'T00:00:00');
+          const now = new Date();
+          now.setHours(0, 0, 0, 0);
+          const diffDays = Math.ceil((expD - now) / (1000 * 60 * 60 * 24));
+          if (diffDays < 0) {
+            const ok = await App.confirm({
+              title: '⚠️ Producto Caducado',
+              message: `¡Atención! El producto "${match.name}" venció hace ${Math.abs(diffDays)} días (${match.expiry_date}).\n\n¿Deseas agregarlo a la venta?`,
+              type: 'danger',
+              icon: '⚠️',
+              confirmText: 'Sí, vender de todos modos',
+              cancelText: 'Cancelar'
+            });
+            if (!ok) return;
+          }
+        } catch(e) {}
+      }
+
       if (match.unit === 'kg' || match.allow_fractions) {
         this.openBulkModal(match);
       } else {
@@ -762,32 +826,80 @@ const PosModule = {
     this.pendingBulkProduct = null;
   },
 
-  addToCart(product, quantity = 1, discountPct = 0, customSubtotal = null, isRounded = false) {
+  calculateItemPromoSubtotal(product, quantity, discountPct = 0) {
     const isBulk = (product.unit === 'kg' || product.allow_fractions === 1);
-    const effPrice = product.sale_price * (1 - discountPct / 100);
+    const effPrice = product.sale_price * (1 - (discountPct || 0) / 100);
+    const baseTotal = quantity * effPrice;
 
-    let subtotal;
-    if (customSubtotal !== null && !isNaN(customSubtotal) && customSubtotal > 0) {
-      subtotal = parseFloat(customSubtotal.toFixed(2));
-    } else if (isBulk && this.isBulkRoundUpActive()) {
-      subtotal = Math.ceil(parseFloat((quantity * effPrice).toFixed(2)));
-    } else {
-      subtotal = parseFloat((quantity * effPrice).toFixed(2));
+    let subtotal = baseTotal;
+    let promoApplied = null;
+    let promoDiscount = 0;
+
+    // 1. Promoción combo "X por $Y" (ej. 3 por $50)
+    if (product.promo_qty && product.promo_qty > 0 && product.promo_price && product.promo_price > 0 && quantity >= product.promo_qty) {
+      const bundles = Math.floor(quantity / product.promo_qty);
+      const remainder = quantity % product.promo_qty;
+      const promoTotal = (bundles * product.promo_price) + (remainder * effPrice);
+      if (promoTotal < baseTotal) {
+        subtotal = promoTotal;
+        promoDiscount = baseTotal - promoTotal;
+        promoApplied = `${product.promo_qty}x$${product.promo_price.toFixed(2)}`;
+      }
+    }
+    // 2. Precio mayoreo por volumen (ej. a partir de 5 pzs, $14.50 c/u)
+    else if (product.wholesale_min_qty && product.wholesale_min_qty > 0 && product.wholesale_price && product.wholesale_price > 0 && quantity >= product.wholesale_min_qty) {
+      const wholesaleTotal = quantity * product.wholesale_price;
+      if (wholesaleTotal < baseTotal) {
+        subtotal = wholesaleTotal;
+        promoDiscount = baseTotal - wholesaleTotal;
+        promoApplied = `Mayoreo ($${product.wholesale_price.toFixed(2)} c/u)`;
+      }
     }
 
+    if (isBulk && this.isBulkRoundUpActive() && !promoApplied) {
+      subtotal = Math.ceil(subtotal);
+    }
+
+    return {
+      subtotal: parseFloat(subtotal.toFixed(2)),
+      promoApplied: promoApplied,
+      promoDiscount: parseFloat(promoDiscount.toFixed(2))
+    };
+  },
+
+  addToCart(product, quantity = 1, discountPct = 0, customSubtotal = null, isRounded = false) {
+    const isBulk = (product.unit === 'kg' || product.allow_fractions === 1);
     const existingIndex = this.cart.findIndex(item => item.product_id === product.id);
 
     if (existingIndex > -1) {
       const newQty = parseFloat((this.cart[existingIndex].quantity + quantity).toFixed(3));
       this.cart[existingIndex].quantity = newQty;
-      const baseSub = newQty * effPrice;
-      if (isBulk && this.isBulkRoundUpActive()) {
-        this.cart[existingIndex].subtotal = Math.ceil(baseSub);
+
+      if (customSubtotal !== null && !isNaN(customSubtotal) && customSubtotal > 0) {
+        this.cart[existingIndex].subtotal = parseFloat(customSubtotal.toFixed(2));
       } else {
-        this.cart[existingIndex].subtotal = parseFloat(baseSub.toFixed(2));
+        const prod = this.products.find(p => p.id === product.id) || product;
+        const calc = this.calculateItemPromoSubtotal(prod, newQty, discountPct);
+        this.cart[existingIndex].subtotal = calc.subtotal;
+        this.cart[existingIndex].promo_applied = calc.promoApplied;
+        this.cart[existingIndex].promo_discount = calc.promoDiscount;
       }
       this.cart[existingIndex].is_rounded = isBulk && this.isBulkRoundUpActive();
     } else {
+      let subtotal;
+      let promoApplied = null;
+      let promoDiscount = 0;
+
+      if (customSubtotal !== null && !isNaN(customSubtotal) && customSubtotal > 0) {
+        subtotal = parseFloat(customSubtotal.toFixed(2));
+      } else {
+        const prod = this.products.find(p => p.id === product.id) || product;
+        const calc = this.calculateItemPromoSubtotal(prod, quantity, discountPct);
+        subtotal = calc.subtotal;
+        promoApplied = calc.promoApplied;
+        promoDiscount = calc.promoDiscount;
+      }
+
       this.cart.push({
         product_id: product.id,
         product_name: product.name,
@@ -799,8 +911,14 @@ const PosModule = {
         unit_price: product.sale_price,
         cost_price: product.cost_price || 0,
         discount_pct: discountPct,
+        promo_qty: product.promo_qty || 0,
+        promo_price: product.promo_price || 0,
+        wholesale_min_qty: product.wholesale_min_qty || 0,
+        wholesale_price: product.wholesale_price || 0,
+        promo_applied: promoApplied,
+        promo_discount: promoDiscount,
         subtotal: subtotal,
-        is_rounded: isRounded || (isBulk && subtotal > (quantity * effPrice))
+        is_rounded: isRounded || (isBulk && subtotal > (quantity * product.sale_price))
       });
     }
 
@@ -818,15 +936,12 @@ const PosModule = {
       this.removeItem(index);
     } else {
       item.quantity = newQty;
-      const effPrice = item.unit_price * (1 - (item.discount_pct || 0) / 100);
-      const baseSub = newQty * effPrice;
-      if (isBulk && this.isBulkRoundUpActive()) {
-        item.subtotal = Math.ceil(baseSub);
-        item.is_rounded = true;
-      } else {
-        item.subtotal = parseFloat(baseSub.toFixed(2));
-        item.is_rounded = false;
-      }
+      const prod = this.products.find(p => p.id === item.product_id) || item;
+      const calc = this.calculateItemPromoSubtotal(prod, newQty, item.discount_pct || 0);
+      item.subtotal = calc.subtotal;
+      item.promo_applied = calc.promoApplied;
+      item.promo_discount = calc.promoDiscount;
+      item.is_rounded = isBulk && this.isBulkRoundUpActive();
       this.renderCart();
     }
   },
@@ -859,9 +974,14 @@ const PosModule = {
 
   getCartDiscountTotal() {
     return this.cart.reduce((sum, item) => {
-      if (!item.discount_pct || item.discount_pct <= 0) return sum;
-      const original = item.unit_price * item.quantity;
-      return sum + (original - item.subtotal);
+      let d = 0;
+      if (item.discount_pct && item.discount_pct > 0) {
+        const original = item.unit_price * item.quantity;
+        d += (original - item.subtotal);
+      } else if (item.promo_discount && item.promo_discount > 0) {
+        d += item.promo_discount;
+      }
+      return sum + d;
     }, 0);
   },
 
@@ -934,6 +1054,11 @@ const PosModule = {
                 <span class="item-name-tag" title="${item.product_name}">
                   ${item.product_name}
                 </span>
+                ${item.promo_applied ? `
+                  <div style="font-size: 0.72rem; color: #15803d; font-weight: 800; margin-top: 2px;">
+                    🎉 ${item.promo_applied} (-$${item.promo_discount.toFixed(2)})
+                  </div>
+                ` : ''}
                 <div class="item-controls-overlay">
                   <button class="item-ctrl-btn" onclick="PosModule.updateItemQty(${idx}, -1)" title="Restar 1">−</button>
                   <button class="item-ctrl-btn" onclick="PosModule.updateItemQty(${idx}, 1)" title="Sumar 1">+</button>
@@ -944,7 +1069,9 @@ const PosModule = {
                 ${isDiscounted ? `
                   <div class="item-unit-price-sub" style="text-decoration: line-through;">$${(item.unit_price * item.quantity).toFixed(2)}</div>
                   <span class="item-discount-tag">-${item.discount_pct}%</span>
-                ` : (item.quantity > 1 ? `<div class="item-unit-price-sub">$${origUnitVal} c/u</div>` : '')}
+                ` : (item.promo_discount > 0 ? `
+                  <div class="item-unit-price-sub" style="text-decoration: line-through; color: #94a3b8;">$${(item.unit_price * item.quantity).toFixed(2)}</div>
+                ` : (item.quantity > 1 ? `<div class="item-unit-price-sub">$${origUnitVal} c/u</div>` : ''))}
                 <div class="item-final-price">${item.is_rounded ? '<span title="Importe redondeado al entero superior" style="font-size:0.65rem; color:#16a34a; background:#dcfce7; padding:0.1rem 0.3rem; border-radius:4px; font-weight:800; vertical-align:middle; margin-right:4px;">🔺</span>' : ''}$${totalItemVal}</div>
               </div>
             </div>

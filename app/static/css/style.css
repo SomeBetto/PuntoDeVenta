@@ -3371,7 +3371,6 @@ body {
   .bar-connect-mobile-btn {
     display: none !important;
   }
-  .bar-action-icon#btn-fullscreen,
   .bar-action-icon#btn-minimize-pos {
     display: none !important;
   }
@@ -3794,7 +3793,6 @@ body.mobile-inventory-mode .drawer-nav-item[data-view="settings"],
 body.mobile-inventory-mode .drawer-nav-item#btn-open-eleventa-modal,
 body.mobile-inventory-mode .drawer-nav-item.logout-item,
 body.mobile-inventory-mode .bar-connect-mobile-btn,
-body.mobile-inventory-mode .bar-action-icon#btn-fullscreen,
 body.mobile-inventory-mode .bar-action-icon#btn-minimize-pos,
 body.mobile-inventory-mode .bar-action-icon#btn-top-settings,
 body.mobile-inventory-mode .pos-mobile-nav-bar,

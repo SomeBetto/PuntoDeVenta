@@ -28,6 +28,11 @@ class ProductCreate(BaseModel):
     unit: str = "pz"
     allow_fractions: int = 0
     image_url: Optional[str] = None
+    expiry_date: Optional[str] = None
+    wholesale_min_qty: Optional[float] = 0.0
+    wholesale_price: Optional[float] = 0.0
+    promo_qty: Optional[float] = 0.0
+    promo_price: Optional[float] = 0.0
 
 class ProductUpdate(BaseModel):
     barcode: Optional[str] = None
@@ -41,6 +46,11 @@ class ProductUpdate(BaseModel):
     unit: Optional[str] = None
     allow_fractions: Optional[int] = None
     image_url: Optional[str] = None
+    expiry_date: Optional[str] = None
+    wholesale_min_qty: Optional[float] = None
+    wholesale_price: Optional[float] = None
+    promo_qty: Optional[float] = None
+    promo_price: Optional[float] = None
     is_active: Optional[int] = None
 
 class StockAdjustment(BaseModel):
@@ -331,8 +341,11 @@ def create_product(product: ProductCreate):
             raise HTTPException(status_code=400, detail=f"Ya existe un producto con el código {product.barcode}")
 
     cursor.execute("""
-        INSERT INTO products (barcode, name, description, category_id, cost_price, sale_price, stock, min_stock, unit, allow_fractions, image_url)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO products (
+            barcode, name, description, category_id, cost_price, sale_price, stock, min_stock,
+            unit, allow_fractions, image_url, expiry_date, wholesale_min_qty, wholesale_price, promo_qty, promo_price
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, (
         product.barcode.strip() if product.barcode else None,
         product.name.strip(),
@@ -344,12 +357,73 @@ def create_product(product: ProductCreate):
         product.min_stock,
         product.unit,
         product.allow_fractions,
-        product.image_url
+        product.image_url,
+        product.expiry_date.strip() if product.expiry_date else None,
+        product.wholesale_min_qty or 0.0,
+        product.wholesale_price or 0.0,
+        product.promo_qty or 0.0,
+        product.promo_price or 0.0
     ))
     new_id = cursor.lastrowid
     conn.commit()
     conn.close()
     return {"message": "Producto creado con éxito", "id": new_id}
+
+@router.get("/expirations")
+def get_product_expirations():
+    """Retorna productos con caducidad registrada clasificados en Vencidos, Próximos a vencer y Vigentes"""
+    from datetime import date, datetime, timedelta
+    today = date.today().isoformat()
+    soon_15d = (date.today() + timedelta(days=15)).isoformat()
+    soon_30d = (date.today() + timedelta(days=30)).isoformat()
+
+    conn = get_db_connection()
+    sql = """
+        SELECT p.*, c.name as category_name, c.icon as category_icon
+        FROM products p
+        LEFT JOIN categories c ON p.category_id = c.id
+        WHERE p.is_active = 1 AND p.expiry_date IS NOT NULL AND TRIM(p.expiry_date) != ''
+        ORDER BY p.expiry_date ASC, p.name ASC
+    """
+    rows = conn.execute(sql).fetchall()
+    conn.close()
+
+    expired = []
+    expiring_soon = []
+    upcoming = []
+
+    for r in rows:
+        item = dict(r)
+        exp_str = item["expiry_date"]
+        try:
+            exp_date = datetime.strptime(exp_str[:10], "%Y-%m-%d").date()
+            diff_days = (exp_date - date.today()).days
+            item["days_until_expiry"] = diff_days
+            if diff_days < 0:
+                item["status"] = "EXPIRED"
+                item["status_label"] = f"Venció hace {abs(diff_days)} días"
+                expired.append(item)
+            elif diff_days <= 15:
+                item["status"] = "EXPIRING_SOON"
+                item["status_label"] = f"Vence en {diff_days} días"
+                expiring_soon.append(item)
+            elif diff_days <= 30:
+                item["status"] = "UPCOMING"
+                item["status_label"] = f"Vence en {diff_days} días"
+                upcoming.append(item)
+        except Exception:
+            continue
+
+    return {
+        "today": today,
+        "expired_count": len(expired),
+        "expiring_soon_count": len(expiring_soon),
+        "upcoming_count": len(upcoming),
+        "expired": expired,
+        "expiring_soon": expiring_soon,
+        "upcoming": upcoming,
+        "all_tracked": expired + expiring_soon + upcoming
+    }
 
 @router.post("/upload-photo")
 def upload_photo(req: ImageUploadRequest):
